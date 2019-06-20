@@ -47,6 +47,8 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 
+uint32_t timer_test = 0;
+
 /* USER CODE END Variables */
 osThreadId Engines_TaskHandle;
 
@@ -107,11 +109,21 @@ void Start_Engines_Task(void const * argument)
 {
 
   /* USER CODE BEGIN Start_Engines_Task */
+
+	uint32_t timer = Get_Micros();
+
   /* Infinite loop */
   for(;;)
   {
-	  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-	  osDelay(250);
+	  if(Get_Micros() - timer > 500000) {
+
+		  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+		  timer = Get_Micros();
+	  }
+
+	  timer_test = Get_Micros();
+
+	  osDelay(1);
   }
   /* USER CODE END Start_Engines_Task */
 }
