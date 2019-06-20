@@ -2,10 +2,29 @@
  * a4988.c
  *
  *  Created on: 23.04.2019
- *      Author: Artur
+ *      Author: Michal Nowak
  */
 
 #include "a4988.h"
+
+/* ************************************************************************************************************** */
+
+void Micros_Init() {
+
+	if(!(CoreDebug->DEMCR & CoreDebug_DEMCR_TRCENA_Msk)) {
+
+		CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+		DWT->CYCCNT = 0;
+		DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+	}
+}
+
+/* ************************************************************************************************************** */
+
+uint32_t Get_Micros() {
+
+	return DWT->CYCCNT / (SystemCoreClock / 1000000);
+}
 
 /* ************************************************************************************************************** */
 A4988_Status A4988_Init(struct A4988 *a4988,

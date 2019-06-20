@@ -27,6 +27,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */     
 
+#include "a4988.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,7 +49,7 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 
-uint32_t timer_test = 0;
+volatile uint32_t timer_global = 0;
 
 /* USER CODE END Variables */
 osThreadId Engines_TaskHandle;
@@ -110,20 +112,36 @@ void Start_Engines_Task(void const * argument)
 
   /* USER CODE BEGIN Start_Engines_Task */
 
-	uint32_t timer = Get_Micros();
+	//uint32_t Timer_start = 0;
 
-  /* Infinite loop */
+	struct A4988 A4988_1;
+	struct A4988 A4988_2;
+
+	A4988_Init(&A4988_1, SD_EN1_GPIO_Port, SD_EN1_Pin, SD_STEP1_GPIO_Port,
+			SD_STEP1_Pin, SD_DIR1_GPIO_Port, SD_DIR1_Pin, MS1_GPIO_Port,
+			MS1_Pin, MS2_GPIO_Port, MS2_Pin, MS3_GPIO_Port, MS3_Pin);
+
+	A4988_Init(&A4988_2, SD_EN2_GPIO_Port, SD_EN2_Pin, SD_STEP2_GPIO_Port,
+			SD_STEP2_Pin, SD_DIR2_GPIO_Port, SD_DIR2_Pin, MS1_GPIO_Port,
+			MS1_Pin, MS2_GPIO_Port, MS2_Pin, MS3_GPIO_Port, MS3_Pin);
+
+	A4988_Power_on(&A4988_1);
+	A4988_Power_on(&A4988_2);
+
+	A4988_1.previous_micros = Get_Micros();
+	A4988_2.previous_micros = Get_Micros();
+
+	Micros_Init();
+
+	/* Infinite loop */
   for(;;)
   {
-	  if(Get_Micros() - timer > 500000) {
+	  if(Get_Micros() - timer_global > 1000000) {
 
 		  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-		  timer = Get_Micros();
+		  timer_global = Get_Micros();
 	  }
 
-	  timer_test = Get_Micros();
-
-	  osDelay(1);
   }
   /* USER CODE END Start_Engines_Task */
 }
