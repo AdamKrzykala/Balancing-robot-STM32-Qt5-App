@@ -71,24 +71,26 @@ void Error_Handler(void);
 #define SD_EN2_GPIO_Port GPIOA
 #define SD_STEP2_Pin GPIO_PIN_1
 #define SD_STEP2_GPIO_Port GPIOA
-#define SD_STEP1_Pin GPIO_PIN_2
-#define SD_STEP1_GPIO_Port GPIOA
-#define SD_DIR1_Pin GPIO_PIN_3
-#define SD_DIR1_GPIO_Port GPIOA
 #define SD_DIR2_Pin GPIO_PIN_4
 #define SD_DIR2_GPIO_Port GPIOA
 #define LD2_Pin GPIO_PIN_5
 #define LD2_GPIO_Port GPIOA
 #define SD_EN1_Pin GPIO_PIN_4
 #define SD_EN1_GPIO_Port GPIOC
+#define ADC1_IN15_LiPol_Pin GPIO_PIN_5
+#define ADC1_IN15_LiPol_GPIO_Port GPIOC
 #define MS3_Pin GPIO_PIN_0
 #define MS3_GPIO_Port GPIOB
+#define SD_DIR1_Pin GPIO_PIN_8
+#define SD_DIR1_GPIO_Port GPIOA
 #define TMS_Pin GPIO_PIN_13
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
 #define TCK_GPIO_Port GPIOA
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
+#define SD_STEP1_Pin GPIO_PIN_4
+#define SD_STEP1_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

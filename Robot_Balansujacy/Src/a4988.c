@@ -188,8 +188,13 @@ A4988_Status A4988_One_Step(struct A4988 *a4988) {
 
 	if( a4988->current_micros - a4988->previous_micros >= a4988->Step_delay) {
 
-		a4988->previous_micros = a4988->current_micros;
-		HAL_GPIO_TogglePin(a4988->SD_STEP_Port, a4988->SD_STEP_Pin);
+		HAL_GPIO_WritePin(a4988->SD_STEP_Port, a4988->SD_STEP_Pin, SET);
+
+		if(a4988->current_micros - a4988->previous_micros >= a4988->Step_delay * 2) {
+
+			HAL_GPIO_WritePin(a4988->SD_STEP_Port, a4988->SD_STEP_Pin, RESET);
+			a4988->previous_micros = Get_Micros();
+		}
 
 	}
 
@@ -198,55 +203,15 @@ A4988_Status A4988_One_Step(struct A4988 *a4988) {
 
 /* ************************************************************************************************************** */
 
-//int soft_start_test_global = 0;
-//double speed_test_global = 0;
-
 A4988_Status A4988_Move(struct A4988 *a4988, double speed) {
 
-	//soft_start_test_global = a4988->soft_start;
-
+	/*
 	int max_value = 1200;
 
 	if(a4988->actual_speed != speed && speed != 0) {
 
-		// power on
-		//A4988_Power_on(a4988);
-
-		// soft start
-		/*
-		if( a4988->soft_start == 1) {
-
-			speed *= a4988->soft_start_ratio;
-
-			if(getMicros() - a4988->previous_micros > 500) {
-
-				a4988->soft_start_ratio += 0.0005;
-				a4988->previous_micros = getMicros();
-			}
-
-			if( a4988->soft_start_ratio >= 1 ) {
-
-				a4988->soft_start = 0;
-				a4988->soft_start_ratio = 0;
-			}
-		}
-		*/
-
 		// speed calculation
 		int real_speed = fabs(speed) * (max_value / 100);
-
-		/*
-		if (real_speed >= 450)
-			A4988_Set_Resolution(a4988, A4988_Full_step);
-		else if (real_speed >= 300 && real_speed < 450)
-			A4988_Set_Resolution(a4988, A4988_One_2_step);
-		else if (real_speed >= 200 && real_speed < 300)
-			A4988_Set_Resolution(a4988, A4988_One_4_step);
-		else if (real_speed >= 60 && real_speed < 200)
-			A4988_Set_Resolution(a4988, A4988_One_8_step);
-		else if (real_speed > 0 && real_speed < 60)
-			A4988_Set_Resolution(a4988, A4988_One_16_step);
-		*/
 
 		// test
 		//real_speed = 25;
@@ -282,7 +247,18 @@ A4988_Status A4988_Move(struct A4988 *a4988, double speed) {
 		//A4988_Power_off(a4988);
 		//a4988->soft_start = 1;
 		//a4988->soft_start_ratio = 0;
-	}
+	}*/
+
+	A4988_Set_Resolution(a4988, A4988_One_8_step);
+	//a4988->Step_delay = 2500;
+	A4988_Set_Speed(a4988, 50);
+
+	A4988_Set_Direction(a4988, A4988_Right);
+
+
+
+	A4988_One_Step(a4988);
+
 
 	return A4988_Status_Ok;
 }

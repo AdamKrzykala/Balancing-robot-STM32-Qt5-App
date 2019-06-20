@@ -27,6 +27,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */     
 
+#include "adc.h"
 #include "a4988.h"
 
 /* USER CODE END Includes */
@@ -51,8 +52,11 @@
 
 volatile uint32_t timer_global = 0;
 
+int16_t LiPol_voltage_global = 0;
+
 /* USER CODE END Variables */
 osThreadId Engines_TaskHandle;
+osThreadId LiPol_TaskHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -60,6 +64,7 @@ osThreadId Engines_TaskHandle;
 /* USER CODE END FunctionPrototypes */
 
 void Start_Engines_Task(void const * argument);
+void Start_LiPol_Task(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -94,6 +99,10 @@ void MX_FREERTOS_Init(void) {
   osThreadDef(Engines_Task, Start_Engines_Task, osPriorityNormal, 0, 128);
   Engines_TaskHandle = osThreadCreate(osThread(Engines_Task), NULL);
 
+  /* definition and creation of LiPol_Task */
+  osThreadDef(LiPol_Task, Start_LiPol_Task, osPriorityNormal, 0, 128);
+  LiPol_TaskHandle = osThreadCreate(osThread(LiPol_Task), NULL);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -112,7 +121,7 @@ void Start_Engines_Task(void const * argument)
 
   /* USER CODE BEGIN Start_Engines_Task */
 
-	//uint32_t Timer_start = 0;
+	Micros_Init();
 
 	struct A4988 A4988_1;
 	struct A4988 A4988_2;
@@ -131,19 +140,68 @@ void Start_Engines_Task(void const * argument)
 	A4988_1.previous_micros = Get_Micros();
 	A4988_2.previous_micros = Get_Micros();
 
-	Micros_Init();
-
 	/* Infinite loop */
   for(;;)
   {
-	  if(Get_Micros() - timer_global > 1000000) {
+	  A4988_Move(&A4988_1,  100);
+	  A4988_Move(&A4988_2, -100);
 
-		  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-		  timer_global = Get_Micros();
-	  }
-
+	  //osDelay(1000);
   }
   /* USER CODE END Start_Engines_Task */
+}
+
+/* USER CODE BEGIN Header_Start_LiPol_Task */
+/**
+* @brief Function implementing the LiPol_Task thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Start_LiPol_Task */
+void Start_LiPol_Task(void const * argument)
+{
+  /* USER CODE BEGIN Start_LiPol_Task */
+
+	const float Supply_voltage = 3.3;
+	const float ADC_resolution = 4096.0;
+	const float Voltage_divider_ratio = 4.7; // uwzgledniono tez spadki napiecia
+
+	uint16_t ADC_value = 0;
+	float LiPol_voltage = 0;
+
+  /* Infinite loop */
+  for(;;)
+  {
+		HAL_ADC_Start(&hadc1);
+
+		HAL_StatusTypeDef status = HAL_ADC_PollForConversion(&hadc1, 10);
+
+		if (status == HAL_OK) {
+
+			ADC_value = HAL_ADC_GetValue(&hadc1);
+			LiPol_voltage = (Supply_voltage * ADC_value) / (ADC_resolution - 1);
+			LiPol_voltage *= Voltage_divider_ratio;
+		}
+
+		HAL_ADC_Start(&hadc1);
+
+		LiPol_voltage_global = LiPol_voltage * 100; // zmienna tymczasowa
+
+		if (LiPol_voltage_global <= 1100) {
+
+			/* Debug LED LD2 fast blink */
+			for (int i = 0; i <= 101; i++) {
+
+				HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+				osDelay(50);
+			}
+
+			//EXIT_FAILURE;
+		}
+
+		osDelay(20000);
+  }
+  /* USER CODE END Start_LiPol_Task */
 }
 
 /* Private application code --------------------------------------------------*/
