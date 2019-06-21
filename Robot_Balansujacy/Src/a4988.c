@@ -156,11 +156,11 @@ A4988_Status A4988_Set_Speed(struct A4988 *a4988, int speed_rpm) {
 	const long int minute = 60000000;
 
 	a4988->Step_angle = 1.8 / a4988->Resolution;
-	a4988->Steps_per_round = 360 / a4988->Step_angle;
+	a4988->Steps_per_round = (360 / a4988->Step_angle);
 	a4988->Speed_RPM = speed_rpm * a4988->Steps_per_round;
 
 	if(a4988->Speed_RPM == 0) return A4988_Status_Error;
-	else a4988->Step_delay = minute / a4988->Speed_RPM;
+	else a4988->Step_delay = (minute / a4988->Speed_RPM );
 
 	return A4988_Status_Ok;
 }
@@ -205,7 +205,6 @@ A4988_Status A4988_One_Step(struct A4988 *a4988) {
 
 A4988_Status A4988_Move(struct A4988 *a4988, double speed) {
 
-	/*
 	int max_value = 1200;
 
 	if(a4988->actual_speed != speed && speed != 0) {
@@ -216,7 +215,7 @@ A4988_Status A4988_Move(struct A4988 *a4988, double speed) {
 		// test
 		//real_speed = 25;
 
-		A4988_Set_Resolution(a4988,A4988_One_4_step);
+		A4988_Set_Resolution(a4988,A4988_One_8_step);
 
 		if (speed > 0) {
 
@@ -247,18 +246,14 @@ A4988_Status A4988_Move(struct A4988 *a4988, double speed) {
 		//A4988_Power_off(a4988);
 		//a4988->soft_start = 1;
 		//a4988->soft_start_ratio = 0;
-	}*/
+	}
 
-	A4988_Set_Resolution(a4988, A4988_One_8_step);
-	//a4988->Step_delay = 2500;
-	A4988_Set_Speed(a4988, 50);
+	//A4988_Set_Resolution(a4988, A4988_One_8_step);
+	//a4988->Step_delay = 900;
+	//A4988_Set_Speed(a4988, 1000);
+	//A4988_Set_Direction(a4988, A4988_Right);
 
-	A4988_Set_Direction(a4988, A4988_Right);
-
-
-
-	A4988_One_Step(a4988);
-
+	//A4988_One_Step(a4988);
 
 	return A4988_Status_Ok;
 }
