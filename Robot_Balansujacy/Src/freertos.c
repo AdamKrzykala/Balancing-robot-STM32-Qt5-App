@@ -71,7 +71,7 @@ int16_t g_x_global = 0, g_y_global = 0, g_z_global = 0;
 int16_t a_x_offset_global = 0, a_y_offset_global = 0, a_z_offset_global = 0;
 int16_t g_x_offset_global = 0, g_y_offset_global = 0, g_z_offset_global = 0;
 
-int16_t Kp_global = 400, Ti_global = 0, Td_global = 0;
+int16_t Kp_global = 200, Ti_global = 0, Td_global = 0;
 
 int16_t LeftEngineSpeed_global = 0;
 int16_t RightEngineSpeed_global = 0;
@@ -173,8 +173,16 @@ void Start_Engines_Task(void const * argument)
 	/* Infinite loop */
   for(;;)
   {
-	  A4988_Move(&A4988_1,  LeftEngineSpeed_global);
-	  A4988_Move(&A4988_2, -RightEngineSpeed_global);
+	  if( LiPol_voltage_too_low != 1 ) {
+
+		  A4988_Move(&A4988_1,  LeftEngineSpeed_global);
+		  A4988_Move(&A4988_2, -RightEngineSpeed_global);
+	  }
+	  else {
+
+		  A4988_Power_off(&A4988_1);
+		  A4988_Power_off(&A4988_2);
+	  }
   }
   /* USER CODE END Start_Engines_Task */
 }

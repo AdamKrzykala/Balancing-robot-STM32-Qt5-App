@@ -8,6 +8,7 @@
 #include "a4988.h"
 
 long int Step_delay_global = 0;
+long int Speed_rpm_global = 0;
 
 /* ************************************************************************************************************** */
 
@@ -165,9 +166,10 @@ A4988_Status A4988_Set_Speed(struct A4988 *a4988, int speed_rpm) {
 	else a4988->Step_delay = (minute / a4988->Speed_RPM );
 
 	Step_delay_global = a4988->Step_delay;
+	Speed_rpm_global = a4988->Speed_RPM;
 
 	// linearizing speed_rpm
-	//a4988->Speed_RPM = -1.17 * a4988->Step_delay + 547.56;
+	//a4988->Speed_RPM = -3415 * a4988->Step_delay + 1726366;
 
 	//if(a4988->Speed_RPM == 0) return A4988_Status_Error;
 	//else a4988->Step_delay = (minute / a4988->Speed_RPM );
