@@ -7,6 +7,8 @@
 
 #include "a4988.h"
 
+long int Step_delay_global = 0;
+
 /* ************************************************************************************************************** */
 
 void Micros_Init() {
@@ -155,12 +157,20 @@ A4988_Status A4988_Set_Speed(struct A4988 *a4988, int speed_rpm) {
 
 	const long int minute = 60000000;
 
-	a4988->Step_angle = 1.8 / a4988->Resolution;
+	a4988->Step_angle = 0.9 / a4988->Resolution;
 	a4988->Steps_per_round = (360 / a4988->Step_angle);
 	a4988->Speed_RPM = speed_rpm * a4988->Steps_per_round;
 
 	if(a4988->Speed_RPM == 0) return A4988_Status_Error;
 	else a4988->Step_delay = (minute / a4988->Speed_RPM );
+
+	Step_delay_global = a4988->Step_delay;
+
+	// linearizing speed_rpm
+	//a4988->Speed_RPM = -1.17 * a4988->Step_delay + 547.56;
+
+	//if(a4988->Speed_RPM == 0) return A4988_Status_Error;
+	//else a4988->Step_delay = (minute / a4988->Speed_RPM );
 
 	return A4988_Status_Ok;
 }
@@ -205,7 +215,7 @@ A4988_Status A4988_One_Step(struct A4988 *a4988) {
 
 A4988_Status A4988_Move(struct A4988 *a4988, double speed) {
 
-	int max_value = 1200;
+	int max_value = 500;
 
 	if(a4988->actual_speed != speed && speed != 0) {
 
@@ -213,7 +223,7 @@ A4988_Status A4988_Move(struct A4988 *a4988, double speed) {
 		int real_speed = fabs(speed) * (max_value / 100);
 
 		// test
-		//real_speed = 25;
+		//real_speed = 1;
 
 		A4988_Set_Resolution(a4988,A4988_One_8_step);
 
@@ -226,7 +236,7 @@ A4988_Status A4988_Move(struct A4988 *a4988, double speed) {
 		}
 
 		// set speed
-		if(real_speed < 25) {
+		if(real_speed < 0) {
 
 			return A4988_Status_Error;
 		}

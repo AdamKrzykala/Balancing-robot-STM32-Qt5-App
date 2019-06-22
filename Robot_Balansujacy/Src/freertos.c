@@ -42,7 +42,8 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define SETPOINT	-90
+#define SETPOINT	0
+#define OFFSET		90
 #define HYSTERESIS	1
 
 /* USER CODE END PD */
@@ -74,6 +75,8 @@ int16_t Kp_global = 400, Ti_global = 0, Td_global = 0;
 
 int16_t LeftEngineSpeed_global = 0;
 int16_t RightEngineSpeed_global = 0;
+
+uint8_t mpu6050_correct_init_global = 0;
 
 /* USER CODE END Variables */
 osThreadId Engines_TaskHandle;
@@ -119,15 +122,15 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of Engines_Task */
-  osThreadDef(Engines_Task, Start_Engines_Task, osPriorityNormal, 0, 128);
+  osThreadDef(Engines_Task, Start_Engines_Task, osPriorityNormal, 0, 512);
   Engines_TaskHandle = osThreadCreate(osThread(Engines_Task), NULL);
 
   /* definition and creation of LiPol_Task */
-  osThreadDef(LiPol_Task, Start_LiPol_Task, osPriorityNormal, 0, 128);
+  osThreadDef(LiPol_Task, Start_LiPol_Task, osPriorityNormal, 0, 512);
   LiPol_TaskHandle = osThreadCreate(osThread(LiPol_Task), NULL);
 
   /* definition and creation of Control_Task */
-  osThreadDef(Control_Task, Start_Control_Task, osPriorityNormal, 0, 128);
+  osThreadDef(Control_Task, Start_Control_Task, osPriorityNormal, 0, 512);
   Control_TaskHandle = osThreadCreate(osThread(Control_Task), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -148,8 +151,6 @@ void Start_Engines_Task(void const * argument)
 
   /* USER CODE BEGIN Start_Engines_Task */
 
-	Micros_Init();
-
 	struct A4988 A4988_1;
 	struct A4988 A4988_2;
 
@@ -164,6 +165,8 @@ void Start_Engines_Task(void const * argument)
 	A4988_Power_on(&A4988_1);
 	A4988_Power_on(&A4988_2);
 
+	Micros_Init();
+
 	A4988_1.previous_micros = Get_Micros();
 	A4988_2.previous_micros = Get_Micros();
 
@@ -172,8 +175,6 @@ void Start_Engines_Task(void const * argument)
   {
 	  A4988_Move(&A4988_1,  LeftEngineSpeed_global);
 	  A4988_Move(&A4988_2, -RightEngineSpeed_global);
-
-	  //osDelay(1000);
   }
   /* USER CODE END Start_Engines_Task */
 }
@@ -191,45 +192,50 @@ void Start_LiPol_Task(void const * argument)
 
 	const float Supply_voltage = 3.3;
 	const float ADC_resolution = 4096.0;
-	const float Voltage_divider_ratio = 4.7; // uwzgledniono tez spadki napiecia
+	const float Voltage_divider_ratio = 4.7;
 
 	uint16_t ADC_value = 0;
 	float LiPol_voltage = 0;
 
-  /* Infinite loop */
-  for(;;)
-  {
-		HAL_ADC_Start(&hadc1);
+	HAL_StatusTypeDef status = HAL_ERROR;
 
-		HAL_StatusTypeDef status = HAL_ADC_PollForConversion(&hadc1, 10);
+  /* Infinite loop */
+  for (;;) {
+
+		status = HAL_ADC_Start(&hadc1);
 
 		if (status == HAL_OK) {
 
-			ADC_value = HAL_ADC_GetValue(&hadc1);
-			LiPol_voltage = (Supply_voltage * ADC_value) / (ADC_resolution - 1);
-			LiPol_voltage *= Voltage_divider_ratio;
-		}
+			status = HAL_ADC_PollForConversion(&hadc1, 10);
 
-		HAL_ADC_Start(&hadc1);
+			if (status == HAL_OK) {
 
-		LiPol_voltage_global = LiPol_voltage * 100; // zmienna tymczasowa
-
-		if (LiPol_voltage_global <= 1100) {
-
-			/* Debug LED LD2 fast blink */
-			for (int i = 0; i <= 10; i++) {
-
-				HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-				osDelay(100);
+				ADC_value = HAL_ADC_GetValue(&hadc1);
+				LiPol_voltage = (Supply_voltage * ADC_value) / (ADC_resolution - 1);
+				LiPol_voltage *= Voltage_divider_ratio;
 			}
 
-			LiPol_voltage_too_low = 1;
-			EXIT_FAILURE;
+			LiPol_voltage_global = LiPol_voltage * 100;
+
+			if (LiPol_voltage_global <= 1100) {
+
+				LiPol_voltage_too_low = 1;
+
+				for(int i = 0; i < 100; i++) {
+
+					HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+					osDelay(100);
+				}
+
+			} else {
+
+				LiPol_voltage_too_low = 0;
+			}
 		}
 
 		osDelay(20000);
-  }
-  /* USER CODE END Start_LiPol_Task */
+	}
+	/* USER CODE END Start_LiPol_Task */
 }
 
 /* USER CODE BEGIN Header_Start_Control_Task */
@@ -245,7 +251,7 @@ void Start_Control_Task(void const * argument)
 
 	int32_t Timer_start = HAL_GetTick();
 
-	// IMU variables
+	/* IMU variables */
 	struct MPU6050 mpu1;
 
 	int32_t I_Time_Stop = HAL_GetTick();
@@ -253,19 +259,15 @@ void Start_Control_Task(void const * argument)
 
 	double Roll_filtered_temp = 0;
 
-	// PID variables
+	/* PID variables */
 	struct PID_regulator pid;
 
 	double Kp = Kp_global;
 	double Ti = Ti_global;
 	double Td = Td_global;
 
-	/******* MPU6050 Initialization and connection ******
-	 * Accelerometer sensitivity: +/- 2g
-	 * Gyroscope operating range: +/- 250 degrees/s
-	 */
-
-	osDelay(500);
+	/******* MPU6050 Initialization and connection ******/
+	osDelay(1500);
 
 	MPU6050_Result connected = MPU6050_Init(mpu6050_i2c_handle, &mpu1,
 			MPU6050_Device_0, MPU6050_Accelerometer_4G, MPU6050_Gyroscope_500s,
@@ -283,73 +285,71 @@ void Start_Control_Task(void const * argument)
 
 		MPU6050_Accelerometer_Set_Offset(&mpu1, 761, -302, -2869);
 		MPU6050_Gyroscope_Set_Offset(&mpu1, 2933, -35, 101);
-	}
 
+		mpu6050_correct_init_global = 1;
+	}
 	else {
 
-		/* Debug LED LD2 three fast blink */
-		for (int i = 0; i <= 5; i++) {
-			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-			osDelay(250);
-		}
+		mpu6050_correct_init_global = 0;
 	}
 
 
   /* Infinite loop */
-  for(;;)
-  {
-		I_Time_Start = I_Time_Stop;
-		I_Time_Stop = HAL_GetTick();
+  for (;;) {
 
-		MPU6050_Accelerometer_RPY(mpu6050_i2c_handle, &mpu1);
-		MPU6050_Gyroscope_RPY(mpu6050_i2c_handle, &mpu1, I_Time_Start,
-				I_Time_Stop);
+		if (mpu6050_correct_init_global == 1) {
 
-		/***** Complementary filter *****/
-		Roll_filtered_temp = (0.89
-				* (Roll_filtered_temp
-						+ (mpu1.Gyro_Roll
-								* ((I_Time_Start - I_Time_Stop) / 1000)))
-				+ (0.11 * mpu1.Acce_Roll));
+			I_Time_Start = I_Time_Stop;
+			I_Time_Stop = HAL_GetTick();
 
-		a_x_global = mpu1.Acce_X;
-		a_y_global = mpu1.Acce_Y;
-		a_z_global = mpu1.Acce_Z;
-		g_x_global = mpu1.Gyro_X;
-		g_y_global = mpu1.Gyro_Y;
-		g_z_global = mpu1.Gyro_Z;
+			MPU6050_Accelerometer_RPY(mpu6050_i2c_handle, &mpu1);
+			MPU6050_Gyroscope_RPY(mpu6050_i2c_handle, &mpu1, I_Time_Start,
+					I_Time_Stop);
 
-		Roll_filtered_global = Roll_filtered_temp;
-		Roll_filtered_pid = Roll_filtered_temp;
+			/***** Complementary filter *****/
+			Roll_filtered_temp = (0.89
+					* (Roll_filtered_temp
+							+ (mpu1.Gyro_Roll
+									* ((I_Time_Start - I_Time_Stop) / 1000)))
+					+ (0.11 * mpu1.Acce_Roll));
 
-		if (HAL_GetTick() - Timer_start >= 0) {
+			a_x_global = mpu1.Acce_X;
+			a_y_global = mpu1.Acce_Y;
+			a_z_global = mpu1.Acce_Z;
+			g_x_global = mpu1.Gyro_X;
+			g_y_global = mpu1.Gyro_Y;
+			g_z_global = mpu1.Gyro_Z;
 
-			if ((Roll_filtered_pid > -120
-					&& Roll_filtered_pid < SETPOINT - HYSTERESIS)
-					|| (Roll_filtered_pid < -60
-							&& Roll_filtered_pid > SETPOINT + HYSTERESIS)) {
+			Roll_filtered_global = Roll_filtered_temp + OFFSET;
 
-				Kp = Kp_global;
-				Kp /= 100;
-				Ti = Ti_global;
-				Ti /= 100;
-				Td = Td_global;
-				Td /= 100;
+			if (HAL_GetTick() - Timer_start >= 0) {
 
-				PID_Set_parameters(&pid, Kp, Ti, Td, SETPOINT);
-				PID_Calculate(&pid, Roll_filtered_pid, I_Time_Start,
-						I_Time_Stop);
+				if ( (Roll_filtered_global < SETPOINT - HYSTERESIS  ||
+					  Roll_filtered_global > SETPOINT + HYSTERESIS) &&
+					  fabs(Roll_filtered_global) < 80) {
 
-				LeftEngineSpeed_global = pid.control;
-				RightEngineSpeed_global = pid.control;
+					Kp = Kp_global;
+					Kp /= 100;
+					Ti = Ti_global;
+					Ti /= 100;
+					Td = Td_global;
+					Td /= 100;
 
-			} else {
+					PID_Set_parameters(&pid, Kp, Ti, Td, SETPOINT);
+					PID_Calculate(&pid, Roll_filtered_global, I_Time_Start,
+							I_Time_Stop);
 
-				LeftEngineSpeed_global = 0;
-				RightEngineSpeed_global = 0;
+					LeftEngineSpeed_global = pid.control;
+					RightEngineSpeed_global = pid.control;
+
+				} else {
+
+					LeftEngineSpeed_global = 0;
+					RightEngineSpeed_global = 0;
+				}
+
+				Timer_start = HAL_GetTick();
 			}
-
-			Timer_start = HAL_GetTick();
 		}
   }
   /* USER CODE END Start_Control_Task */

@@ -93,8 +93,8 @@ void Error_Handler(void);
 #define SD_STEP1_GPIO_Port GPIOB
 #define I2C1_SCL_MPU6050_Pin GPIO_PIN_6
 #define I2C1_SCL_MPU6050_GPIO_Port GPIOB
-#define I2C_SDA_MPU6050_Pin GPIO_PIN_7
-#define I2C_SDA_MPU6050_GPIO_Port GPIOB
+#define I2C1_SDA_MPU6050_Pin GPIO_PIN_7
+#define I2C1_SDA_MPU6050_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
