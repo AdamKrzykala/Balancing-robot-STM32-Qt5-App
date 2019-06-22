@@ -227,15 +227,19 @@ void Start_LiPol_Task(void const * argument)
 
 			if (LiPol_voltage_global <= 1100) {
 
-				LiPol_voltage_too_low = 1;
-
 				for(int i = 0; i < 100; i++) {
 
 					HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 					osDelay(100);
 				}
 
-			} else {
+				if(LiPol_voltage_global <= 1050) {
+
+					LiPol_voltage_too_low = 1;
+				}
+
+			}
+			else {
 
 				LiPol_voltage_too_low = 0;
 			}
