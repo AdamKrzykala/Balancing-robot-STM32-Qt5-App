@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTimer>
+
+#include "qcustomplot.h"
 
 namespace Ui {
 class MainWindow;
@@ -17,6 +20,13 @@ public:
 
 private:
     Ui::MainWindow *ui;
+
+    QTimer dataTimer;
+
+    void setup();
+
+private slots:
+    void realtimeDataSlot();
 };
 
 #endif // MAINWINDOW_H
