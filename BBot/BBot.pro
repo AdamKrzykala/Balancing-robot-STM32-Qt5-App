@@ -25,11 +25,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        bluetooth.cpp \
         main.cpp \
         mainwindow.cpp \
         qcustomplot.cpp
 
 HEADERS += \
+        bluetooth.h \
         mainwindow.h \
         qcustomplot.h
 

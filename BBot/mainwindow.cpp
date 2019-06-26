@@ -1,21 +1,70 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
-    setup();
+    MainWindow_Resize_and_Center();
+
+    MainWindow_Setup_QCustomPlot();
+
+    BT->Parse_frame_thread();
 }
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
-void MainWindow::setup()
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::MainWindow_Resize_and_Center()
+{
+    // Resize Window acording to Desktop Resolution
+    QSize availableSize = qApp->desktop()->availableGeometry().size();
+    int32_t width  = availableSize.width();
+    int32_t height = availableSize.height();
+    QSize newSize( width, height );
+
+    // Set new Geometry
+    setGeometry(QStyle::alignedRect( Qt::LeftToRight, Qt::AlignCenter, newSize, qApp->desktop()->availableGeometry() ) );
+
+    // Put Window to top of the screen
+    this->topLevelWidget();
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    QMessageBox messageBox(QMessageBox::Question,
+                           tr("BBot"),
+                           tr("Czy na pewno chcesz zakończyć ? \n"),
+                           QMessageBox::Yes | QMessageBox::No);
+
+    messageBox.setButtonText(QMessageBox::Yes, tr("Tak"));
+    messageBox.setButtonText(QMessageBox::No,  tr("Nie"));
+
+    if(messageBox.exec() != QMessageBox::Yes) {
+
+        event->ignore();
+    }
+    else {
+
+        event->accept();
+    }
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::MainWindow_Setup_QCustomPlot()
 {
     ui->Testowy_wykres->addGraph(); // blue line
     ui->Testowy_wykres->graph(0)->setPen(QPen(QColor(40, 110, 255)));
@@ -33,42 +82,27 @@ void MainWindow::setup()
     connect(ui->Testowy_wykres->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->Testowy_wykres->yAxis2, SLOT(setRange(QCPRange)));
 
     // setup a timer that repeatedly calls MainWindow::realtimeDataSlot:
-    connect(&dataTimer, SIGNAL(timeout()), this, SLOT(realtimeDataSlot()));
     dataTimer.start(0); // Interval 0 means to refresh as fast as possible
+    connect(BT, SIGNAL(Parsed_Frame_OK()), this, SLOT(MainWindow_realtimeDataSlot()));
 }
 
-void MainWindow::realtimeDataSlot()
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void MainWindow::MainWindow_realtimeDataSlot()
 {
     static QTime time(QTime::currentTime());
     // calculate two new data points:
     double key = time.elapsed()/1000.0; // time elapsed since start of demo, in seconds
-    static double lastPointKey = 0;
-    if (key-lastPointKey > 0.002) // at most add point every 2 ms
-    {
-      // add data to lines:
-      ui->Testowy_wykres->graph(0)->addData(key, qSin(key)+qrand()/(double)RAND_MAX*1*qSin(key/0.3843));
-      ui->Testowy_wykres->graph(1)->addData(key, qCos(key)+qrand()/(double)RAND_MAX*0.5*qSin(key/0.4364));
-      // rescale value (vertical) axis to fit the current data:
-      //ui->customPlot->graph(0)->rescaleValueAxis();
-      //ui->customPlot->graph(1)->rescaleValueAxis(true);
-      lastPointKey = key;
-    }
+
+    // add data to lines:
+    ui->Testowy_wykres->graph(0)->addData(key, qSin(key)+qrand()/(double)RAND_MAX*1*qSin(key/0.3843));
+    ui->Testowy_wykres->graph(1)->addData(key, qCos(key)+qrand()/(double)RAND_MAX*0.5*qSin(key/0.4364));
+    // rescale value (vertical) axis to fit the current data:
+    ui->Testowy_wykres->graph(0)->rescaleValueAxis();
+    ui->Testowy_wykres->graph(1)->rescaleValueAxis(true);
+
     // make key axis range scroll with the data (at a constant range size of 8):
     ui->Testowy_wykres->xAxis->setRange(key, 8, Qt::AlignRight);
     ui->Testowy_wykres->replot();
-
-    // calculate frames per second:
-    static double lastFpsKey;
-    static int frameCount;
-    ++frameCount;
-    if (key-lastFpsKey > 2) // average fps over 2 seconds
-    {
-      ui->statusBar->showMessage(
-            QString("%1 FPS, Total Data points: %2")
-            .arg(frameCount/(key-lastFpsKey), 0, 'f', 0)
-            .arg(ui->Testowy_wykres->graph(0)->data()->size()+ui->Testowy_wykres->graph(1)->data()->size())
-            , 0);
-      lastFpsKey = key;
-      frameCount = 0;
-    }
 }
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
