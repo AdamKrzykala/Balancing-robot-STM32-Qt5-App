@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
@@ -24,21 +24,28 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 CONFIG += c++11
 
+INCLUDEPATH += inc\
+
 SOURCES += \
-        bluetooth.cpp \
-        main.cpp \
-        mainwindow.cpp \
-        qcustomplot.cpp
+        src/bluetooth.cpp \
+        src/glwidget.cpp \
+        src/main.cpp \
+        src/mainwindow.cpp \
+        src/qcustomplot.cpp
 
 HEADERS += \
-        bluetooth.h \
-        mainwindow.h \
-        qcustomplot.h
+        inc/bluetooth.h \
+        inc/glwidget.h \
+        inc/mainwindow.h \
+        inc/qcustomplot.h
 
 FORMS += \
-        mainwindow.ui
+        ui/mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    zasoby.qrc
