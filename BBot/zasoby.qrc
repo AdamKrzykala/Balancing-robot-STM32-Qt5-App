@@ -3,5 +3,9 @@
         <file>png/Blue_dot.png</file>
         <file>png/Green_dot.png</file>
         <file>png/Red_dot.png</file>
+        <file>png/Battery_full.png</file>
+        <file>png/Battery_low.png</file>
+        <file>png/Battery_medium.png</file>
+        <file>png/Battery_null.png</file>
     </qresource>
 </RCC>
