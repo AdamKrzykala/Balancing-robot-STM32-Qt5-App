@@ -22,9 +22,8 @@ public:
     GLWidget(QWidget *parent = nullptr);
     ~GLWidget() Q_DECL_OVERRIDE;
 
-    //QSize minimumSizeHint() const Q_DECL_OVERRIDE;
-
-    //QSize sizeHint()        const Q_DECL_OVERRIDE;
+    QSize minimumSizeHint() const Q_DECL_OVERRIDE;
+    QSize sizeHint()        const Q_DECL_OVERRIDE;
 
 public slots:
 
