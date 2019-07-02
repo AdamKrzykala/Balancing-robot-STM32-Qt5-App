@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>CommunicationWindow</class>
+ <widget class="QDialog" name="CommunicationWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>835</width>
+    <height>445</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QPushButton" name="pushButton_Search">
+     <property name="text">
+      <string>Szukaj urządzeń</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QComboBox" name="comboBox_Devices"/>
+   </item>
+   <item row="3" column="0" colspan="2">
+    <widget class="QTextBrowser" name="textBrowser_Logs"/>
+   </item>
+   <item row="1" column="1">
+    <widget class="QPushButton" name="pushButton_Disconnect">
+     <property name="text">
+      <string>Rozłącz</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QPushButton" name="pushButton_Connect">
+     <property name="text">
+      <string>Połącz</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="pushButton_Send2">
+     <property name="text">
+      <string>Wyślij 2</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QPushButton" name="pushButton_Send1">
+     <property name="text">
+      <string>Wyślij 1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0" colspan="2">
+    <widget class="QPushButton" name="pushButton_Clear">
+     <property name="text">
+      <string>Wyczyść</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

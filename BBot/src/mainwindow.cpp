@@ -54,7 +54,8 @@ MainWindow::MainWindow(QWidget *parent) :
     w->setLayout(container);
     mainLayout->addWidget(w);
 
-    //ui->widget_RPY_Visualisation->setLayout(mainLayout);
+    // Setup CommunicationWindow
+    CW->exec();
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

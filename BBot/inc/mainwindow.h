@@ -8,6 +8,7 @@
 #include "qcustomplot.h"
 #include "bluetooth.h"
 #include "glwidget.h"
+#include "communicationwindow.h"
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -34,11 +35,9 @@ private:
 
     Ui::MainWindow *ui;
 
-    Bluetooth *BT = new Bluetooth;
-    GLWidget  *GW = new GLWidget;
-
-    void MainWindow_Default_View();
-    void MainWindow_Setup_Icons();
+    Bluetooth           *BT = new Bluetooth;
+    GLWidget            *GW = new GLWidget;
+    CommunicationWindow *CW = new CommunicationWindow;
 
     bool Show_Accelerometer_X, Show_Accelerometer_Y, Show_Accelerometer_Z;
     bool Show_Accelerometer_Roll, Show_Accelerometer_Pitch, Show_Accelerometer_Yaw;
@@ -50,6 +49,9 @@ private:
     bool Show_Magnetometer_Roll, Show_Magnetometer_Pitch, Show_Magnetometer_Yaw;
 
     bool Show_Complementary_Filter_Roll, Show_Complementary_Filter_Pitch, Show_Complementary_Filter_Yaw;
+
+    void MainWindow_Default_View();
+    void MainWindow_Setup_Icons();
 
     void MainWindow_Setup_Accelerometer_Graph();
     void MainWindow_Setup_Accelerometer_RPY_Graph();

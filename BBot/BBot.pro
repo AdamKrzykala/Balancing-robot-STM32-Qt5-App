@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui opengl
+QT       += core gui opengl serialport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
@@ -28,6 +28,7 @@ INCLUDEPATH += inc\
 
 SOURCES += \
         src/bluetooth.cpp \
+        src/communicationwindow.cpp \
         src/glwidget.cpp \
         src/main.cpp \
         src/mainwindow.cpp \
@@ -35,11 +36,13 @@ SOURCES += \
 
 HEADERS += \
         inc/bluetooth.h \
+        inc/communicationwindow.h \
         inc/glwidget.h \
         inc/mainwindow.h \
         inc/qcustomplot.h
 
 FORMS += \
+        ui/communicationwindow.ui \
         ui/mainwindow.ui
 
 # Default rules for deployment.
