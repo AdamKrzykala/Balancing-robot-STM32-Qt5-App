@@ -21,9 +21,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     Show_Complementary_Filter_Roll = true; Show_Complementary_Filter_Pitch = true; Show_Complementary_Filter_Yaw = true;
 
-    // Setup MainWindow
-    this->showMaximized();
-
     MainWindow_Default_View();
     MainWindow_Setup_Icons();
 
@@ -39,11 +36,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     MainWindow_Setup_Complementary_Filter_Graph();
 
-    // Setup Slots and Signals
+    // Connection with BT
     connect(BT, SIGNAL( Parsed_Frame_OK() ), this, SLOT( MainWindow_realtimeDataSlot() ));
 
-    // Run communication thread
-    BT->Start_communication_thread();
+    // Connection with CommunicationWindow
+    connect(this, SIGNAL( Disconnect_Signal() ), CW, SLOT( Disconnect_Slot() ) );
+    connect(CW, SIGNAL( Connection_OK_Signal() ), this, SLOT( Connection_OK_Slot() ) );
 
     // Setup OpenGL visualisation
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -449,6 +447,16 @@ void MainWindow::MainWindow_realtimeDataSlot()
 
     MainWindow_Display_Battery_data(Battery_voltage);
     MainWindow_Display_IMU_data();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::Connection_OK_Slot()
+{
+    this->showMaximized();
+
+    // Run communication thread
+    BT->Start_communication_thread();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -880,6 +888,63 @@ void MainWindow::on_checkBox_Complementary_Filter_Yaw_clicked()
 
         Show_Complementary_Filter_Yaw = false;
     }
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_ConnectDisconnect_clicked()
+{
+    this->hide();
+    emit Disconnect_Signal();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_PID_Default_clicked()
+{
+
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_PID_Clear_clicked()
+{
+
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_PID_Download_clicked()
+{
+
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_PID_Send_clicked()
+{
+
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_doubleSpinBox_PID_Kp_valueChanged(double arg1)
+{
+    ui->progressBar_PID_Kp->setValue( static_cast<int>(arg1) );
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_doubleSpinBox_PID_Kd_valueChanged(double arg1)
+{
+    ui->progressBar_PID_Kd->setValue( static_cast<int>(arg1) );
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_doubleSpinBox_PID_Ki_valueChanged(double arg1)
+{
+    ui->progressBar_PID_Ki->setValue( static_cast<int>(arg1) );
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -13,9 +13,9 @@ class GLWidget : public QOpenGLWidget
 
 private:
 
-    int m_xRot;
-    int m_yRot;
-    int m_zRot;
+    double m_xRot;
+    double m_yRot;
+    double m_zRot;
 
 public:
 
@@ -27,9 +27,9 @@ public:
 
 public slots:
 
-    void setXRotation(int angle);
-    void setYRotation(int angle);
-    void setZRotation(int angle);
+    void setXRotation(double angle);
+    void setYRotation(double angle);
+    void setZRotation(double angle);
 
 protected:
 

@@ -6,61 +6,344 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>835</width>
-    <height>445</height>
+    <width>906</width>
+    <height>696</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Łączenie</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QPushButton" name="pushButton_Search">
-     <property name="text">
-      <string>Szukaj urządzeń</string>
+  <layout class="QGridLayout" name="gridLayout_4">
+   <item row="1" column="0" colspan="2">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Preferred</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>10</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Komunikaty</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QTextBrowser" name="textBrowser_Logs"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="pushButton_Clear">
+        <property name="text">
+         <string>Wyczyść</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QPushButton" name="pushButton_Continue">
+     <property name="text">
+      <string>Dalej</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Parametry transmisji</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Szybkość transmisji:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_Baud">
+          <item>
+           <property name="text">
+            <string>1200</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>4800</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>9600</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>19200</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>38400</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>57600</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>115200</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Nieznane</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Ilość bitów:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_Bits">
+          <item>
+           <property name="text">
+            <string>5 bitów</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>6 bitów</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>7 bitów</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>8 bitów</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Nieznane</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="2" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Kontrola parzystości:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_Parity">
+          <item>
+           <property name="text">
+            <string>Brak</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Pozytywna</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Negatywna</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Bit parzystości zawsze 1</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Bit parzystości zawsze 0</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Nieznane</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="3" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Bit stopu:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_Stop">
+          <item>
+           <property name="text">
+            <string>Jeden</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Dwa</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Półtora</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Nieznane</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="4" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Kontrola przepływu:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_Control">
+          <item>
+           <property name="text">
+            <string>Brak</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Sprzętowa</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Programowa</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Nieznane</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </widget>
    </item>
    <item row="0" column="1">
-    <widget class="QComboBox" name="comboBox_Devices"/>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Obsługa połączenia</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="1" column="0">
+       <widget class="QPushButton" name="pushButton_Connect">
+        <property name="text">
+         <string>Połącz</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="2">
+       <widget class="QPushButton" name="pushButton_Disconnect">
+        <property name="text">
+         <string>Rozłącz</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QPushButton" name="pushButton_Send1">
+        <property name="text">
+         <string>Wyślij 1</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="2">
+       <widget class="QPushButton" name="pushButton_Send2">
+        <property name="text">
+         <string>Wyślij 2</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QPushButton" name="pushButton_Search">
+        <property name="text">
+         <string>Szukaj urządzeń</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1" colspan="2">
+       <widget class="QComboBox" name="comboBox_Devices"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QPushButton" name="pushButton_Cancel">
+     <property name="text">
+      <string>Anuluj</string>
+     </property>
+    </widget>
    </item>
    <item row="3" column="0" colspan="2">
-    <widget class="QTextBrowser" name="textBrowser_Logs"/>
-   </item>
-   <item row="1" column="1">
-    <widget class="QPushButton" name="pushButton_Disconnect">
-     <property name="text">
-      <string>Rozłącz</string>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <widget class="QPushButton" name="pushButton_Connect">
-     <property name="text">
-      <string>Połącz</string>
+     <property name="sizeType">
+      <enum>QSizePolicy::Preferred</enum>
      </property>
-    </widget>
-   </item>
-   <item row="2" column="1">
-    <widget class="QPushButton" name="pushButton_Send2">
-     <property name="text">
-      <string>Wyślij 2</string>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>10</height>
+      </size>
      </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QPushButton" name="pushButton_Send1">
-     <property name="text">
-      <string>Wyślij 1</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0" colspan="2">
-    <widget class="QPushButton" name="pushButton_Clear">
-     <property name="text">
-      <string>Wyczyść</string>
-     </property>
-    </widget>
+    </spacer>
    </item>
   </layout>
  </widget>

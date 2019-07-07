@@ -32,7 +32,7 @@ QSize GLWidget::sizeHint() const
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-static void qNormalizeAngle(int &angle)
+static void qNormalizeAngle(double &angle)
 {
     while (angle < 0)
         angle += 360 * 16;
@@ -42,7 +42,7 @@ static void qNormalizeAngle(int &angle)
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void GLWidget::setXRotation(int angle)
+void GLWidget::setXRotation(double angle)
 {
     qNormalizeAngle(angle);
     if (angle != m_xRot) {
@@ -53,7 +53,7 @@ void GLWidget::setXRotation(int angle)
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void GLWidget::setYRotation(int angle)
+void GLWidget::setYRotation(double angle)
 {
     qNormalizeAngle(angle);
     if (angle != m_yRot) {
@@ -64,7 +64,7 @@ void GLWidget::setYRotation(int angle)
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void GLWidget::setZRotation(int angle)
+void GLWidget::setZRotation(double angle)
 {
     qNormalizeAngle(angle);
     if (angle != m_zRot) {
@@ -158,9 +158,9 @@ void GLWidget::paintGL() {
     glLoadIdentity();
     gluLookAt(2,0,5, 0,0,0, 0,1,0);
 
-    glRotatef(-m_xRot,  1,0,0);
-    glRotatef(-m_yRot,  0,1,0);
-    glRotatef(-m_zRot,  0,0,1);
+    glRotated(-m_xRot,  1,0,0);
+    glRotated(-m_yRot,  0,1,0);
+    glRotated(-m_zRot,  0,0,1);
 
     GLCreateCube(2.5, 3.0, 0.75);
 }

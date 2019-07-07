@@ -31,6 +31,8 @@ public slots:
 
     void MainWindow_realtimeDataSlot();
 
+    void Connection_OK_Slot();
+
 private:
 
     Ui::MainWindow *ui;
@@ -99,7 +101,25 @@ private slots:
     void on_checkBox_Complementary_Filter_Pitch_clicked();
     void on_checkBox_Complementary_Filter_Yaw_clicked();
 
+    void on_pushButton_ConnectDisconnect_clicked();
+
+    void on_pushButton_PID_Default_clicked();
+
+    void on_pushButton_PID_Clear_clicked();
+
+    void on_pushButton_PID_Download_clicked();
+
+    void on_pushButton_PID_Send_clicked();
+
+    void on_doubleSpinBox_PID_Kp_valueChanged(double arg1);
+
+    void on_doubleSpinBox_PID_Kd_valueChanged(double arg1);
+
+    void on_doubleSpinBox_PID_Ki_valueChanged(double arg1);
+
 signals:
+
+    void Disconnect_Signal();
 
 };
 
