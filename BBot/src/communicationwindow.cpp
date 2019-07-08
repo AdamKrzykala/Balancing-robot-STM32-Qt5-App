@@ -117,6 +117,11 @@ void CommunicationWindow::on_pushButton_Connect_clicked()
             this->device->setFlowControl(control);
 
             this->CommunicationWindow_addToLogs("Otwarto port szeregowy.");
+
+            while(1) {
+
+                readFromPort();
+            }
         }
         else {
 
@@ -150,17 +155,18 @@ void CommunicationWindow::on_pushButton_Disconnect_clicked()
 
 void CommunicationWindow::readFromPort()
 {
-    while(this->device->canReadLine()) {
 
-        QString line = this->device->readLine();
-        //qDebug() << line;
+    while(device->waitForReadyRead(100)) {
 
-        QString terminator = "\r";
-        int pos = line.lastIndexOf(terminator);
-        //qDebug() << line.left(pos);
-
-        this->CommunicationWindow_addToLogs(line.left(pos));
+        QByteArray line = this->device->readAll();
+        qDebug() << line;
     }
+
+    //QString terminator = "\r";
+    //int pos = line.lastIndexOf(terminator);
+    //qDebug() << line.left(pos);
+
+    //this->CommunicationWindow_addToLogs(line.left(pos));
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
