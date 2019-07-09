@@ -37,7 +37,7 @@ private:
 
     Ui::MainWindow *ui;
 
-    Bluetooth           *BT = new Bluetooth;
+    //Bluetooth           *BT = new Bluetooth;
     GLWidget            *GW = new GLWidget;
     CommunicationWindow *CW = new CommunicationWindow;
 

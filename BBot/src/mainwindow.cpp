@@ -37,7 +37,7 @@ MainWindow::MainWindow(QWidget *parent) :
     MainWindow_Setup_Complementary_Filter_Graph();
 
     // Connection with BT
-    connect(BT, SIGNAL( Parsed_Frame_OK() ), this, SLOT( MainWindow_realtimeDataSlot() ));
+    //connect(BT, SIGNAL( Parsed_Frame_OK() ), this, SLOT( MainWindow_realtimeDataSlot() ));
 
     // Connection with CommunicationWindow
     connect(this, SIGNAL( Disconnect_Signal() ), CW, SLOT( Disconnect_Slot() ) );
@@ -456,7 +456,7 @@ void MainWindow::Connection_OK_Slot()
     this->showMaximized();
 
     // Run communication thread
-    BT->Start_communication_thread();
+    //BT->Start_communication_thread();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -923,7 +923,13 @@ void MainWindow::on_pushButton_PID_Download_clicked()
 
 void MainWindow::on_pushButton_PID_Send_clicked()
 {
+    Data_to_Robot Data;
 
+    Data.Kp = ui->doubleSpinBox_PID_Kp->value();
+    Data.Ki = ui->doubleSpinBox_PID_Ki->value();
+    Data.Kd = ui->doubleSpinBox_PID_Kd->value();
+
+    CW->Fill_Data_to_robot(Data);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

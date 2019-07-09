@@ -295,20 +295,6 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QPushButton" name="pushButton_Send1">
-        <property name="text">
-         <string>Wyślij 1</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1" colspan="2">
-       <widget class="QPushButton" name="pushButton_Send2">
-        <property name="text">
-         <string>Wyślij 2</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0">
        <widget class="QPushButton" name="pushButton_Search">
         <property name="text">

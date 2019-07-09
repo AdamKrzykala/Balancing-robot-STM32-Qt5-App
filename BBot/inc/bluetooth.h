@@ -3,6 +3,29 @@
 
 #include <QThread>
 #include <QDebug>
+#include <QSerialPort>
+
+#include "crc.h"
+
+
+#define DATA_FRAME_TO_ROBOT_SIZE    7
+
+typedef enum {
+
+    Open_connection_OK      =   1,
+    Open_connection_FAIL    =   2,
+
+    Close_connection_OK     =   3,
+    Close_connection_FAIL   =   4,
+
+    Port_is_busy            =   5
+
+} Status_Codes;
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+int16_t Merge_bytes(uint8_t _lower_byte, uint8_t _higher_byte);
+int8_t Divide_bytes(int16_t data, uint8_t which_byte);
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -15,7 +38,7 @@ struct Data_from_Robot
 
 struct Data_to_Robot
 {
-
+    double Kp, Ki, Kd;
 };
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -26,13 +49,12 @@ class Bluetooth : public QThread
 
 private:
 
+    QSerialPort *Device = new QSerialPort;
+
     Data_from_Robot DF_Robot;
     Data_to_Robot   DT_Robot;
 
     void (Bluetooth::*f)();
-
-    void Open_connection();
-    void Close_connection();
 
     void Receive_frame();
     void Parse_frame();
@@ -50,7 +72,12 @@ public:
         (this->*f)();
     }
 
+    void Open_connection(QString portName);
+    void Close_connection();
+
     void Start_communication_thread();
+
+    void Set_DT_Robot(Data_to_Robot Data);
 
 private slots:
 
@@ -58,20 +85,7 @@ public slots:
 
 signals:
 
-    void Open_Connection_OK();
-    void Open_Connection_FAIL();
-
-    void Close_Connection_OK();
-    void Close_Connection_FAIL();
-
-    void Received_Frame_OK();
-    void Received_Frame_FAIL();
-
-    void Parsed_Frame_OK();
-    void Parsed_Frame_FAIL();
-
-    void Sended_Frame_OK();
-    void Sended_Frame_FAIL();
+    void Serial_Interface_Signal(Status_Codes);
 };
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

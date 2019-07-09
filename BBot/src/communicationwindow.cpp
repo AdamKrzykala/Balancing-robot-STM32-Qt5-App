@@ -11,6 +11,41 @@ void CommunicationWindow::Disconnect_Slot()
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+void CommunicationWindow::Serial_Interface_Slot(Status_Codes status)
+{
+    switch (status) {
+
+        case Open_connection_OK:
+
+            Serial_is_open = true;
+            this->CommunicationWindow_addToLogs("Otwarto port szeregowy");
+            break;
+
+        case Open_connection_FAIL:
+
+            this->CommunicationWindow_addToLogs("Otwarcie portu szeregowego się nie powiodło !");
+            break;
+
+        case Close_connection_OK:
+
+            Serial_is_open = false;
+            this->CommunicationWindow_addToLogs("Zamknięto port szeregowy");
+            break;
+
+        case Close_connection_FAIL:
+
+            this->CommunicationWindow_addToLogs("Port już jest otwarty !");
+            break;
+
+        case Port_is_busy:
+
+            this->CommunicationWindow_addToLogs("Port już jest otwarty !");
+            break;
+    }
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 CommunicationWindow::CommunicationWindow(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CommunicationWindow)
@@ -20,7 +55,7 @@ CommunicationWindow::CommunicationWindow(QWidget *parent) :
     CommunicationWindow_set_default();
 
     // CONNECT:
-    connect(this->device, SIGNAL( readyRead() ), this, SLOT( readFromPort() ));
+    connect(BT, SIGNAL( Serial_Interface_Signal(Status_Codes) ), this, SLOT( Serial_Interface_Slot(Status_Codes) ));
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -28,7 +63,13 @@ CommunicationWindow::CommunicationWindow(QWidget *parent) :
 CommunicationWindow::~CommunicationWindow()
 {
     delete ui;
-    delete device;
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void CommunicationWindow::Fill_Data_to_robot(Data_to_Robot Data)
+{
+    BT->Set_DT_Robot(Data);
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -59,6 +100,7 @@ void CommunicationWindow::CommunicationWindow_addToLogs(QString message)
 
 void CommunicationWindow::CommunicationWindow_sendMessageToDevice(QString message)
 {
+    /*
     if( this->device->isOpen() && this->device->isWritable() ) {
 
         this->CommunicationWindow_addToLogs("Wysyłam informacje do urządzenia " + message);
@@ -68,6 +110,7 @@ void CommunicationWindow::CommunicationWindow_sendMessageToDevice(QString messag
 
         this->CommunicationWindow_addToLogs("Nie mogę wysłać wiadomości. Port nie jest otwarty!");
     }
+    */
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -103,84 +146,16 @@ void CommunicationWindow::on_pushButton_Connect_clicked()
     }
 
     QString portName = ui->comboBox_Devices->currentText().split("\t").first();
-    this->device->setPortName(portName);
 
-    // OTWÓRZ I SKONFIGURUJ PORT:
-    if(!device->isOpen()) {
-
-        if( device->open(QSerialPort::ReadWrite) ) {
-
-            this->device->setBaudRate(baud);
-            this->device->setDataBits(bits);
-            this->device->setParity(parity);
-            this->device->setStopBits(stop);
-            this->device->setFlowControl(control);
-
-            this->CommunicationWindow_addToLogs("Otwarto port szeregowy.");
-
-            while(1) {
-
-                readFromPort();
-            }
-        }
-        else {
-
-            this->CommunicationWindow_addToLogs("Otwarcie portu szeregowego się nie powiodło!");
-        }
-    }
-    else {
-
-        this->CommunicationWindow_addToLogs("Port już jest otwarty!");
-        return;
-    }
+    BT->Open_connection(portName);
+    BT->Start_communication_thread();
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 void CommunicationWindow::on_pushButton_Disconnect_clicked()
 {
-    if(this->device->isOpen()) {
-
-        this->device->close();
-        this->CommunicationWindow_addToLogs("Zamknięto połączenie.");
-    }
-    else {
-
-        this->CommunicationWindow_addToLogs("Port nie jest otwarty!");
-        return;
-    }
-}
-
-// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-void CommunicationWindow::readFromPort()
-{
-
-    while(device->waitForReadyRead(100)) {
-
-        QByteArray line = this->device->readAll();
-        qDebug() << line;
-    }
-
-    //QString terminator = "\r";
-    //int pos = line.lastIndexOf(terminator);
-    //qDebug() << line.left(pos);
-
-    //this->CommunicationWindow_addToLogs(line.left(pos));
-}
-
-// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-void CommunicationWindow::on_pushButton_Send1_clicked()
-{
-    CommunicationWindow_sendMessageToDevice("1");
-}
-
-// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-void CommunicationWindow::on_pushButton_Send2_clicked()
-{
-    CommunicationWindow_sendMessageToDevice("0");
+    BT->Close_connection();
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -194,6 +169,8 @@ void CommunicationWindow::on_pushButton_Clear_clicked()
 
 void CommunicationWindow::CommunicationWindow_set_default()
 {
+    Serial_is_open = false;
+
     on_comboBox_Baud_currentIndexChanged(2);
     on_comboBox_Bits_currentIndexChanged(3);
     on_comboBox_Parity_currentIndexChanged(0);
@@ -370,7 +347,8 @@ void CommunicationWindow::on_pushButton_Cancel_clicked()
 
 void CommunicationWindow::on_pushButton_Continue_clicked()
 {
-    if( device->isOpen() ) {
+
+    if( Serial_is_open == true ) {
 
         this->hide();
         emit Connection_OK_Signal();
