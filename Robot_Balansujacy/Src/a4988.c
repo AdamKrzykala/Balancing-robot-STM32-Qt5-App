@@ -217,19 +217,11 @@ A4988_Status A4988_One_Step(struct A4988 *a4988) {
 
 A4988_Status A4988_Move(struct A4988 *a4988, double speed) {
 
-	int max_value = 500;
-
 	if(a4988->actual_speed != speed && speed != 0) {
-
-		// speed calculation
-		int real_speed = fabs(speed) * (max_value / 100);
-
-		// test
-		//real_speed = 1;
 
 		A4988_Set_Resolution(a4988,A4988_One_8_step);
 
-		if (speed > 0) {
+		if (speed < 0) {
 
 			A4988_Set_Direction(a4988, A4988_Right);
 		} else {
@@ -237,13 +229,7 @@ A4988_Status A4988_Move(struct A4988 *a4988, double speed) {
 			A4988_Set_Direction(a4988, A4988_Left);
 		}
 
-		// set speed
-		if(real_speed < 0) {
-
-			return A4988_Status_Error;
-		}
-
-		A4988_Set_Speed(a4988, real_speed);
+		A4988_Set_Speed(a4988, fabs(speed));
 
 		// save actual speed
 		a4988->actual_speed = speed;
@@ -253,19 +239,6 @@ A4988_Status A4988_Move(struct A4988 *a4988, double speed) {
 
 		A4988_One_Step(a4988);
 	}
-	else {
-
-		//A4988_Power_off(a4988);
-		//a4988->soft_start = 1;
-		//a4988->soft_start_ratio = 0;
-	}
-
-	//A4988_Set_Resolution(a4988, A4988_One_8_step);
-	//a4988->Step_delay = 900;
-	//A4988_Set_Speed(a4988, 1000);
-	//A4988_Set_Direction(a4988, A4988_Right);
-
-	//A4988_One_Step(a4988);
 
 	return A4988_Status_Ok;
 }

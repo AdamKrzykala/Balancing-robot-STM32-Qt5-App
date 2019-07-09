@@ -58,8 +58,6 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define TIM3_PERIOD 63
-#define TIM3_PRESCALER 0
 #define B1_Pin GPIO_PIN_13
 #define B1_GPIO_Port GPIOC
 #define B1_EXTI_IRQn EXTI15_10_IRQn
@@ -83,6 +81,10 @@ void Error_Handler(void);
 #define MS3_GPIO_Port GPIOB
 #define SD_DIR1_Pin GPIO_PIN_8
 #define SD_DIR1_GPIO_Port GPIOA
+#define USART_TX_HC05_Pin GPIO_PIN_9
+#define USART_TX_HC05_GPIO_Port GPIOA
+#define USART1_RX_HC05_Pin GPIO_PIN_10
+#define USART1_RX_HC05_GPIO_Port GPIOA
 #define TMS_Pin GPIO_PIN_13
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14

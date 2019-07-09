@@ -351,21 +351,28 @@ MPU6050_Result MPU6050_Accelerometer_RPY(I2C_HandleTypeDef *I2Cx,
 
 	float Acce_Sens = DataStruct->Acce_Sensitivity;
 
-	/******* Accelerometer measurement *******/
-	MPU6050_Read_Accelerometer(I2Cx,DataStruct);
+	//for(int i = 0; i < 4; ++i) {
 
-	DataStruct->Acce_X = DataStruct->Acce_X - DataStruct->Acce_X_Offset;
-	DataStruct->Acce_Y = DataStruct->Acce_Y - DataStruct->Acce_Y_Offset;
-	DataStruct->Acce_Z = DataStruct->Acce_Z - DataStruct->Acce_Z_Offset;
+		/******* Accelerometer measurement *******/
+		MPU6050_Read_Accelerometer(I2Cx,DataStruct);
 
-	DataStruct->Acce_X_G = DataStruct->Acce_X / Acce_Sens;
-	DataStruct->Acce_Y_G = DataStruct->Acce_Y / Acce_Sens;
-	DataStruct->Acce_Z_G = DataStruct->Acce_Z / Acce_Sens;
+		DataStruct->Acce_X = DataStruct->Acce_X - DataStruct->Acce_X_Offset;
+		DataStruct->Acce_Y = DataStruct->Acce_Y - DataStruct->Acce_Y_Offset;
+		DataStruct->Acce_Z = DataStruct->Acce_Z - DataStruct->Acce_Z_Offset;
 
-	/* Converting to RPY */
-	DataStruct->Acce_Roll  = atan2(DataStruct->Acce_Y_G, DataStruct->Acce_Z_G) * (180 / M_PI);
-	DataStruct->Acce_Pitch = atan2(DataStruct->Acce_X_G, DataStruct->Acce_Z_G) * (180 / M_PI);
-	/* Yaw unused*/
+		DataStruct->Acce_X_G = DataStruct->Acce_X / Acce_Sens;
+		DataStruct->Acce_Y_G = DataStruct->Acce_Y / Acce_Sens;
+		DataStruct->Acce_Z_G = DataStruct->Acce_Z / Acce_Sens;
+
+
+		/* Converting to RPY */
+		DataStruct->Acce_Roll  = atan2(DataStruct->Acce_Y_G, DataStruct->Acce_Z_G) * (180 / M_PI);
+		DataStruct->Acce_Pitch = atan2(DataStruct->Acce_X_G, DataStruct->Acce_Z_G) * (180 / M_PI);
+		/* Yaw unused*/
+	//}
+
+	//DataStruct->Acce_Roll  /= 4;
+	//DataStruct->Acce_Pitch /= 4;
 
 	return MPU6050_Result_Ok;
 }
@@ -435,13 +442,6 @@ MPU6050_Result MPU6050_Gyroscope_RPY(I2C_HandleTypeDef* I2Cx,
 	DataStruct->Gyro_X_DGS = (int16_t)( DataStruct->Gyro_X / Gyro_Sens);
 	DataStruct->Gyro_Y_DGS = (int16_t)( DataStruct->Gyro_Y / Gyro_Sens);
 	DataStruct->Gyro_Z_DGS = (int16_t)( DataStruct->Gyro_Z / Gyro_Sens);
-
-	if( (DataStruct->Gyro_X_DGS == 1 || DataStruct->Gyro_X_DGS == -1) && DataStruct->Gyro_X_DGS_Past == 0)
-		DataStruct->Gyro_X_DGS = 0;
-	if( (DataStruct->Gyro_Y_DGS == 1 || DataStruct->Gyro_Y_DGS == -1) && DataStruct->Gyro_Y_DGS_Past == 0)
-		DataStruct->Gyro_X_DGS = 0;
-	if( (DataStruct->Gyro_Z_DGS == 1 || DataStruct->Gyro_Z_DGS == -1) && DataStruct->Gyro_Z_DGS_Past == 0)
-		DataStruct->Gyro_X_DGS = 0;
 
 	/* Converting to RPY */
 	DataStruct->Gyro_Roll  = DataStruct->Gyro_Roll  + ( 0.5 * ( (long double)(I_Time_Stop - I_Time_Start) / 1000 )
