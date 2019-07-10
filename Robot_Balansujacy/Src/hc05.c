@@ -10,9 +10,11 @@
 uint8_t HC05_Divide_int16(int16_t _data, uint8_t _which_byte) {
 
 	if(_which_byte == 'L') {
+
 		return (_data & 0xFF); // return lower byte
 	}
 	else if(_which_byte == 'H'){
+
 		return (_data >> 8);   // return higher byte
 	}
 
@@ -33,38 +35,41 @@ int16_t HC05_Merge_bytes(uint8_t _lower_byte, uint8_t _higher_byte) {
 	return 0;
 }
 
-void HC05_Fill_Data_frame(struct Data_frame_to_PC *_frame,
-						  int16_t _a_x, int16_t _a_y, int16_t _a_z,
-						  int16_t _g_x, int16_t _g_y, int16_t _g_z,
-						  int16_t _roll,
-						  int16_t _LiPol_voltage,
-						  int16_t _Kp, int16_t _Ti, int16_t _Td,
-						  int16_t _Left_engine_speed, int16_t _Right_engine_speed) {
+void HC05_Fill_Data_frame(struct Data_frame_to_PC *_data, uint8_t *_frame,
+		  	  	  	  	  int16_t _LiPol_voltage,
+						  int16_t a_x, int16_t a_y, int16_t a_z) {
 
+	_data->Lipol_voltage = _LiPol_voltage;
+	_data->a_x = a_x; _data->a_y = a_y; _data->a_z = a_z;
+
+	_frame[0] = 'S';
+	/* Lipol data */
+	_frame[1] = HC05_Divide_int16(_data->Lipol_voltage, 'L');
+	_frame[2] = HC05_Divide_int16(_data->Lipol_voltage, 'H');
+	/* Accelerometer data */
+	_frame[3] = HC05_Divide_int16(_data->a_x, 'L');
+	_frame[4] = HC05_Divide_int16(_data->a_x, 'H');
+	_frame[5] = HC05_Divide_int16(_data->a_y, 'L');
+	_frame[6] = HC05_Divide_int16(_data->a_y, 'H');
+	_frame[7] = HC05_Divide_int16(_data->a_z, 'L');
+	_frame[8] = HC05_Divide_int16(_data->a_z, 'H');
+	/* CRC */
+	_frame[9] = CRC8_DataArray(_frame, DATA_FRAME_TO_PC_SIZE - 1);
 }
-
-void HC05_Send_Data_frame(struct Data_frame_to_PC *_frame, UART_HandleTypeDef *_huart) {
-
-
-}
-
-uint8_t Test_byte1 = 0;
-uint8_t Test_byte2 = 0;
-uint8_t Test_byte3 = 0;
-uint8_t Test_byte4 = 0;
-uint8_t Test_byte5 = 0;
-uint8_t Test_byte6 = 0;
 
 void HC05_Parse_Data_frame(struct Data_frame_from_PC *_data, uint8_t *_frame) {
 
-	Test_byte1 = _frame[1];
-	Test_byte2 = _frame[2];
-	Test_byte3 = _frame[3];
-	Test_byte4  = _frame[4];
-	Test_byte5 = _frame[5];
-	Test_byte6 = _frame[6];
+	/* PID data */
+	_data->Set_point  = HC05_Merge_bytes(_frame[1], _frame[2]);
+	_data->Hysteresis = HC05_Merge_bytes(_frame[3], _frame[4]);
 
-	_data->Kp = HC05_Merge_bytes(_frame[1], _frame[2]);
-	_data->Ki = HC05_Merge_bytes(_frame[3], _frame[4]);
-	_data->Kd = HC05_Merge_bytes(_frame[5], _frame[6]);
+	_data->Kp = HC05_Merge_bytes(_frame[5], _frame[6]);
+	_data->Ki = HC05_Merge_bytes(_frame[7], _frame[8]);
+	_data->Kd = HC05_Merge_bytes(_frame[9], _frame[10]);
+
+	/* Filters data */
+	_data->Complementary_filter_weight = _frame[11];
+
+	/* Additional data */
+	_data->Emergency_stop = _frame[12];
 }

@@ -28,6 +28,8 @@
 /* USER CODE BEGIN Includes */     
 
 #include "adc.h"
+#include "tim.h"
+
 #include "a4988.h"
 #include "mpu6050.h"
 #include "pid.h"
@@ -44,8 +46,12 @@
 /* USER CODE BEGIN PD */
 
 #define SETPOINT	0
-#define OFFSET		0
-#define HYSTERESIS	0.5
+#define HYSTERESIS	0
+#define K_P			0
+#define K_I			0
+#define K_D			0
+
+#define FILTER_WEIGHT 0
 
 /* USER CODE END PD */
 
@@ -57,34 +63,47 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 
-struct Data_frame_from_PC	DF_PC;
-
-int8_t Data_from_PC[DATA_FRAME_FROM_PC_SIZE];
-uint8_t Data_to_PC[DATA_FRAME_TO_PC_SIZE];
-
-double Filter_weight = 0.05;
-
-int16_t LiPol_voltage_global = 0;
-uint8_t LiPol_voltage_too_low = 0;
-
 I2C_HandleTypeDef  *mpu6050_i2c_handle = &hi2c1;
 UART_HandleTypeDef *hc05_uart_handle   = &huart1;
 
-int16_t Roll_filtered_global = 0;
-double  Roll_filtered_pid = 0;
+struct Data_frame_from_PC	DF_PC;
+struct Data_frame_to_PC		DT_PC;
 
+uint8_t Data_from_PC[DATA_FRAME_FROM_PC_SIZE];
+uint8_t Data_to_PC[DATA_FRAME_TO_PC_SIZE];
+
+/* PID global variables */
+double Set_point_global  = SETPOINT;
+double Hysteresis_global = HYSTERESIS;
+
+double Kp_global = K_P, Ti_global = K_I, Td_global = K_D;
+
+/* IMU global variables */
+uint8_t mpu6050_correct_init_global = 0;
+
+/* accelerometer */
 int16_t a_x_global = 0, a_y_global = 0, a_z_global = 0;
+/* gyroscope */
 int16_t g_x_global = 0, g_y_global = 0, g_z_global = 0;
 
 int16_t a_x_offset_global = 0, a_y_offset_global = 0, a_z_offset_global = 0;
 int16_t g_x_offset_global = 0, g_y_offset_global = 0, g_z_offset_global = 0;
 
-int16_t Kp_global = 6000, Ti_global = 0, Td_global = 0;
+int16_t Roll_filtered_global = 0;
+double  Roll_filtered_pid = 0;
 
+double Filter_weight_global = FILTER_WEIGHT;
+
+/* LiPol global variables */
+int16_t LiPol_voltage_global = 0;
+uint8_t LiPol_voltage_too_low = 0;
+
+/* Stepper motors global variables */
 int16_t LeftEngineSpeed_global = 0;
 int16_t RightEngineSpeed_global = 0;
 
-uint8_t mpu6050_correct_init_global = 0;
+/* Additional variable */
+uint8_t Emergency_stop_global = 0;
 
 /* USER CODE END Variables */
 osThreadId Engines_TaskHandle;
@@ -95,6 +114,7 @@ osThreadId Control_TaskHandle;
 /* USER CODE BEGIN FunctionPrototypes */
    
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim);
 
 /* USER CODE END FunctionPrototypes */
 
@@ -174,8 +194,8 @@ void Start_Engines_Task(void const * argument)
 			SD_STEP2_Pin, SD_DIR2_GPIO_Port, SD_DIR2_Pin, MS1_GPIO_Port,
 			MS1_Pin, MS2_GPIO_Port, MS2_Pin, MS3_GPIO_Port, MS3_Pin);
 
-	A4988_Power_off(&A4988_1);
-	A4988_Power_off(&A4988_2);
+	A4988_Power_on(&A4988_1);
+	A4988_Power_on(&A4988_2);
 
 	Micros_Init();
 
@@ -185,7 +205,10 @@ void Start_Engines_Task(void const * argument)
 	/* Infinite loop */
   for(;;)
   {
-	  if( LiPol_voltage_too_low != 1 ) {
+	  if( LiPol_voltage_too_low != 1 && Emergency_stop_global != 1) {
+
+		  A4988_Power_on(&A4988_1);
+		  A4988_Power_on(&A4988_2);
 
 		  A4988_Move(&A4988_1,  LeftEngineSpeed_global);
 		  A4988_Move(&A4988_2, -RightEngineSpeed_global);
@@ -288,11 +311,7 @@ void Start_Control_Task(void const * argument)
 	/* PID variables */
 	struct PID_regulator pid;
 
-	PID_Init(&pid, SETPOINT);
-
-	double Kp = Kp_global;
-	double Ti = Ti_global;
-	double Td = Td_global;
+	PID_Init(&pid, Set_point_global);
 
 	/******* MPU6050 Initialization and connection ******/
 	osDelay(1500);
@@ -335,37 +354,25 @@ void Start_Control_Task(void const * argument)
 			I_Time_Stop = HAL_GetTick();
 
 			MPU6050_Accelerometer_RPY(mpu6050_i2c_handle, &mpu1);
-			MPU6050_Gyroscope_RPY(mpu6050_i2c_handle, &mpu1, I_Time_Start,
-					I_Time_Stop);
+			MPU6050_Gyroscope_RPY(mpu6050_i2c_handle, &mpu1, I_Time_Start, I_Time_Stop);
 
 			/***** Complementary filter *****/
-			Roll_filtered_temp = ((1-Filter_weight)
-					* (Roll_filtered_temp
-							+ (mpu1.Gyro_Pitch
-									* ((I_Time_Start - I_Time_Stop) / 1000)))
-					+ (Filter_weight * mpu1.Acce_Pitch));
+			Roll_filtered_temp = ((1-Filter_weight_global) * (Roll_filtered_temp + (mpu1.Gyro_Pitch * ((I_Time_Start - I_Time_Stop) / 1000)))
+					           + (Filter_weight_global * mpu1.Acce_Pitch));
 
-			a_x_global = mpu1.Acce_X;
-			a_y_global = mpu1.Acce_Y;
-			a_z_global = mpu1.Acce_Z;
-			g_x_global = mpu1.Gyro_X;
-			g_y_global = mpu1.Gyro_Y;
-			g_z_global = mpu1.Gyro_Z;
+			a_x_global = mpu1.Acce_X; a_y_global = mpu1.Acce_Y; a_z_global = mpu1.Acce_Z;
+			g_x_global = mpu1.Gyro_X; g_y_global = mpu1.Gyro_Y; g_z_global = mpu1.Gyro_Z;
 
-			Roll_filtered_global = Roll_filtered_temp + OFFSET;
-			Roll_filtered_pid = Roll_filtered_temp + OFFSET;
+			Roll_filtered_global = Roll_filtered_temp;
+			Roll_filtered_pid    = Roll_filtered_temp;
 
 			if (HAL_GetTick() - Timer_start >= 4) {
 
-				Kp = Kp_global;
-				Ti = Ti_global;
-				Td = Td_global;
-
-				PID_Set_parameters(&pid, Kp / 100, Ti / 100, Td/ 100);
+				PID_Set_parameters(&pid, Kp_global, Ti_global, Td_global);
 				PID_Calculate(&pid, Roll_filtered_pid, I_Time_Start, I_Time_Stop);
 
-				if ( (Roll_filtered_pid < SETPOINT - HYSTERESIS  ||
-					  Roll_filtered_pid > SETPOINT + HYSTERESIS) &&
+				if ( (Roll_filtered_pid < Set_point_global - Hysteresis_global  ||
+					  Roll_filtered_pid > Set_point_global + Hysteresis_global) &&
 					  fabs(Roll_filtered_pid) < 80) {
 
 					LeftEngineSpeed_global = pid.control;
@@ -386,17 +393,44 @@ void Start_Control_Task(void const * argument)
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+
+	void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+
+		if( htim->Instance == TIM3 ) {
+
+			//HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+
+			HC05_Fill_Data_frame(&DT_PC, Data_to_PC,
+								 LiPol_voltage_global,
+								 a_x_global, a_y_global, a_z_global);
+
+			HAL_UART_Transmit_DMA(hc05_uart_handle, Data_to_PC, DATA_FRAME_TO_PC_SIZE);
+		}
+	}
      
 	void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 
-		HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+		if( huart->Instance == USART1 ) {
 
-		HAL_UART_Receive_DMA(hc05_uart_handle, Data_from_PC, DATA_FRAME_FROM_PC_SIZE);
-		HC05_Parse_Data_frame(&DF_PC, Data_from_PC);
+			//HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 
-		Kp_global = DF_PC.Kp;
-		Ti_global = DF_PC.Ki;
-		Td_global = DF_PC.Kd;
+			HAL_UART_Receive_DMA(hc05_uart_handle, Data_from_PC, DATA_FRAME_FROM_PC_SIZE);
+			HC05_Parse_Data_frame(&DF_PC, Data_from_PC);
+
+			/* PID data from PC */
+			Set_point_global  = (double)DF_PC.Set_point  / 100;
+			Hysteresis_global = (double)DF_PC.Hysteresis / 100;
+
+			Kp_global = (double)DF_PC.Kp / 100;
+			Ti_global = (double)DF_PC.Ki / 100;
+			Td_global = (double)DF_PC.Kd / 100;
+
+			/* Filters data from PC */
+			Filter_weight_global = (double)DF_PC.Complementary_filter_weight / 100;
+
+			/* Additional data from PC */
+			Emergency_stop_global = DF_PC.Emergency_stop;
+		}
 	}
 
 /* USER CODE END Application */
