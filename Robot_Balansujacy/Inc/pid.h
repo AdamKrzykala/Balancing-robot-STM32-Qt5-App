@@ -10,8 +10,8 @@
 
 #include "math.h"
 
-#define MAX_CONTROL  900
-#define MIN_CONTROL -900
+#define MAX_CONTROL  8000
+#define MIN_CONTROL -8000
 
 #define I_MAX	 900
 #define I_MIN	-900
@@ -31,9 +31,9 @@ struct PID_regulator{
 	double derivative;
 };
 
-void PID_Init(struct PID_regulator *pid, double set_point);
+void PID_Init(struct PID_regulator *pid);
 
-void PID_Set_parameters(struct PID_regulator *pid, double Kp, double Ti, double Td);
+void PID_Set_parameters(struct PID_regulator *pid, double set_point, double Kp, double Ti, double Td);
 
 double PID_Calculate(struct PID_regulator *pid, double measured_point, long double I_Time_Start, long double I_Time_Stop);
 

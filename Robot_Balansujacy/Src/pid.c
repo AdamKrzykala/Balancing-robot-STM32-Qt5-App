@@ -7,21 +7,21 @@
 
 #include "pid.h"
 
-void PID_Init(struct PID_regulator *pid, double set_point) {
+void PID_Init(struct PID_regulator *pid) {
 
 	pid->control = 0;
 	pid->control_error = 0;
 	pid->control_error_past = 0;
 
-	pid->set_point = set_point;
 	pid->measured_point = 0;
 
 	pid->integral = 0;
 	pid->derivative = 0;
 }
 
-void PID_Set_parameters(struct PID_regulator *pid, double Kp, double Ti, double Td) {
+void PID_Set_parameters(struct PID_regulator *pid, double set_point, double Kp, double Ti, double Td) {
 
+	pid->set_point = set_point;
 	pid->Kp = Kp;
 	pid->Ti = Ti;
 	pid->Td = Td;
@@ -33,22 +33,15 @@ double PID_Calculate(struct PID_regulator *pid, double measured_point, long doub
 	pid->control_error = pid->set_point - pid->measured_point;
 
 	// K_I
-	if( fabs(pid->control_error) > 0.01 ) { // 0.01 to anty windup ?
+	pid->integral = pid->integral + (0.5 * (pid->control_error + pid->control_error_past) * ((I_Time_Stop - I_Time_Start) / 1000));
 
-		pid->integral = pid->integral + ( 0.5 * (pid->control_error + pid->control_error_past) * ( (I_Time_Stop - I_Time_Start ) / 1000 ) );
+	if (pid->integral > I_MAX) {
 
-		if(pid->integral > I_MAX ) {
+		pid->integral = I_MAX;
 
-			pid->integral = I_MAX;
-		}
-		else if( pid->integral < I_MIN) {
+	} else if (pid->integral < I_MIN) {
 
-			pid->integral = I_MIN;
-		}
-	}
-	else {
-
-		//pid->integral = 0;
+		pid->integral = I_MIN;
 	}
 
 	// K_D

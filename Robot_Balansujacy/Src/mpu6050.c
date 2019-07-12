@@ -316,7 +316,7 @@ MPU6050_Result MPU6050_Accelerometer_Calibration(I2C_HandleTypeDef *I2Cx,
 	float Acce_Sens = DataStruct->Acce_Sensitivity;
 
 	/* Accelerometer offset averaging */
-	for(int i = 0; i < 100; ++i) {
+	for(int i = 0; i < 1000; ++i) {
 
 		MPU6050_Read_Accelerometer(I2Cx, DataStruct);
 		DataStruct->Acce_X_Offset = DataStruct->Acce_X_Offset + DataStruct->Acce_X;
@@ -324,9 +324,9 @@ MPU6050_Result MPU6050_Accelerometer_Calibration(I2C_HandleTypeDef *I2Cx,
 		DataStruct->Acce_Z_Offset = DataStruct->Acce_Z_Offset + DataStruct->Acce_Z;
 	}
 
-	DataStruct->Acce_X_Offset /= 100;
-	DataStruct->Acce_Y_Offset /= 100;
-	DataStruct->Acce_Z_Offset = DataStruct->Acce_Z_Offset / 100 - Acce_Sens;
+	DataStruct->Acce_X_Offset /= 1000;
+	DataStruct->Acce_Y_Offset /= 1000;
+	DataStruct->Acce_Z_Offset = DataStruct->Acce_Z_Offset / 1000 - Acce_Sens;
 
 
 	return MPU6050_Result_Ok;
@@ -351,7 +351,7 @@ MPU6050_Result MPU6050_Accelerometer_RPY(I2C_HandleTypeDef *I2Cx,
 
 	float Acce_Sens = DataStruct->Acce_Sensitivity;
 
-	//for(int i = 0; i < 4; ++i) {
+	for(int i = 0; i < 4; ++i) {
 
 		/******* Accelerometer measurement *******/
 		MPU6050_Read_Accelerometer(I2Cx,DataStruct);
@@ -366,13 +366,13 @@ MPU6050_Result MPU6050_Accelerometer_RPY(I2C_HandleTypeDef *I2Cx,
 
 
 		/* Converting to RPY */
-		DataStruct->Acce_Roll  = atan2(DataStruct->Acce_Y_G, DataStruct->Acce_Z_G) * (180 / M_PI);
-		DataStruct->Acce_Pitch = atan2(DataStruct->Acce_X_G, DataStruct->Acce_Z_G) * (180 / M_PI);
+		DataStruct->Acce_Roll  += atan2(DataStruct->Acce_Y_G, DataStruct->Acce_Z_G) * (180 / M_PI);
+		DataStruct->Acce_Pitch += atan2(DataStruct->Acce_X_G, DataStruct->Acce_Z_G) * (180 / M_PI);
 		/* Yaw unused*/
-	//}
+	}
 
-	//DataStruct->Acce_Roll  /= 4;
-	//DataStruct->Acce_Pitch /= 4;
+	DataStruct->Acce_Roll  /= 4;
+	DataStruct->Acce_Pitch /= 4;
 
 	return MPU6050_Result_Ok;
 }
@@ -388,7 +388,7 @@ MPU6050_Result MPU6050_Gyroscope_Calibration(I2C_HandleTypeDef *I2Cx,
 	 */
 
 	/* Gyroscope offset averaging */
-	for(int i = 0; i <= 100; ++i) {
+	for(int i = 0; i <= 1000; ++i) {
 
 		MPU6050_Read_Gyroscope(I2Cx,DataStruct);
 		DataStruct->Gyro_X_Offset += DataStruct->Gyro_X;
@@ -396,9 +396,9 @@ MPU6050_Result MPU6050_Gyroscope_Calibration(I2C_HandleTypeDef *I2Cx,
 		DataStruct->Gyro_Z_Offset += DataStruct->Gyro_Z;
 	}
 
-	DataStruct->Gyro_X_Offset /= 100;
-	DataStruct->Gyro_Y_Offset /= 100;
-	DataStruct->Gyro_Z_Offset /= 100;
+	DataStruct->Gyro_X_Offset /= 1000;
+	DataStruct->Gyro_Y_Offset /= 1000;
+	DataStruct->Gyro_Z_Offset /= 1000;
 
 	return MPU6050_Result_Ok;
 }
@@ -439,9 +439,9 @@ MPU6050_Result MPU6050_Gyroscope_RPY(I2C_HandleTypeDef* I2Cx,
 	DataStruct->Gyro_Y = DataStruct->Gyro_Y - DataStruct->Gyro_Y_Offset;
 	DataStruct->Gyro_Z = DataStruct->Gyro_Z - DataStruct->Gyro_Z_Offset;
 
-	DataStruct->Gyro_X_DGS = (int16_t)( DataStruct->Gyro_X / Gyro_Sens);
-	DataStruct->Gyro_Y_DGS = (int16_t)( DataStruct->Gyro_Y / Gyro_Sens);
-	DataStruct->Gyro_Z_DGS = (int16_t)( DataStruct->Gyro_Z / Gyro_Sens);
+	DataStruct->Gyro_X_DGS = DataStruct->Gyro_X / Gyro_Sens;
+	DataStruct->Gyro_Y_DGS = DataStruct->Gyro_Y / Gyro_Sens;
+	DataStruct->Gyro_Z_DGS = DataStruct->Gyro_Z / Gyro_Sens;
 
 	/* Converting to RPY */
 	DataStruct->Gyro_Roll  = DataStruct->Gyro_Roll  + ( 0.5 * ( (long double)(I_Time_Stop - I_Time_Start) / 1000 )

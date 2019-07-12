@@ -47,11 +47,11 @@
 
 #define SETPOINT	0
 #define HYSTERESIS	0
-#define K_P			0
+#define K_P			100
 #define K_I			0
 #define K_D			0
 
-#define FILTER_WEIGHT 0
+#define FILTER_WEIGHT 0.02
 
 /* USER CODE END PD */
 
@@ -69,8 +69,10 @@ UART_HandleTypeDef *hc05_uart_handle   = &huart1;
 struct Data_frame_from_PC	DF_PC;
 struct Data_frame_to_PC		DT_PC;
 
+uint8_t Accelerometer_data_frame[ACCELEROMETER_DATA_FRAME_SIZE];
+uint8_t Gyroscope_data_frame[GYROSCOPE_DATA_FRAME_SIZE];
+
 uint8_t Data_from_PC[DATA_FRAME_FROM_PC_SIZE];
-uint8_t Data_to_PC[DATA_FRAME_TO_PC_SIZE];
 
 /* PID global variables */
 double Set_point_global  = SETPOINT;
@@ -82,9 +84,11 @@ double Kp_global = K_P, Ti_global = K_I, Td_global = K_D;
 uint8_t mpu6050_correct_init_global = 0;
 
 /* accelerometer */
-int16_t a_x_global = 0, a_y_global = 0, a_z_global = 0;
+double a_x_g_global = 0, a_y_g_global = 0, a_z_g_global = 0;
+double a_roll_global = 0, a_pitch_global = 0, a_yaw_global = 0;
 /* gyroscope */
-int16_t g_x_global = 0, g_y_global = 0, g_z_global = 0;
+double g_x_dgs_global = 0, g_y_dgs_global = 0, g_z_dgs_global = 0;
+double g_roll_global = 0, g_pitch_global = 0, g_yaw_global = 0;
 
 int16_t a_x_offset_global = 0, a_y_offset_global = 0, a_z_offset_global = 0;
 int16_t g_x_offset_global = 0, g_y_offset_global = 0, g_z_offset_global = 0;
@@ -311,7 +315,7 @@ void Start_Control_Task(void const * argument)
 	/* PID variables */
 	struct PID_regulator pid;
 
-	PID_Init(&pid, Set_point_global);
+	PID_Init(&pid);
 
 	/******* MPU6050 Initialization and connection ******/
 	osDelay(1500);
@@ -350,42 +354,49 @@ void Start_Control_Task(void const * argument)
 
 		if (mpu6050_correct_init_global == 1) {
 
-			I_Time_Start = I_Time_Stop;
-			I_Time_Stop = HAL_GetTick();
+				I_Time_Start = I_Time_Stop;
+				I_Time_Stop = HAL_GetTick();
 
-			MPU6050_Accelerometer_RPY(mpu6050_i2c_handle, &mpu1);
-			MPU6050_Gyroscope_RPY(mpu6050_i2c_handle, &mpu1, I_Time_Start, I_Time_Stop);
+				MPU6050_Accelerometer_RPY(mpu6050_i2c_handle, &mpu1);
+				MPU6050_Gyroscope_RPY(mpu6050_i2c_handle, &mpu1, I_Time_Start, I_Time_Stop);
 
-			/***** Complementary filter *****/
-			Roll_filtered_temp = ((1-Filter_weight_global) * (Roll_filtered_temp + (mpu1.Gyro_Pitch * ((I_Time_Start - I_Time_Stop) / 1000)))
-					           + (Filter_weight_global * mpu1.Acce_Pitch));
+				/***** Complementary filter *****/
+				Roll_filtered_temp = ((1-Filter_weight_global) * (Roll_filtered_temp + (mpu1.Gyro_Pitch * ((I_Time_Start - I_Time_Stop) / 1000)))
+								   + (Filter_weight_global * mpu1.Acce_Pitch));
 
-			a_x_global = mpu1.Acce_X; a_y_global = mpu1.Acce_Y; a_z_global = mpu1.Acce_Z;
-			g_x_global = mpu1.Gyro_X; g_y_global = mpu1.Gyro_Y; g_z_global = mpu1.Gyro_Z;
+				/* Acce */
+				a_x_g_global = mpu1.Acce_X_G; a_y_g_global = mpu1.Acce_Y_G; a_z_g_global = mpu1.Acce_Z_G;
+				a_roll_global = mpu1.Acce_Roll, a_pitch_global = mpu1.Acce_Pitch, a_yaw_global = 0;
 
-			Roll_filtered_global = Roll_filtered_temp;
-			Roll_filtered_pid    = Roll_filtered_temp;
+				/* Gyro */
+				g_x_dgs_global = mpu1.Gyro_X_DGS, g_y_dgs_global = mpu1.Gyro_Y_DGS, g_z_dgs_global = mpu1.Gyro_Z_DGS;
+				g_roll_global = mpu1.Gyro_Roll, g_pitch_global = mpu1.Gyro_Pitch, g_yaw_global = 0;
 
-			if (HAL_GetTick() - Timer_start >= 4) {
+				Roll_filtered_global = Roll_filtered_temp;
+				Roll_filtered_pid    = Roll_filtered_temp;
 
-				PID_Set_parameters(&pid, Kp_global, Ti_global, Td_global);
-				PID_Calculate(&pid, Roll_filtered_pid, I_Time_Start, I_Time_Stop);
+				if (HAL_GetTick() - Timer_start >= 0) {
 
-				if ( (Roll_filtered_pid < Set_point_global - Hysteresis_global  ||
-					  Roll_filtered_pid > Set_point_global + Hysteresis_global) &&
-					  fabs(Roll_filtered_pid) < 80) {
+					PID_Set_parameters(&pid, Set_point_global, Kp_global, Ti_global, Td_global);
+					PID_Calculate(&pid, Roll_filtered_pid, I_Time_Start, I_Time_Stop);
 
-					LeftEngineSpeed_global = pid.control;
-					RightEngineSpeed_global = pid.control;
+					if ( (Roll_filtered_pid < Set_point_global - Hysteresis_global  ||
+						  Roll_filtered_pid > Set_point_global + Hysteresis_global) &&
+						  fabs(Roll_filtered_pid) < 80) {
 
-				} else {
+						LeftEngineSpeed_global = pid.control;
+						RightEngineSpeed_global = pid.control;
 
-					LeftEngineSpeed_global = 0;
-					RightEngineSpeed_global = 0;
+					} else {
+
+						LeftEngineSpeed_global = pid.control;
+						RightEngineSpeed_global = pid.control;
+						//LeftEngineSpeed_global = 0;
+						//RightEngineSpeed_global = 0;
+					}
+
+					Timer_start = HAL_GetTick();
 				}
-
-				Timer_start = HAL_GetTick();
-			}
 		}
   }
   /* USER CODE END Start_Control_Task */
@@ -400,11 +411,17 @@ void Start_Control_Task(void const * argument)
 
 			//HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 
-			HC05_Fill_Data_frame(&DT_PC, Data_to_PC,
-								 LiPol_voltage_global,
-								 a_x_global, a_y_global, a_z_global);
+			HC05_Fill_Gyroscope_Data_frame(&DT_PC, Gyroscope_data_frame,
+													       g_x_dgs_global, g_y_dgs_global, g_z_dgs_global,
+														   g_roll_global, g_pitch_global, g_yaw_global);
 
-			HAL_UART_Transmit_DMA(hc05_uart_handle, Data_to_PC, DATA_FRAME_TO_PC_SIZE);
+			HAL_UART_Transmit_DMA(hc05_uart_handle, Gyroscope_data_frame, GYROSCOPE_DATA_FRAME_SIZE);
+
+			HC05_Fill_Accelerometer_Data_frame(&DT_PC, Accelerometer_data_frame,
+							                   a_x_g_global, a_y_g_global, a_z_g_global,
+											   a_roll_global, a_pitch_global, a_yaw_global);
+
+			HAL_UART_Transmit_DMA(hc05_uart_handle, Accelerometer_data_frame, ACCELEROMETER_DATA_FRAME_SIZE);
 		}
 	}
      
