@@ -21,6 +21,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     Show_Complementary_Filter_Roll = true; Show_Complementary_Filter_Pitch = true; Show_Complementary_Filter_Yaw = true;
 
+    Data_to.Angle_Kd = 0; Data_to.Angle_Ki = 0; Data_to.Angle_Kp = 0;
+    Data_to.Speed_Kd = 0; Data_to.Speed_Ki = 0; Data_to.Speed_Kp = 0;
+    Data_to.Complementary_filter_weight = 0;
+    Data_to.Left_engine_speed = 0; Data_to.Right_engine_speed = 0;
+    Data_to.Emergency_stop = 0;
+
     MainWindow_Default_View();
     MainWindow_Setup_Icons();
 
@@ -41,7 +47,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Connection with CommunicationWindow
     connect(this, SIGNAL( Disconnect_Signal() ), CW, SLOT( Disconnect_Slot() ) );
+    connect(this, SIGNAL( Send_data_Signal() ), CW, SLOT( Send_Data_to_robot_Slot() ) );
+
     connect(CW, SIGNAL( Connection_OK_Signal() ), this, SLOT( Connection_OK_Slot() ) );
+    connect(CW, SIGNAL( Parsed_frame_OK_Signal(Data_from_Robot) ), this, SLOT( MainWindow_realtimeDataSlot(Data_from_Robot) ));
 
     // Setup OpenGL visualisation
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -101,7 +110,7 @@ void MainWindow::MainWindow_Setup_Accelerometer_Graph()
 
     ui->Accelerometer_Graph->xAxis->setTicker(timeTicker);
     ui->Accelerometer_Graph->axisRect()->setupFullAxesBox();
-    ui->Accelerometer_Graph->yAxis->setRange(-1.2, 1.2);
+    ui->Accelerometer_Graph->yAxis->setRange(-1.5, 1.5);
 
     // make left and bottom axes transfer their ranges to right and top axes:
     connect(ui->Accelerometer_Graph->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->Accelerometer_Graph->xAxis2, SLOT(setRange(QCPRange)));
@@ -147,7 +156,7 @@ void MainWindow::MainWindow_Setup_Gyroscope_Graph()
 
     ui->Gyroscope_Graph->xAxis->setTicker(timeTicker);
     ui->Gyroscope_Graph->axisRect()->setupFullAxesBox();
-    ui->Gyroscope_Graph->yAxis->setRange(-1.2, 1.2);
+    ui->Gyroscope_Graph->yAxis->setRange(-500, 500);
 
     // make left and bottom axes transfer their ranges to right and top axes:
     connect(ui->Gyroscope_Graph->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->Gyroscope_Graph->xAxis2, SLOT(setRange(QCPRange)));
@@ -255,18 +264,18 @@ void MainWindow::MainWindow_Display_IMU_data()
     double key = time.elapsed()/1000.0; // time elapsed since start of demo, in seconds
 
     // Accelerometer data
-    double Accelerometer_X = qSin(key)+qrand()/static_cast<double>(RAND_MAX)*1*qSin(key/0.3843);
-    double Accelerometer_Y = qCos(key)+qrand()/static_cast<double>(RAND_MAX)*0.5*qSin(key/0.4364);
-    double Accelerometer_Z = qCos(key)+qrand()/static_cast<double>(RAND_MAX)*0.8*qSin(key/0.4364);
+    double Accelerometer_X = Data_from.a_x;
+    double Accelerometer_Y = Data_from.a_y;
+    double Accelerometer_Z = Data_from.a_z;
 
-    double Accelerometer_Roll  = qSin(key)+qrand()/static_cast<double>(RAND_MAX)*1*qSin(key/0.3843);
-    double Accelerometer_Pitch = qCos(key)+qrand()/static_cast<double>(RAND_MAX)*0.5*qSin(key/0.4364);
-    double Accelerometer_Yaw   = qCos(key)+qrand()/static_cast<double>(RAND_MAX)*0.8*qSin(key/0.4364);
+    double Accelerometer_Roll  = Data_from.a_roll;
+    double Accelerometer_Pitch = Data_from.a_pitch;
+    double Accelerometer_Yaw   = Data_from.a_yaw;
 
     // Gyroscope data
-    double Gyroscope_X = qSin(key)+qrand()/static_cast<double>(RAND_MAX)*1*qSin(key/0.3843);
-    double Gyroscope_Y = qCos(key)+qrand()/static_cast<double>(RAND_MAX)*0.5*qSin(key/0.4364);
-    double Gyroscope_Z = qCos(key)+qrand()/static_cast<double>(RAND_MAX)*0.8*qSin(key/0.4364);
+    double Gyroscope_X = Data_from.g_x;
+    double Gyroscope_Y = Data_from.g_y;
+    double Gyroscope_Z = Data_from.g_z;
 
     double Gyroscope_Roll  = qSin(key)+qrand()/static_cast<double>(RAND_MAX)*1*qSin(key/0.3843);
     double Gyroscope_Pitch = qCos(key)+qrand()/static_cast<double>(RAND_MAX)*0.5*qSin(key/0.4364);
@@ -344,14 +353,14 @@ void MainWindow::MainWindow_Display_IMU_data()
     if(Show_Complementary_Filter_Yaw   == true) ui->Complementary_Filter_Graph->graph(2)->addData(key, Complementary_Filter_Yaw);
 
     // rescale value (vertical) axis to fit the current data:
-    ui->Accelerometer_Graph->graph(0)->rescaleValueAxis();
-    ui->Accelerometer_Graph->graph(1)->rescaleValueAxis(true);
+    //ui->Accelerometer_Graph->graph(0)->rescaleValueAxis();
+    //ui->Accelerometer_Graph->graph(1)->rescaleValueAxis(true);
 
     ui->Accelerometer_RPY_Graph->graph(0)->rescaleValueAxis();
     ui->Accelerometer_RPY_Graph->graph(1)->rescaleValueAxis(true);
 
-    ui->Gyroscope_Graph->graph(0)->rescaleValueAxis();
-    ui->Gyroscope_Graph->graph(1)->rescaleValueAxis(true);
+    //ui->Gyroscope_Graph->graph(0)->rescaleValueAxis();
+    //ui->Gyroscope_Graph->graph(1)->rescaleValueAxis(true);
 
     ui->Gyroscope_RPY_Graph->graph(0)->rescaleValueAxis();
     ui->Gyroscope_RPY_Graph->graph(1)->rescaleValueAxis(true);
@@ -395,7 +404,7 @@ void MainWindow::MainWindow_Display_IMU_data()
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void MainWindow::MainWindow_Display_Battery_data(int voltage)
+void MainWindow::MainWindow_Display_Battery_data(double voltage)
 {
 
     QPixmap Battery_null(":/new/prefix1/png/Battery_null.png");
@@ -406,11 +415,11 @@ void MainWindow::MainWindow_Display_Battery_data(int voltage)
     int w = ui->label_Battery->width();
     int h = ui->label_Battery->height();
 
-    double max_value = 1260;
-    double min_value = 1050;
+    double max_value = 12.6;
+    double min_value = 10.5;
     double ratio = max_value - min_value;
 
-    int battery_level = static_cast<int>( ( (voltage - min_value) / ratio ) * 100 );
+    double battery_level =  ( (voltage - min_value) / ratio ) * 100;
 
     if(battery_level >= 0 && battery_level <= 20) {
 
@@ -427,25 +436,27 @@ void MainWindow::MainWindow_Display_Battery_data(int voltage)
 
     if(battery_level >= 0) {
 
-        ui->label_Voltage->setNum(battery_level);
+        ui->label_Capacity->setNum( static_cast<int>(battery_level) );
     }
     else if(battery_level > 100) {
 
-        ui->label_Voltage->setNum(100);
+        ui->label_Capacity->setNum(100);
     }
     else {
 
-        ui->label_Voltage->setNum(0);
+        ui->label_Capacity->setNum(0);
     }
+
+    ui->label_Voltage->setNum(voltage);
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void MainWindow::MainWindow_realtimeDataSlot()
+void MainWindow::MainWindow_realtimeDataSlot(Data_from_Robot data)
 {        
-    // Battery data
-    int Battery_voltage = 1260;
+    Data_from = data;
 
-    MainWindow_Display_Battery_data(Battery_voltage);
+    // Battery data
+    MainWindow_Display_Battery_data( data.Lipol_voltage );
     MainWindow_Display_IMU_data();
 }
 
@@ -454,6 +465,8 @@ void MainWindow::MainWindow_realtimeDataSlot()
 void MainWindow::Connection_OK_Slot()
 {
     this->showMaximized();
+
+    ui->label_PortName->setText( CW->Get_PortName() );
 
     // Run communication thread
     //BT->Start_communication_thread();
@@ -504,8 +517,28 @@ void MainWindow::MainWindow_Setup_Icons()
     QPixmap Red_dot(":/new/prefix1/png/Red_dot.png");
     QPixmap Green_dot(":/new/prefix1/png/Green_dot.png");
     QPixmap Blue_dot(":/new/prefix1/png/Blue_dot.png");
-
     QPixmap Battery_null(":/new/prefix1/png/Battery_null.png");
+    QPixmap Connection(":/new/prefix1/png/Connection.png");
+    QPixmap Stop(":/new/prefix1/png/Stop_button.png");
+    QPixmap RPY(":/new/prefix1/png/RPY.png");
+    QPixmap StepperMotor(":/new/prefix1/png/StepperMotor.png");
+
+    QPixmap RedArrowUp(":/new/prefix1/png/RedArrowUp.png");
+    QPixmap RedArrowDown(":/new/prefix1/png/RedArrowDown.png");
+    QPixmap RedArrowLeft(":/new/prefix1/png/RedArrowLeft.png");
+    QPixmap RedArrowRight(":/new/prefix1/png/RedArrowRight.png");
+
+    w = ui->label_StepperMotor->width();
+    h = ui->label_StepperMotor->height();
+    ui->label_StepperMotor->setPixmap( StepperMotor.scaled(w, h, Qt::KeepAspectRatio) );
+
+    w = ui->label_RPY->width();
+    h = ui->label_RPY->height();
+    ui->label_RPY->setPixmap( RPY.scaled(w, h, Qt::KeepAspectRatio) );
+
+    w = ui->label_Connection->width();
+    h = ui->label_Connection->height();
+    ui->label_Connection->setPixmap( Connection.scaled(w, h, Qt::KeepAspectRatio) );
 
     w = ui->label_Battery->width();
     h = ui->label_Battery->height();
@@ -594,6 +627,46 @@ void MainWindow::MainWindow_Setup_Icons()
     w = ui->label_Complementary_Filter_Yaw->width();
     h = ui->label_Complementary_Filter_Yaw->height();
     ui->label_Complementary_Filter_Yaw->setPixmap( Blue_dot.scaled(w, h, Qt::KeepAspectRatio) );
+
+    w = ui->pushButton_EmergencyStop->width();
+    h = ui->pushButton_EmergencyStop->height();
+
+    QIcon ButtonIcon(Stop.scaled(w, h, Qt::KeepAspectRatio));
+
+    ui->pushButton_EmergencyStop->setIcon(ButtonIcon);
+    ui->pushButton_EmergencyStop->setIconSize(QSize(w,h));
+
+    w = ui->pushButton_Forward->width();
+    h = ui->pushButton_Forward->height();
+
+    QIcon ForwardButtonIcon(RedArrowUp.scaled(w, h, Qt::KeepAspectRatio));
+
+    ui->pushButton_Forward->setIcon(ForwardButtonIcon);
+    ui->pushButton_Forward->setIconSize(QSize(w,h));
+
+    w = ui->pushButton_Backward->width();
+    h = ui->pushButton_Backward->height();
+
+    QIcon BackwardButtonIcon(RedArrowDown.scaled(w, h, Qt::KeepAspectRatio));
+
+    ui->pushButton_Backward->setIcon(BackwardButtonIcon);
+    ui->pushButton_Backward->setIconSize(QSize(w,h));
+
+    w = ui->pushButton_Left->width();
+    h = ui->pushButton_Left->height();
+
+    QIcon LeftButtonIcon(RedArrowLeft.scaled(w, h, Qt::KeepAspectRatio));
+
+    ui->pushButton_Left->setIcon(LeftButtonIcon);
+    ui->pushButton_Left->setIconSize(QSize(w,h));
+
+    w = ui->pushButton_Right->width();
+    h = ui->pushButton_Right->height();
+
+    QIcon RightButtonIcon(RedArrowRight.scaled(w, h, Qt::KeepAspectRatio));
+
+    ui->pushButton_Right->setIcon(RightButtonIcon);
+    ui->pushButton_Right->setIconSize(QSize(w,h));
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -921,19 +994,6 @@ void MainWindow::on_pushButton_PID_Download_clicked()
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void MainWindow::on_pushButton_PID_Send_clicked()
-{
-    Data_to_Robot Data;
-
-    Data.Kp = ui->doubleSpinBox_PID_Kp->value();
-    Data.Ki = ui->doubleSpinBox_PID_Ki->value();
-    Data.Kd = ui->doubleSpinBox_PID_Kd->value();
-
-    CW->Fill_Data_to_robot(Data);
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 void MainWindow::on_doubleSpinBox_PID_Kp_valueChanged(double arg1)
 {
     ui->progressBar_PID_Kp->setValue( static_cast<int>(arg1) );
@@ -951,6 +1011,228 @@ void MainWindow::on_doubleSpinBox_PID_Kd_valueChanged(double arg1)
 void MainWindow::on_doubleSpinBox_PID_Ki_valueChanged(double arg1)
 {
     ui->progressBar_PID_Ki->setValue( static_cast<int>(arg1) );
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_EmergencyStop_clicked()
+{
+    ui->pushButton_EmergencyStop->setCheckable(true);
+
+    if( ui->pushButton_EmergencyStop->isChecked() ) {
+
+        Data_to.Emergency_stop = 1;
+    }
+    else {
+
+        Data_to.Emergency_stop = 0;
+    }
+
+    CW->Fill_Data_to_robot(Data_to);
+
+    emit Send_data_Signal();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_doubleSpinBox_Speed_PID_Kp_valueChanged(double arg1)
+{
+    ui->progressBar_Speed_PID_Kp->setValue( static_cast<int>(arg1) );
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_doubleSpinBox_Speed_PID_Ki_valueChanged(double arg1)
+{
+    ui->progressBar_Speed_PID_Ki->setValue( static_cast<int>(arg1) );
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_doubleSpinBox_Speed_PID_Kd_valueChanged(double arg1)
+{
+    ui->progressBar_Speed_PID_Kd->setValue( static_cast<int>(arg1) );
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_Send_clicked()
+{
+    // Angle PID data
+    Data_to.Angle_Kp = ui->doubleSpinBox_PID_Kp->value();
+    Data_to.Angle_Ki = ui->doubleSpinBox_PID_Ki->value();
+    Data_to.Angle_Kd = ui->doubleSpinBox_PID_Kd->value();
+
+    // Speed PID data
+    Data_to.Speed_Kp = ui->doubleSpinBox_Speed_PID_Kp->value();
+    Data_to.Speed_Ki = ui->doubleSpinBox_Speed_PID_Ki->value();
+    Data_to.Speed_Kd = ui->doubleSpinBox_Speed_PID_Kd->value();
+
+    // Filters data
+    Data_to.Complementary_filter_weight = ui->doubleSpinBox_Complementary_filter_weight->value();
+
+    CW->Fill_Data_to_robot(Data_to);
+
+    emit Send_data_Signal();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_Exit_clicked()
+{
+    exit(0);
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_Forward_pressed()
+{
+    QPixmap GreenArrowUp(":/new/prefix1/png/GreenArrowUp.png");
+
+    int w = ui->pushButton_Forward->width();
+    int h = ui->pushButton_Forward->height();
+
+    QIcon ForwardButtonIcon(GreenArrowUp.scaled(w, h, Qt::KeepAspectRatio));
+
+    ui->pushButton_Forward->setIcon(ForwardButtonIcon);
+    ui->pushButton_Forward->setIconSize(QSize(w,h));
+
+    // Send data to robot
+    Data_to.Left_engine_speed = 10;
+    Data_to.Right_engine_speed = 10;
+
+    CW->Fill_Data_to_robot(Data_to);
+
+    emit Send_data_Signal();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_Forward_released()
+{
+    QPixmap RedArrowUp(":/new/prefix1/png/RedArrowUp.png");
+
+    int w = ui->pushButton_Forward->width();
+    int h = ui->pushButton_Forward->height();
+
+    QIcon ForwardButtonIcon(RedArrowUp.scaled(w, h, Qt::KeepAspectRatio));
+
+    ui->pushButton_Forward->setIcon(ForwardButtonIcon);
+    ui->pushButton_Forward->setIconSize(QSize(w,h));
+
+    // Send data to robot
+    Data_to.Left_engine_speed = 0;
+    Data_to.Right_engine_speed = 0;
+
+    CW->Fill_Data_to_robot(Data_to);
+
+    emit Send_data_Signal();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_Left_pressed()
+{
+    QPixmap GreenArrowLeft(":/new/prefix1/png/GreenArrowLeft.png");
+
+    int w = ui->pushButton_Left->width();
+    int h = ui->pushButton_Left->height();
+
+    QIcon LeftButtonIcon(GreenArrowLeft.scaled(w, h, Qt::KeepAspectRatio));
+
+    ui->pushButton_Left->setIcon(LeftButtonIcon);
+    ui->pushButton_Left->setIconSize(QSize(w,h));
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_Left_released()
+{
+    QPixmap RedArrowLeft(":/new/prefix1/png/RedArrowLeft.png");
+
+    int w = ui->pushButton_Left->width();
+    int h = ui->pushButton_Left->height();
+
+    QIcon LeftButtonIcon(RedArrowLeft.scaled(w, h, Qt::KeepAspectRatio));
+
+    ui->pushButton_Left->setIcon(LeftButtonIcon);
+    ui->pushButton_Left->setIconSize(QSize(w,h));
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_Right_pressed()
+{
+    QPixmap GreenArrowRight(":/new/prefix1/png/GreenArrowRight.png");
+
+    int w = ui->pushButton_Right->width();
+    int h = ui->pushButton_Right->height();
+
+    QIcon RightButtonIcon(GreenArrowRight.scaled(w, h, Qt::KeepAspectRatio));
+
+    ui->pushButton_Right->setIcon(RightButtonIcon);
+    ui->pushButton_Right->setIconSize(QSize(w,h));
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_Right_released()
+{
+    QPixmap RedArrowRight(":/new/prefix1/png/RedArrowRight.png");
+
+    int w = ui->pushButton_Right->width();
+    int h = ui->pushButton_Right->height();
+
+    QIcon RightButtonIcon(RedArrowRight.scaled(w, h, Qt::KeepAspectRatio));
+
+    ui->pushButton_Right->setIcon(RightButtonIcon);
+    ui->pushButton_Right->setIconSize(QSize(w,h));
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_Backward_pressed()
+{
+    QPixmap GreenArrowBackward(":/new/prefix1/png/GreenArrowDown.png");
+
+    int w = ui->pushButton_Backward->width();
+    int h = ui->pushButton_Backward->height();
+
+    QIcon BackwardButtonIcon(GreenArrowBackward.scaled(w, h, Qt::KeepAspectRatio));
+
+    ui->pushButton_Backward->setIcon(BackwardButtonIcon);
+    ui->pushButton_Backward->setIconSize(QSize(w,h));
+
+    // Send data to robot
+    Data_to.Left_engine_speed = -10;
+    Data_to.Right_engine_speed = -10;
+
+    CW->Fill_Data_to_robot(Data_to);
+
+    emit Send_data_Signal();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_Backward_released()
+{
+    QPixmap RedArrowBackward(":/new/prefix1/png/RedArrowDown.png");
+
+    int w = ui->pushButton_Backward->width();
+    int h = ui->pushButton_Backward->height();
+
+    QIcon BackwardButtonIcon(RedArrowBackward.scaled(w, h, Qt::KeepAspectRatio));
+
+    ui->pushButton_Backward->setIcon(BackwardButtonIcon);
+    ui->pushButton_Backward->setIconSize(QSize(w,h));
+
+    // Send data to robot
+    Data_to.Left_engine_speed = 0;
+    Data_to.Right_engine_speed = 0;
+
+    CW->Fill_Data_to_robot(Data_to);
+
+    emit Send_data_Signal();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

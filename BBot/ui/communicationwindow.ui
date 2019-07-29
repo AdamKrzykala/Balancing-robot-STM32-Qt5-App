@@ -6,54 +6,78 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>906</width>
-    <height>696</height>
+    <width>788</width>
+    <height>506</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Łączenie</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_4">
-   <item row="1" column="0" colspan="2">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Preferred</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>10</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="2" column="0" colspan="2">
-    <widget class="QGroupBox" name="groupBox_2">
+   <item row="0" column="1">
+    <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
-      <string>Komunikaty</string>
+      <string>Obsługa połączenia</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
+     <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">
-       <widget class="QTextBrowser" name="textBrowser_Logs"/>
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Znalezione urządzenia:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QComboBox" name="comboBox_Devices"/>
+        </item>
+       </layout>
       </item>
       <item row="1" column="0">
-       <widget class="QPushButton" name="pushButton_Clear">
-        <property name="text">
-         <string>Wyczyść</string>
-        </property>
-       </widget>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Status połączenia:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_ConnectionStatus">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="2" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_7">
+        <item>
+         <widget class="QPushButton" name="pushButton_Search">
+          <property name="text">
+           <string>Szukaj urządzeń</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_Connect">
+          <property name="text">
+           <string>Połącz</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_Disconnect">
+          <property name="text">
+           <string>Rozłącz</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
-    </widget>
-   </item>
-   <item row="4" column="1">
-    <widget class="QPushButton" name="pushButton_Continue">
-     <property name="text">
-      <string>Dalej</string>
-     </property>
     </widget>
    </item>
    <item row="0" column="0">
@@ -275,61 +299,56 @@
      </layout>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QGroupBox" name="groupBox_3">
-     <property name="title">
-      <string>Obsługa połączenia</string>
+   <item row="3" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_9">
+     <item>
+      <widget class="QPushButton" name="pushButton_Cancel">
+       <property name="text">
+        <string>Anuluj</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_Continue">
+       <property name="text">
+        <string>Dalej</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="0" colspan="2">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <item row="1" column="0">
-       <widget class="QPushButton" name="pushButton_Connect">
-        <property name="text">
-         <string>Połącz</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1" colspan="2">
-       <widget class="QPushButton" name="pushButton_Disconnect">
-        <property name="text">
-         <string>Rozłącz</string>
-        </property>
-       </widget>
-      </item>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="2">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Komunikaty</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
-       <widget class="QPushButton" name="pushButton_Search">
+       <widget class="QTextBrowser" name="textBrowser_Logs"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QPushButton" name="pushButton_Clear">
         <property name="text">
-         <string>Szukaj urządzeń</string>
+         <string>Wyczyść</string>
         </property>
        </widget>
-      </item>
-      <item row="0" column="1" colspan="2">
-       <widget class="QComboBox" name="comboBox_Devices"/>
       </item>
      </layout>
     </widget>
    </item>
-   <item row="4" column="0">
-    <widget class="QPushButton" name="pushButton_Cancel">
-     <property name="text">
-      <string>Anuluj</string>
+   <item row="4" column="0" colspan="2">
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
-   </item>
-   <item row="3" column="0" colspan="2">
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Preferred</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>10</height>
-      </size>
-     </property>
-    </spacer>
    </item>
   </layout>
  </widget>

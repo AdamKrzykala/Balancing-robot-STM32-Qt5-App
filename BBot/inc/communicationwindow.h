@@ -9,6 +9,7 @@
 #include <QDateTime>
 #include <QEvent>
 #include <QMessageBox>
+#include <QColorDialog>
 
 #include "bluetooth.h"
 
@@ -25,11 +26,15 @@ public slots:
     void Disconnect_Slot();
     void Serial_Interface_Slot(Status_Codes status);
 
+    void Send_Data_to_robot_Slot();
+    void Parsed_frame_OK_Slot();
+
 public:
 
     explicit CommunicationWindow(QWidget *parent = nullptr);
     ~CommunicationWindow() override;
 
+    QString Get_PortName();
     void Fill_Data_to_robot(Data_to_Robot Data);
 
 private slots:
@@ -53,6 +58,8 @@ private:
 
     Bluetooth *BT = new Bluetooth;
 
+    QString                     PortName;
+
     QSerialPort::BaudRate       baud;
     QSerialPort::DataBits       bits;
     QSerialPort::Parity         parity;
@@ -71,6 +78,7 @@ signals:
 
     void Connection_OK_Signal();
     void Connection_FAIL_Signal();
+    void Parsed_frame_OK_Signal(Data_from_Robot);
 };
 
 #endif // COMMUNICATIONWINDOW_H

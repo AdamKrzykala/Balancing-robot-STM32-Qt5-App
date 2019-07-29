@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QEvent>
 #include <QPixmap>
+#include <QKeyEvent>
 
 #include "qcustomplot.h"
 #include "bluetooth.h"
@@ -29,17 +30,18 @@ public:
 
 public slots:
 
-    void MainWindow_realtimeDataSlot();
-
+    void MainWindow_realtimeDataSlot(Data_from_Robot data);
     void Connection_OK_Slot();
 
 private:
 
     Ui::MainWindow *ui;
 
-    //Bluetooth           *BT = new Bluetooth;
     GLWidget            *GW = new GLWidget;
     CommunicationWindow *CW = new CommunicationWindow;
+
+    Data_to_Robot Data_to;
+    Data_from_Robot Data_from;
 
     bool Show_Accelerometer_X, Show_Accelerometer_Y, Show_Accelerometer_Z;
     bool Show_Accelerometer_Roll, Show_Accelerometer_Pitch, Show_Accelerometer_Yaw;
@@ -67,7 +69,7 @@ private:
     void MainWindow_Setup_Complementary_Filter_Graph();
 
     void MainWindow_Display_IMU_data();
-    void MainWindow_Display_Battery_data(int voltage);
+    void MainWindow_Display_Battery_data(double voltage);
 
     void closeEvent(QCloseEvent *event) override;
 
@@ -104,23 +106,39 @@ private slots:
     void on_pushButton_ConnectDisconnect_clicked();
 
     void on_pushButton_PID_Default_clicked();
-
     void on_pushButton_PID_Clear_clicked();
-
     void on_pushButton_PID_Download_clicked();
 
-    void on_pushButton_PID_Send_clicked();
-
     void on_doubleSpinBox_PID_Kp_valueChanged(double arg1);
-
     void on_doubleSpinBox_PID_Kd_valueChanged(double arg1);
-
     void on_doubleSpinBox_PID_Ki_valueChanged(double arg1);
+
+    void on_pushButton_EmergencyStop_clicked();
+
+    void on_doubleSpinBox_Speed_PID_Kp_valueChanged(double arg1);
+    void on_doubleSpinBox_Speed_PID_Ki_valueChanged(double arg1);
+    void on_doubleSpinBox_Speed_PID_Kd_valueChanged(double arg1);
+
+    void on_pushButton_Send_clicked();
+
+    void on_pushButton_Exit_clicked();
+
+    void on_pushButton_Forward_pressed();
+    void on_pushButton_Forward_released();
+
+    void on_pushButton_Left_pressed();
+    void on_pushButton_Left_released();
+
+    void on_pushButton_Right_pressed();
+    void on_pushButton_Right_released();
+
+    void on_pushButton_Backward_pressed();
+    void on_pushButton_Backward_released();
 
 signals:
 
     void Disconnect_Signal();
-
+    void Send_data_Signal();
 };
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

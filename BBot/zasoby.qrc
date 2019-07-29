@@ -7,5 +7,17 @@
         <file>png/Battery_low.png</file>
         <file>png/Battery_medium.png</file>
         <file>png/Battery_null.png</file>
+        <file>png/Stop_button.png</file>
+        <file>png/Connection.png</file>
+        <file>png/RPY.png</file>
+        <file>png/StepperMotor.png</file>
+        <file>png/GreenArrowDown.png</file>
+        <file>png/GreenArrowLeft.png</file>
+        <file>png/GreenArrowRight.png</file>
+        <file>png/GreenArrowUp.png</file>
+        <file>png/RedArrowDown.png</file>
+        <file>png/RedArrowLeft.png</file>
+        <file>png/RedArrowRight.png</file>
+        <file>png/RedArrowUp.png</file>
     </qresource>
 </RCC>

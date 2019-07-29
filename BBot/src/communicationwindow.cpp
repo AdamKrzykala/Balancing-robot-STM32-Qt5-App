@@ -19,17 +19,20 @@ void CommunicationWindow::Serial_Interface_Slot(Status_Codes status)
 
             Serial_is_open = true;
             this->CommunicationWindow_addToLogs("Otwarto port szeregowy");
+            ui->label_ConnectionStatus->setText("<font color='green'>Połączono</font>");
             break;
 
         case Open_connection_FAIL:
 
             this->CommunicationWindow_addToLogs("Otwarcie portu szeregowego się nie powiodło !");
+            ui->label_ConnectionStatus->setText("<font color='red'>Coś poszło nie tak</font>");
             break;
 
         case Close_connection_OK:
 
             Serial_is_open = false;
             this->CommunicationWindow_addToLogs("Zamknięto port szeregowy");
+            ui->label_ConnectionStatus->setText("<font color='orange'>Rozłączono</font>");
             break;
 
         case Close_connection_FAIL:
@@ -46,6 +49,18 @@ void CommunicationWindow::Serial_Interface_Slot(Status_Codes status)
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+void CommunicationWindow::Send_Data_to_robot_Slot()
+{
+    BT->Set_Send_Flag();
+}
+
+void CommunicationWindow::Parsed_frame_OK_Slot()
+{
+    emit Parsed_frame_OK_Signal(BT->Get_DF_Robot());
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 CommunicationWindow::CommunicationWindow(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::CommunicationWindow)
@@ -56,6 +71,7 @@ CommunicationWindow::CommunicationWindow(QWidget *parent) :
 
     // CONNECT:
     connect(BT, SIGNAL( Serial_Interface_Signal(Status_Codes) ), this, SLOT( Serial_Interface_Slot(Status_Codes) ));
+    connect(BT, SIGNAL( Parsed_frame_OK_Signal() ), this, SLOT( Parsed_frame_OK_Slot() ));
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -98,23 +114,6 @@ void CommunicationWindow::CommunicationWindow_addToLogs(QString message)
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void CommunicationWindow::CommunicationWindow_sendMessageToDevice(QString message)
-{
-    /*
-    if( this->device->isOpen() && this->device->isWritable() ) {
-
-        this->CommunicationWindow_addToLogs("Wysyłam informacje do urządzenia " + message);
-        this->device->write(message.toStdString().c_str());
-    }
-    else {
-
-        this->CommunicationWindow_addToLogs("Nie mogę wysłać wiadomości. Port nie jest otwarty!");
-    }
-    */
-}
-
-// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 void CommunicationWindow::closeEvent(QCloseEvent *event)
 {
     QMessageBox messageBox(QMessageBox::Question,
@@ -145,9 +144,9 @@ void CommunicationWindow::on_pushButton_Connect_clicked()
       return;
     }
 
-    QString portName = ui->comboBox_Devices->currentText().split("\t").first();
+    PortName = ui->comboBox_Devices->currentText().split("\t").first();
 
-    BT->Open_connection(portName);
+    BT->Open_connection(PortName);
     BT->Start_communication_thread();
 }
 
@@ -334,6 +333,13 @@ void CommunicationWindow::on_comboBox_Control_currentIndexChanged(int index)
             control = QSerialPort::FlowControl::UnknownFlowControl;
             break;
     }
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+QString CommunicationWindow::Get_PortName()
+{
+    return PortName;
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

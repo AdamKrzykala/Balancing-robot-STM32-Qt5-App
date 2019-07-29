@@ -29,7 +29,6 @@ INCLUDEPATH += inc\
 SOURCES += \
         src/bluetooth.cpp \
         src/communicationwindow.cpp \
-        src/crc.c \
         src/glwidget.cpp \
         src/main.cpp \
         src/mainwindow.cpp \
@@ -38,7 +37,6 @@ SOURCES += \
 HEADERS += \
         inc/bluetooth.h \
         inc/communicationwindow.h \
-        inc/crc.h \
         inc/glwidget.h \
         inc/mainwindow.h \
         inc/qcustomplot.h
