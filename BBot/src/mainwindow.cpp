@@ -27,6 +27,9 @@ MainWindow::MainWindow(QWidget *parent) :
     Data_to.Left_engine_speed = 0; Data_to.Right_engine_speed = 0;
     Data_to.Emergency_stop = 0;
 
+    m_sSettingsFile = QApplication::applicationDirPath().left(1) + ":/main_settings.ini";
+    loadSettings();
+
     MainWindow_Default_View();
     MainWindow_Setup_Icons();
 
@@ -264,18 +267,18 @@ void MainWindow::MainWindow_Display_IMU_data()
     double key = time.elapsed()/1000.0; // time elapsed since start of demo, in seconds
 
     // Accelerometer data
-    double Accelerometer_X = Data_from.a_x;
-    double Accelerometer_Y = Data_from.a_y;
-    double Accelerometer_Z = Data_from.a_z;
+    double Accelerometer_X = 0;
+    double Accelerometer_Y = 0;
+    double Accelerometer_Z = 0;
 
-    double Accelerometer_Roll  = Data_from.a_roll;
-    double Accelerometer_Pitch = Data_from.a_pitch;
-    double Accelerometer_Yaw   = Data_from.a_yaw;
+    double Accelerometer_Roll  = 0;
+    double Accelerometer_Pitch = 0;
+    double Accelerometer_Yaw   = 0;
 
     // Gyroscope data
-    double Gyroscope_X = Data_from.g_x;
-    double Gyroscope_Y = Data_from.g_y;
-    double Gyroscope_Z = Data_from.g_z;
+    double Gyroscope_X = 0;
+    double Gyroscope_Y = 0;
+    double Gyroscope_Z = 0;
 
     double Gyroscope_Roll  = qSin(key)+qrand()/static_cast<double>(RAND_MAX)*1*qSin(key/0.3843);
     double Gyroscope_Pitch = qCos(key)+qrand()/static_cast<double>(RAND_MAX)*0.5*qSin(key/0.4364);
@@ -291,9 +294,13 @@ void MainWindow::MainWindow_Display_IMU_data()
     double Magnetometer_Yaw   = qCos(key)+qrand()/static_cast<double>(RAND_MAX)*0.8*qSin(key/0.4364);
 
     // Fusion data
-    double Complementary_Filter_Roll  = qSin(key)+qrand()/static_cast<double>(RAND_MAX)*10*qSin(key/0.3843);
-    double Complementary_Filter_Pitch = qCos(key)+qrand()/static_cast<double>(RAND_MAX)*2*qSin(key/0.4364);
-    double Complementary_Filter_Yaw   = qCos(key)+qrand()/static_cast<double>(RAND_MAX)*4*qSin(key/0.4364);
+    double Complementary_Filter_Roll  = Data_from.Complementary_roll;
+    double Complementary_Filter_Pitch = Data_from.Complementary_pitch;
+    double Complementary_Filter_Yaw   = Data_from.Complementary_yaw;
+
+    ui->label_Roll_View->setNum(Complementary_Filter_Roll);
+    ui->label_Pitch_View->setNum(Complementary_Filter_Pitch);
+    ui->label_Yaw_View->setNum(Complementary_Filter_Yaw);
 
     ui->lcdNumber_Accelerometer_X->display(Accelerometer_X);
     ui->lcdNumber_Accelerometer_Y->display(Accelerometer_Y);
@@ -368,11 +375,12 @@ void MainWindow::MainWindow_Display_IMU_data()
     ui->Magnetometer_Graph->graph(0)->rescaleValueAxis();
     ui->Magnetometer_Graph->graph(1)->rescaleValueAxis(true);
 
-    ui->Magnetometer_RPY_Graph->graph(0)->rescaleValueAxis();
+    ui->Magnetometer_RPY_Graph->graph(0)->rescaleValueAxis(true);
     ui->Magnetometer_RPY_Graph->graph(1)->rescaleValueAxis(true);
 
-    ui->Complementary_Filter_Graph->graph(0)->rescaleValueAxis();
+    ui->Complementary_Filter_Graph->graph(0)->rescaleValueAxis(true);
     ui->Complementary_Filter_Graph->graph(1)->rescaleValueAxis(true);
+    ui->Complementary_Filter_Graph->graph(2)->rescaleValueAxis(true);
 
     // make key axis range scroll with the data (at a constant range size of 8):
     ui->Accelerometer_Graph->xAxis->setRange(key, 20, Qt::AlignRight);
@@ -397,9 +405,9 @@ void MainWindow::MainWindow_Display_IMU_data()
     ui->Complementary_Filter_Graph->replot();
 
     // OpenGL visualisation
-    ui->widget_RPY_Visualisation->setXRotation(Complementary_Filter_Roll);
-    ui->widget_RPY_Visualisation->setYRotation(Complementary_Filter_Pitch);
-    ui->widget_RPY_Visualisation->setZRotation(Complementary_Filter_Yaw);
+    ui->widget_RPY_Visualisation->setXRotation(Complementary_Filter_Pitch);
+    ui->widget_RPY_Visualisation->setYRotation(Complementary_Filter_Yaw);
+    ui->widget_RPY_Visualisation->setZRotation(Complementary_Filter_Roll);
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -451,13 +459,24 @@ void MainWindow::MainWindow_Display_Battery_data(double voltage)
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::MainWindow_Display_Engines_data()
+{
+    int Left_engine_speed  = Data_from.Left_engine_speed;
+    int Right_engine_speed = Data_from.Right_engine_speed;
+
+    ui->label_Left_engine_speed_View->setNum(Left_engine_speed);
+    ui->label_Right_engine_speed_View->setNum(Right_engine_speed);
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void MainWindow::MainWindow_realtimeDataSlot(Data_from_Robot data)
 {        
     Data_from = data;
 
-    // Battery data
     MainWindow_Display_Battery_data( data.Lipol_voltage );
     MainWindow_Display_IMU_data();
+    MainWindow_Display_Engines_data();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -470,6 +489,88 @@ void MainWindow::Connection_OK_Slot()
 
     // Run communication thread
     //BT->Start_communication_thread();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::loadSettings()
+{
+    QSettings settings(m_sSettingsFile);
+
+    double PID_Kp = settings.value("PID_Kp").toDouble();
+    double PID_Ki = settings.value("PID_Ki").toDouble();
+    double PID_Kd = settings.value("PID_Kd").toDouble();
+
+    double Speed_PID_Kp = settings.value("Speed_PID_Kp").toDouble();
+    double Speed_PID_Ki = settings.value("Speed_PID_Ki").toDouble();
+    double Speed_PID_Kd = settings.value("Speed_PID_Kd").toDouble();
+
+    double Complementary_weight = settings.value("Complementary_weight").toDouble();
+
+    settings.setValue("PID_Kp", PID_Kp);
+    settings.setValue("PID_Ki", PID_Ki);
+    settings.setValue("PID_Kd", PID_Kd);
+
+    settings.setValue("Speed_PID_Kp", Speed_PID_Kp);
+    settings.setValue("Speed_PID_Ki", Speed_PID_Ki);
+    settings.setValue("Speed_PID_Kd", Speed_PID_Kd);
+
+    settings.setValue("Complementary_weight", Complementary_weight);
+
+    ui->doubleSpinBox_PID_Kp->setValue(PID_Kp);
+    ui->doubleSpinBox_PID_Ki->setValue(PID_Ki);
+    ui->doubleSpinBox_PID_Kd->setValue(PID_Kd);
+
+    ui->doubleSpinBox_Speed_PID_Kp->setValue(Speed_PID_Kp);
+    ui->doubleSpinBox_Speed_PID_Ki->setValue(Speed_PID_Ki);
+    ui->doubleSpinBox_Speed_PID_Kd->setValue(Speed_PID_Kd);
+
+    ui->doubleSpinBox_Complementary_filter_weight->setValue(Complementary_weight);
+
+    qDebug() << "Wczytano PID_Kp: " << PID_Kp;
+    qDebug() << "Wczytano PID_Ki: " << PID_Ki;
+    qDebug() << "Wczytano PID_Kd: " << PID_Kd;
+
+    qDebug() << "Wczytano Speed_PID_Kp: " << Speed_PID_Kp;
+    qDebug() << "Wczytano Speed_PID_Ki: " << Speed_PID_Ki;
+    qDebug() << "Wczytano Speed_PID_Kd: " << Speed_PID_Kd;
+
+    qDebug() << "Wczytano Complementary_weight: " << Complementary_weight;
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::saveSettings()
+{
+    QSettings settings(m_sSettingsFile);
+
+    double PID_Kp = ui->doubleSpinBox_PID_Kp->value();
+    double PID_Ki = ui->doubleSpinBox_PID_Ki->value();
+    double PID_Kd = ui->doubleSpinBox_PID_Kd->value();
+
+    double Speed_PID_Kp = ui->doubleSpinBox_Speed_PID_Kp->value();
+    double Speed_PID_Ki = ui->doubleSpinBox_Speed_PID_Ki->value();
+    double Speed_PID_Kd = ui->doubleSpinBox_Speed_PID_Kd->value();
+
+    double Complementary_weight = ui->doubleSpinBox_Complementary_filter_weight->value();
+
+    settings.setValue("PID_Kp", PID_Kp);
+    settings.setValue("PID_Ki", PID_Ki);
+    settings.setValue("PID_Kd", PID_Kd);
+
+    settings.setValue("Speed_PID_Kp", Speed_PID_Kp);
+    settings.setValue("Speed_PID_Ki", Speed_PID_Ki);
+    settings.setValue("Speed_PID_Kd", Speed_PID_Kd);
+
+    settings.setValue("Complementary_weight", Complementary_weight);
+
+    qDebug() << "Zapisano PID_Kp: " << PID_Kp;
+    qDebug() << "Zapisano PID_Ki: " << PID_Ki;
+    qDebug() << "Zapisano PID_Kd: " << PID_Kd;
+    qDebug() << "Zapisano Speed_PID_Kp: " << Speed_PID_Kp;
+    qDebug() << "Zapisano Speed_PID_Ki: " << Speed_PID_Ki;
+    qDebug() << "Zapisano Speed_PID_Kd: " << Speed_PID_Kd;
+    qDebug() << "Zapisano Complementary_weight: " << Complementary_weight;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -975,21 +1076,18 @@ void MainWindow::on_pushButton_ConnectDisconnect_clicked()
 
 void MainWindow::on_pushButton_PID_Default_clicked()
 {
-
+    ui->doubleSpinBox_PID_Kp->setValue(10);
+    ui->doubleSpinBox_PID_Ki->setValue(100);
+    ui->doubleSpinBox_PID_Kd->setValue(0.1);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 void MainWindow::on_pushButton_PID_Clear_clicked()
 {
-
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-void MainWindow::on_pushButton_PID_Download_clicked()
-{
-
+    ui->doubleSpinBox_PID_Kp->setValue(0);
+    ui->doubleSpinBox_PID_Ki->setValue(0);
+    ui->doubleSpinBox_PID_Kd->setValue(0);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -997,6 +1095,7 @@ void MainWindow::on_pushButton_PID_Download_clicked()
 void MainWindow::on_doubleSpinBox_PID_Kp_valueChanged(double arg1)
 {
     ui->progressBar_PID_Kp->setValue( static_cast<int>(arg1) );
+    saveSettings();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1004,6 +1103,7 @@ void MainWindow::on_doubleSpinBox_PID_Kp_valueChanged(double arg1)
 void MainWindow::on_doubleSpinBox_PID_Kd_valueChanged(double arg1)
 {
     ui->progressBar_PID_Kd->setValue( static_cast<int>(arg1) );
+    saveSettings();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1011,6 +1111,7 @@ void MainWindow::on_doubleSpinBox_PID_Kd_valueChanged(double arg1)
 void MainWindow::on_doubleSpinBox_PID_Ki_valueChanged(double arg1)
 {
     ui->progressBar_PID_Ki->setValue( static_cast<int>(arg1) );
+    saveSettings();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1038,6 +1139,7 @@ void MainWindow::on_pushButton_EmergencyStop_clicked()
 void MainWindow::on_doubleSpinBox_Speed_PID_Kp_valueChanged(double arg1)
 {
     ui->progressBar_Speed_PID_Kp->setValue( static_cast<int>(arg1) );
+    saveSettings();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1045,6 +1147,7 @@ void MainWindow::on_doubleSpinBox_Speed_PID_Kp_valueChanged(double arg1)
 void MainWindow::on_doubleSpinBox_Speed_PID_Ki_valueChanged(double arg1)
 {
     ui->progressBar_Speed_PID_Ki->setValue( static_cast<int>(arg1) );
+    saveSettings();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1052,6 +1155,7 @@ void MainWindow::on_doubleSpinBox_Speed_PID_Ki_valueChanged(double arg1)
 void MainWindow::on_doubleSpinBox_Speed_PID_Kd_valueChanged(double arg1)
 {
     ui->progressBar_Speed_PID_Kd->setValue( static_cast<int>(arg1) );
+    saveSettings();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1233,6 +1337,31 @@ void MainWindow::on_pushButton_Backward_released()
     CW->Fill_Data_to_robot(Data_to);
 
     emit Send_data_Signal();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_doubleSpinBox_Complementary_filter_weight_valueChanged(double arg1)
+{
+    saveSettings();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_Speed_PID_Default_clicked()
+{
+    ui->doubleSpinBox_Speed_PID_Kp->setValue(1);
+    ui->doubleSpinBox_Speed_PID_Ki->setValue(2);
+    ui->doubleSpinBox_Speed_PID_Kd->setValue(3);
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_Speed_PID_Clear_clicked()
+{
+    ui->doubleSpinBox_Speed_PID_Kp->setValue(0);
+    ui->doubleSpinBox_Speed_PID_Ki->setValue(0);
+    ui->doubleSpinBox_Speed_PID_Kd->setValue(0);
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

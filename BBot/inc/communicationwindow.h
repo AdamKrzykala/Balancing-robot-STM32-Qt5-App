@@ -10,6 +10,7 @@
 #include <QEvent>
 #include <QMessageBox>
 #include <QColorDialog>
+#include <QSettings>
 
 #include "bluetooth.h"
 
@@ -66,7 +67,12 @@ private:
     QSerialPort::StopBits       stop;
     QSerialPort::FlowControl    control;
 
+    QString m_sSettingsFile;
+
     bool Serial_is_open;
+
+    void loadSettings();
+    void saveSettings();
 
     void CommunicationWindow_set_default();
     void CommunicationWindow_addToLogs(QString message);

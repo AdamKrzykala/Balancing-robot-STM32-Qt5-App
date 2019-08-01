@@ -44,7 +44,7 @@ static void qNormalizeAngle(double &angle)
 
 void GLWidget::setXRotation(double angle)
 {
-    qNormalizeAngle(angle);
+    //qNormalizeAngle(angle);
     if (angle != m_xRot) {
         m_xRot = angle;
         update();
@@ -55,7 +55,7 @@ void GLWidget::setXRotation(double angle)
 
 void GLWidget::setYRotation(double angle)
 {
-    qNormalizeAngle(angle);
+    //qNormalizeAngle(angle);
     if (angle != m_yRot) {
         m_yRot = angle;
         update();
@@ -66,7 +66,7 @@ void GLWidget::setYRotation(double angle)
 
 void GLWidget::setZRotation(double angle)
 {
-    qNormalizeAngle(angle);
+    //qNormalizeAngle(angle);
     if (angle != m_zRot) {
         m_zRot = angle;
         update();
@@ -158,9 +158,9 @@ void GLWidget::paintGL() {
     glLoadIdentity();
     gluLookAt(2,0,5, 0,0,0, 0,1,0);
 
-    glRotated(-m_xRot,  1,0,0);
-    glRotated(-m_yRot,  0,1,0);
-    glRotated(-m_zRot,  0,0,1);
+    glRotated(m_xRot,  1,0,0);
+    glRotated(m_yRot,  0,1,0);
+    glRotated(m_zRot,  0,0,1);
 
     GLCreateCube(2.5, 3.0, 0.75);
 }

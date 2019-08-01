@@ -5,9 +5,7 @@
 #include <QDebug>
 #include <QSerialPort>
 
-#define ACCELEROMETER_DATA_FRAME_SIZE   11
-#define GYROSCOPE_DATA_FRAME_SIZE       14
-
+#define DATA_FRAME_FROM_ROBOT_SIZE      13
 #define DATA_FRAME_TO_ROBOT_SIZE        20
 
 #define POLYNOMIAL_9	0x31
@@ -37,11 +35,9 @@ struct Data_from_Robot
 {
     double Lipol_voltage;   // <- in volts
 
-    double a_x, a_y, a_z;   // <- in g-force
-    double a_roll, a_pitch, a_yaw;
+    double Complementary_roll, Complementary_pitch, Complementary_yaw;
 
-    double g_x, g_y, g_z;   // <- dg/s
-    double g_roll, g_pitch, g_yaw;
+    int Left_engine_speed, Right_engine_speed;
 };
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -74,8 +70,7 @@ private:
 
     QSerialPort *Device = new QSerialPort;
 
-    int8_t Acce_data_frame_received[ACCELEROMETER_DATA_FRAME_SIZE];
-    int8_t Gyro_data_frame_received[GYROSCOPE_DATA_FRAME_SIZE];
+    int8_t Data_frame_from_robot[DATA_FRAME_FROM_ROBOT_SIZE];
 
     Data_from_Robot DF_Robot;
     Data_to_Robot   DT_Robot;
@@ -86,8 +81,7 @@ private:
     void (Bluetooth::*f)();
 
     void Receive_frame();
-    void Parse_accelerometer_frame();
-    void Parse_gyroscope_frame();
+    void Parse_data_frame();
     void Send_frame();
 
     void Communication();

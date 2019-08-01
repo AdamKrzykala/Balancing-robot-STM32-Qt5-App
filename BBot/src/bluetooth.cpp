@@ -82,6 +82,13 @@ Bluetooth::Bluetooth()
     DT_Robot.Emergency_stop = 0;
     DT_Robot.Complementary_filter_weight = 0;
 
+    DF_Robot.Lipol_voltage = 0;
+    DF_Robot.Complementary_roll = 0;
+    DF_Robot.Complementary_pitch = 0;
+    DF_Robot.Complementary_yaw = 0;
+    DF_Robot.Left_engine_speed = 0;
+    DF_Robot.Right_engine_speed = 0;
+
     Send_flag = false;
     Receive_flag = false;
 
@@ -156,85 +163,45 @@ void Bluetooth::Receive_frame()
     if( Device->isOpen() && Device->isReadable()) {
 
         // Case 1: Read all data from Serial Port
+        Device->flush();
         QByteArray array = Device->readAll();
+        Device->waitForReadyRead();
 
         // Case 2: Copy this data to temporary frame
-        if(array[0] == 'G') {
+        for(int i = 0; i < DATA_FRAME_FROM_ROBOT_SIZE; i++) {
 
-            for(int i = 0; i < GYROSCOPE_DATA_FRAME_SIZE; i++) {
-
-                Gyro_data_frame_received[i] = array[i];
-            }
-
-            int8_t CRC_received = Gyro_data_frame_received[GYROSCOPE_DATA_FRAME_SIZE - 1];
-            int8_t CRC_actual = CRC8_DataArray(Gyro_data_frame_received, GYROSCOPE_DATA_FRAME_SIZE - 1);
-
-            if( CRC_actual == CRC_received ) {
-
-                Parse_gyroscope_frame();
-            }
+            Data_frame_from_robot[i] = array[i];
         }
-        if(array[14] == 'A') {
 
-            for(int i = 0; i < ACCELEROMETER_DATA_FRAME_SIZE; i++) {
+        int8_t CRC_received = Data_frame_from_robot[DATA_FRAME_FROM_ROBOT_SIZE - 1];
+        int8_t CRC_actual = CRC8_DataArray(Data_frame_from_robot, DATA_FRAME_FROM_ROBOT_SIZE - 1);
 
-                Acce_data_frame_received[i] = array[i];
-            }
+        if( CRC_actual == CRC_received ) {
 
-            int8_t CRC_received = Acce_data_frame_received[ACCELEROMETER_DATA_FRAME_SIZE - 1];
-            int8_t CRC_actual = CRC8_DataArray(Acce_data_frame_received, ACCELEROMETER_DATA_FRAME_SIZE - 1);
-
-            if( CRC_actual == CRC_received ) {
-
-                Parse_accelerometer_frame();
-            }
+            Parse_data_frame();
         }
     }
-
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void Bluetooth::Parse_accelerometer_frame()
+void Bluetooth::Parse_data_frame()
 {
-    //qDebug() << "Parsuję ! \n";
+    DF_Robot.Lipol_voltage = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[0]), static_cast<uint8_t>(Data_frame_from_robot[1])  ) ) / 100;
 
-    DF_Robot.a_x = static_cast<double>( Acce_data_frame_received[1] ) / 100;
-    DF_Robot.a_y = static_cast<double>( Acce_data_frame_received[2] ) / 100;
-    DF_Robot.a_z = static_cast<double>( Acce_data_frame_received[3] ) / 100;
+    DF_Robot.Complementary_roll  = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[2]), static_cast<uint8_t>(Data_frame_from_robot[3])  ) ) / 100;
+    DF_Robot.Complementary_pitch = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[4]), static_cast<uint8_t>(Data_frame_from_robot[5])  ) ) / 100;
+    DF_Robot.Complementary_yaw   = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[6]), static_cast<uint8_t>(Data_frame_from_robot[7])  ) ) / 100;
 
-    DF_Robot.a_roll  = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Acce_data_frame_received[4]), static_cast<uint8_t>(Acce_data_frame_received[5])  ) ) / 100;
-    DF_Robot.a_pitch = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Acce_data_frame_received[6]), static_cast<uint8_t>(Acce_data_frame_received[7])  ) ) / 100;
-    DF_Robot.a_yaw   = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Acce_data_frame_received[8]), static_cast<uint8_t>(Acce_data_frame_received[9]) ) ) / 100;
+    DF_Robot.Left_engine_speed  = static_cast<int16_t>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[8]),  static_cast<uint8_t>(Data_frame_from_robot[9])  ) );
+    DF_Robot.Right_engine_speed = static_cast<int16_t>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[10]), static_cast<uint8_t>(Data_frame_from_robot[11]) ) );
 
-    qDebug() << "Odbieram dane: ";
-    qDebug() << "a_x: " << DF_Robot.a_x;
-    qDebug() << "a_y: " << DF_Robot.a_y;
-    qDebug() << "a_z: " << DF_Robot.a_z;
-    qDebug() << "a_roll: "  << DF_Robot.a_roll;
-    qDebug() << "a_pitch: " << DF_Robot.a_pitch;
-    qDebug() << "a_yaw: "   << DF_Robot.a_yaw;
-}
-
-// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-void Bluetooth::Parse_gyroscope_frame()
-{
-
-    DF_Robot.g_x = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Gyro_data_frame_received[1]), static_cast<uint8_t>(Gyro_data_frame_received[2]) ) ) / 100;
-    DF_Robot.g_y = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Gyro_data_frame_received[3]), static_cast<uint8_t>(Gyro_data_frame_received[4]) ) ) / 100;
-    DF_Robot.g_z = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Gyro_data_frame_received[5]), static_cast<uint8_t>(Gyro_data_frame_received[6]) ) ) / 100;
-
-    DF_Robot.g_roll  = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Gyro_data_frame_received[7]), static_cast<uint8_t>(Gyro_data_frame_received[8])  ) ) / 100;
-    DF_Robot.g_pitch = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Gyro_data_frame_received[9]), static_cast<uint8_t>(Gyro_data_frame_received[10])  ) ) / 100;
-    DF_Robot.g_yaw   = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Gyro_data_frame_received[11]), static_cast<uint8_t>(Gyro_data_frame_received[12]) ) ) / 100;
-
-    qDebug() << "g_x: " << DF_Robot.g_x;
-    qDebug() << "g_y: " << DF_Robot.g_y;
-    qDebug() << "g_z: " << DF_Robot.g_z;
-    qDebug() << "g_roll: "  << DF_Robot.g_roll;
-    qDebug() << "g_pitch: " << DF_Robot.g_pitch;
-    qDebug() << "g_yaw: "   << DF_Robot.g_yaw;
+    qDebug() << "Napiecie LiPol: "             << DF_Robot.Lipol_voltage;
+    qDebug() << "Filtr komplementarny Roll: "  << DF_Robot.Complementary_roll;
+    qDebug() << "Filtr komplementarny Pitch: " << DF_Robot.Complementary_pitch;
+    qDebug() << "Filtr komplementarny Yaw: "   << DF_Robot.Complementary_yaw;
+    qDebug() << "Predkosc lewego silnika: "    << DF_Robot.Left_engine_speed;
+    qDebug() << "Predskoc prawego silnika: "   << DF_Robot.Right_engine_speed;
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -254,7 +221,7 @@ void Bluetooth::Send_frame()
     int16_t Speed_Kd = static_cast<int16_t>(DT_Robot.Speed_Kd * 100);
 
     // Filters data
-    int8_t Complementary_filter_weight = static_cast<int8_t>(DT_Robot.Complementary_filter_weight * 100);
+    int8_t Complementary_filter_weight = static_cast<int8_t>(DT_Robot.Complementary_filter_weight * 1000);
 
     // Engines speed data
     int16_t Left_engine_speed  = static_cast<int16_t>(DT_Robot.Left_engine_speed);
@@ -352,7 +319,7 @@ void Bluetooth::Communication()
 
             emit Parsed_frame_OK_Signal();
 
-            msleep(80);
+            msleep(100);
         }
         else {
 

@@ -5,6 +5,7 @@
 #include <QEvent>
 #include <QPixmap>
 #include <QKeyEvent>
+#include <QSettings>
 
 #include "qcustomplot.h"
 #include "bluetooth.h"
@@ -40,6 +41,8 @@ private:
     GLWidget            *GW = new GLWidget;
     CommunicationWindow *CW = new CommunicationWindow;
 
+    QString m_sSettingsFile;
+
     Data_to_Robot Data_to;
     Data_from_Robot Data_from;
 
@@ -53,6 +56,9 @@ private:
     bool Show_Magnetometer_Roll, Show_Magnetometer_Pitch, Show_Magnetometer_Yaw;
 
     bool Show_Complementary_Filter_Roll, Show_Complementary_Filter_Pitch, Show_Complementary_Filter_Yaw;
+
+    void loadSettings();
+    void saveSettings();
 
     void MainWindow_Default_View();
     void MainWindow_Setup_Icons();
@@ -70,6 +76,7 @@ private:
 
     void MainWindow_Display_IMU_data();
     void MainWindow_Display_Battery_data(double voltage);
+    void MainWindow_Display_Engines_data();
 
     void closeEvent(QCloseEvent *event) override;
 
@@ -107,7 +114,6 @@ private slots:
 
     void on_pushButton_PID_Default_clicked();
     void on_pushButton_PID_Clear_clicked();
-    void on_pushButton_PID_Download_clicked();
 
     void on_doubleSpinBox_PID_Kp_valueChanged(double arg1);
     void on_doubleSpinBox_PID_Kd_valueChanged(double arg1);
@@ -134,6 +140,12 @@ private slots:
 
     void on_pushButton_Backward_pressed();
     void on_pushButton_Backward_released();
+
+    void on_doubleSpinBox_Complementary_filter_weight_valueChanged(double arg1);
+
+    void on_pushButton_Speed_PID_Default_clicked();
+
+    void on_pushButton_Speed_PID_Clear_clicked();
 
 signals:
 

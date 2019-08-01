@@ -67,7 +67,9 @@ CommunicationWindow::CommunicationWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    CommunicationWindow_set_default();
+    m_sSettingsFile = QApplication::applicationDirPath().left(1) + ":/settings.ini";
+
+    loadSettings();
 
     // CONNECT:
     connect(BT, SIGNAL( Serial_Interface_Signal(Status_Codes) ), this, SLOT( Serial_Interface_Slot(Status_Codes) ));
@@ -166,25 +168,6 @@ void CommunicationWindow::on_pushButton_Clear_clicked()
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void CommunicationWindow::CommunicationWindow_set_default()
-{
-    Serial_is_open = false;
-
-    on_comboBox_Baud_currentIndexChanged(2);
-    on_comboBox_Bits_currentIndexChanged(3);
-    on_comboBox_Parity_currentIndexChanged(0);
-    on_comboBox_Stop_currentIndexChanged(0);
-    on_comboBox_Control_currentIndexChanged(0);
-
-    ui->comboBox_Baud->setCurrentIndex(2);
-    ui->comboBox_Bits->setCurrentIndex(3);
-    ui->comboBox_Parity->setCurrentIndex(0);
-    ui->comboBox_Stop->setCurrentIndex(0);
-    ui->comboBox_Control->setCurrentIndex(0);
-}
-
-// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 void CommunicationWindow::on_comboBox_Baud_currentIndexChanged(int index)
 {
     switch(index) {
@@ -225,6 +208,8 @@ void CommunicationWindow::on_comboBox_Baud_currentIndexChanged(int index)
             baud = QSerialPort::UnknownBaud;
             break;
     }
+
+    saveSettings();
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -253,6 +238,8 @@ void CommunicationWindow::on_comboBox_Bits_currentIndexChanged(int index)
             bits = QSerialPort::UnknownDataBits;
             break;
     }
+
+    saveSettings();
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -285,6 +272,8 @@ void CommunicationWindow::on_comboBox_Parity_currentIndexChanged(int index)
             parity = QSerialPort::UnknownParity;
             break;
     }
+
+    saveSettings();
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -309,6 +298,8 @@ void CommunicationWindow::on_comboBox_Stop_currentIndexChanged(int index)
             stop = QSerialPort::StopBits::UnknownStopBits;
             break;
     }
+
+    saveSettings();
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -333,6 +324,58 @@ void CommunicationWindow::on_comboBox_Control_currentIndexChanged(int index)
             control = QSerialPort::FlowControl::UnknownFlowControl;
             break;
     }
+
+    saveSettings();
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void CommunicationWindow::loadSettings()
+{
+    QSettings settings(m_sSettingsFile);
+
+    int s_baud = settings.value("s_baud").toInt();
+    int s_bits = settings.value("s_bits").toInt();
+    int s_parity = settings.value("s_parity").toInt();
+    int s_stop = settings.value("s_stop").toInt();
+    int s_control = settings.value("s_control").toInt();
+
+    ui->comboBox_Baud->setCurrentIndex(s_baud);
+    ui->comboBox_Bits->setCurrentIndex(s_bits);
+    ui->comboBox_Parity->setCurrentIndex(s_parity);
+    ui->comboBox_Stop->setCurrentIndex(s_stop);
+    ui->comboBox_Control->setCurrentIndex(s_control);
+
+    qDebug() << "Wczytano baud: "    << s_baud;
+    qDebug() << "Wczytano bits: "    << s_bits;
+    qDebug() << "Wczytano parity: "  << s_parity;
+    qDebug() << "Wczytano stop: "    << s_stop;
+    qDebug() << "Wczytano control: " << s_control;
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void CommunicationWindow::saveSettings()
+{
+    QSettings settings(m_sSettingsFile);
+
+    int s_baud    = ui->comboBox_Baud->currentIndex();
+    int s_bits    = ui->comboBox_Bits->currentIndex();
+    int s_parity  = ui->comboBox_Parity->currentIndex();
+    int s_stop    = ui->comboBox_Stop->currentIndex();
+    int s_control = ui->comboBox_Control->currentIndex();
+
+    settings.setValue("s_baud",    s_baud);
+    settings.setValue("s_bits",    s_bits);
+    settings.setValue("s_parity",  s_parity);
+    settings.setValue("s_stop",    s_stop);
+    settings.setValue("s_control", s_control);
+
+    qDebug() << "Zapisano baud: "    << s_baud;
+    qDebug() << "Zapisano bits: "    << s_bits;
+    qDebug() << "Zapisano parity: "  << s_parity;
+    qDebug() << "Zapisano stop: "    << s_stop;
+    qDebug() << "Zapisano control: " << s_control;
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
