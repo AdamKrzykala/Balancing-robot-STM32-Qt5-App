@@ -71,6 +71,8 @@ void Error_Handler(void);
 #define SD_DIR2_GPIO_Port GPIOA
 #define LD2_Pin GPIO_PIN_5
 #define LD2_GPIO_Port GPIOA
+#define SD_STEP1_PWM_Pin GPIO_PIN_6
+#define SD_STEP1_PWM_GPIO_Port GPIOA
 #define SD_EN1_Pin GPIO_PIN_4
 #define SD_EN1_GPIO_Port GPIOC
 #define ADC1_IN15_LiPol_Pin GPIO_PIN_5
@@ -79,10 +81,16 @@ void Error_Handler(void);
 #define SD_MS3_GPIO_Port GPIOB
 #define SD_DIR1_Pin GPIO_PIN_8
 #define SD_DIR1_GPIO_Port GPIOA
+#define USART1_TX_HC05_Pin GPIO_PIN_9
+#define USART1_TX_HC05_GPIO_Port GPIOA
+#define USART1_RX_HC05_Pin GPIO_PIN_10
+#define USART1_RX_HC05_GPIO_Port GPIOA
 #define TMS_Pin GPIO_PIN_13
 #define TMS_GPIO_Port GPIOA
 #define TCK_Pin GPIO_PIN_14
 #define TCK_GPIO_Port GPIOA
+#define TIM2_CH1_PWM_Pin GPIO_PIN_15
+#define TIM2_CH1_PWM_GPIO_Port GPIOA
 #define SWO_Pin GPIO_PIN_3
 #define SWO_GPIO_Port GPIOB
 #define I2C1_SCL_MPU9250_Pin GPIO_PIN_6

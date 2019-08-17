@@ -32,6 +32,7 @@
 #include "mpu9250.h"
 #include "apid.h"
 #include "spid.h"
+#include "hc05.h"
 
 /* USER CODE END Includes */
 
@@ -108,15 +109,13 @@ int16_t LeftEngineSpeed_control_global = 0;
 int16_t RightEngineSpeed_control_global = 0;
 
 /* -----------> Communication variables <----------- */
-/*
-UART_HandleTypeDef *hc05_uart_handle = &huart1;
+UART_HandleTypeDef *HC05_handle = &huart1;
 
 struct Data_frame_from_PC	DF_PC;
 struct Data_frame_to_PC		DT_PC;
 
 uint8_t Data_to_PC[DATA_FRAME_TO_PC_SIZE];
 uint8_t Data_from_PC[DATA_FRAME_FROM_PC_SIZE];
-*/
 
 /* -----------> 	LiPol variables 	<----------- */
 int16_t LiPol_voltage_global = 0;
@@ -130,6 +129,7 @@ float dt = 0;
 osThreadId LiPol_TaskHandle;
 osThreadId Engines_TaskHandle;
 osThreadId IMU_TaskHandle;
+osThreadId USART_TaskHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -139,6 +139,7 @@ osThreadId IMU_TaskHandle;
 void Start_LiPol_Task(void const * argument);
 void Start_Engines_Task(void const * argument);
 void Start_IMU_Task(void const * argument);
+void Start_USART_Task(void const * argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -180,6 +181,10 @@ void MX_FREERTOS_Init(void) {
   /* definition and creation of IMU_Task */
   osThreadDef(IMU_Task, Start_IMU_Task, osPriorityNormal, 0, 512);
   IMU_TaskHandle = osThreadCreate(osThread(IMU_Task), NULL);
+
+  /* definition and creation of USART_Task */
+  osThreadDef(USART_Task, Start_USART_Task, osPriorityNormal, 0, 512);
+  USART_TaskHandle = osThreadCreate(osThread(USART_Task), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
@@ -455,8 +460,70 @@ void Start_IMU_Task(void const * argument)
   /* USER CODE END Start_IMU_Task */
 }
 
+/* USER CODE BEGIN Header_Start_USART_Task */
+/**
+* @brief Function implementing the USART_Task thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_Start_USART_Task */
+void Start_USART_Task(void const * argument)
+{
+  /* USER CODE BEGIN Start_USART_Task */
+
+	/* Start receiving */
+	HAL_UART_Receive_DMA(HC05_handle, Data_from_PC, DATA_FRAME_FROM_PC_SIZE);
+
+  /* Infinite loop */
+  for(;;)
+  {
+	  HC05_Fill_Data_frame_to_PC(&DT_PC, Data_to_PC,
+			  	  	  	   	     LiPol_voltage_global,
+								 Complementary_Roll_global, Complementary_Pitch_global, Complementary_Yaw_global,
+								 LeftEngineSpeed_global, RightEngineSpeed_global);
+
+	  HAL_UART_Transmit_DMA(HC05_handle, Data_to_PC, DATA_FRAME_TO_PC_SIZE);
+
+	  osDelay(50);
+  }
+  /* USER CODE END Start_USART_Task */
+}
+
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
+
+	if (huart->Instance == USART1) {
+
+		HAL_UART_Receive_DMA(HC05_handle, Data_from_PC, DATA_FRAME_FROM_PC_SIZE);
+
+		if( HC05_Parse_Data_frame(&DF_PC, Data_from_PC) == 0 ) {
+
+			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+
+			/* Angle PID data from PC */
+			Angle_KP_global = (double) DF_PC.Angle_KP / 100;
+			Angle_KI_global = (double) DF_PC.Angle_KI / 100;
+			Angle_KD_global = (double) DF_PC.Angle_KD / 100;
+
+			/* Speed PID data from PC */
+			Speed_KP_global = (double) DF_PC.Speed_KP / 100;
+			Speed_KI_global = (double) DF_PC.Speed_KI / 100;
+			Speed_KD_global = (double) DF_PC.Speed_KD / 100;
+
+			/* Filters data from PC */
+			Filter_weight_global = (double) DF_PC.Complementary_filter_weight / 1000;
+
+			/* Engines speed data from PC */
+			LeftEngineSpeed_control_global  = DF_PC.Left_engine_speed;
+			RightEngineSpeed_control_global = DF_PC.Right_engine_speed;
+
+			/* Additional data from PC */
+			Emergency_stop_global = DF_PC.Emergency_stop;
+		}
+	}
+}
      
 /* USER CODE END Application */
 
