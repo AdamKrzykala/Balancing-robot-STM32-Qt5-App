@@ -179,7 +179,7 @@ void MX_FREERTOS_Init(void) {
   Engines_TaskHandle = osThreadCreate(osThread(Engines_Task), NULL);
 
   /* definition and creation of IMU_Task */
-  osThreadDef(IMU_Task, Start_IMU_Task, osPriorityNormal, 0, 512);
+  osThreadDef(IMU_Task, Start_IMU_Task, osPriorityAboveNormal, 0, 512);
   IMU_TaskHandle = osThreadCreate(osThread(IMU_Task), NULL);
 
   /* definition and creation of USART_Task */
@@ -269,8 +269,8 @@ void Start_Engines_Task(void const * argument)
 	struct A4988 A4988_1;
 	struct A4988 A4988_2;
 
-	struct Angle_PID a_pid;
-	struct Speed_PID s_pid;
+	struct Angle_PID a_pid_left, a_pid_right;
+	struct Speed_PID s_pid_left, s_pid_right;
 
 	uint32_t I_Time_Stop = 0;
 	uint32_t I_Time_Start = 0;
@@ -293,8 +293,11 @@ void Start_Engines_Task(void const * argument)
 			   SD_MS3_GPIO_Port, SD_MS3_Pin);
 
 	/* PID regulators initialization */
-	Angle_PID_Init(&a_pid);
-	Speed_PID_Init(&s_pid);
+	Angle_PID_Init(&a_pid_left);
+	Angle_PID_Init(&a_pid_left);
+
+	Speed_PID_Init(&s_pid_right);
+	Speed_PID_Init(&s_pid_right);
 
   /* Infinite loop */
   for(;;)
@@ -316,26 +319,51 @@ void Start_Engines_Task(void const * argument)
 		I_Time_Start = I_Time_Stop;
 		I_Time_Stop = HAL_GetTick();
 
-		/* ---------------------------------> Speed PID <--------------------------------- */
-		/* 					Update PID parameters and get PID output  	 				   */
-		Speed_Set_point_left_global = LeftEngineSpeed_control_global;
+
+		Speed_Set_point_left_global  = LeftEngineSpeed_control_global;
 		Speed_Set_point_right_global = RightEngineSpeed_control_global;
 
-		Speed_PID_Set_parameters(&s_pid, Speed_Set_point_left_global, Speed_KP_global, Speed_KI_global, Speed_KD_global);
-		Speed_PID_Calculate(&s_pid, a_pid.control, I_Time_Start, I_Time_Stop);
+		/* ---------------------------------> Speed PID <--------------------------------- */
+		/* 					Update PID parameters and get PID output  	 				   */
 
-		Angle_Set_point_left_global  = -s_pid.control / 1000;
-		Angle_Set_point_right_global = -s_pid.control / 1000;
+		if( LeftEngineSpeed_control_global == RightEngineSpeed_control_global ) {
+
+			/* Left engine */
+			Speed_PID_Set_parameters(&s_pid_left, Speed_Set_point_left_global, Speed_KP_global, Speed_KI_global, Speed_KD_global);
+			Speed_PID_Calculate(&s_pid_left, a_pid_left.control, I_Time_Start, I_Time_Stop);
+
+			Angle_Set_point_left_global  = -s_pid_left.control / 1000;
+
+			/* Right engine */
+			Speed_PID_Set_parameters(&s_pid_right, Speed_Set_point_right_global, Speed_KP_global, Speed_KI_global, Speed_KD_global);
+			Speed_PID_Calculate(&s_pid_right, a_pid_right.control, I_Time_Start, I_Time_Stop);
+
+			Angle_Set_point_right_global = -s_pid_right.control / 1000;
+		}
+		else {
+
+			Angle_Set_point_left_global  = 2;
+			Angle_Set_point_right_global = 2;
+
+			s_pid_left.integral = 0;
+			s_pid_right.integral = 0;
+		}
 
 		/* ---------------------------------> Angle PID <--------------------------------- */
 		/* 					Update PID parameters and get PID output  	 				   */
-		Angle_PID_Set_parameters(&a_pid, Angle_Set_point_left_global, Angle_KP_global, Angle_KI_global, Angle_KD_global);
-		Angle_PID_Calculate(&a_pid, Complementary_Pitch_global, I_Time_Start, I_Time_Stop);
+
+		/* Left engine */
+		Angle_PID_Set_parameters(&a_pid_left, Angle_Set_point_left_global, Angle_KP_global, Angle_KI_global, Angle_KD_global);
+		Angle_PID_Calculate(&a_pid_left, Complementary_Pitch_global, I_Time_Start, I_Time_Stop);
+
+		/* Right engine */
+		Angle_PID_Set_parameters(&a_pid_right, Angle_Set_point_right_global, Angle_KP_global, Angle_KI_global, Angle_KD_global);
+		Angle_PID_Calculate(&a_pid_right, Complementary_Pitch_global, I_Time_Start, I_Time_Stop);
 
 		if ( fabs(Complementary_Pitch_global) < 40 ) {
 
-			LeftEngineSpeed_global  = a_pid.control;
-			RightEngineSpeed_global = a_pid.control;
+			LeftEngineSpeed_global  = a_pid_left.control;
+			RightEngineSpeed_global = a_pid_right.control;
 
 		} else {
 
@@ -345,33 +373,33 @@ void Start_Engines_Task(void const * argument)
 			LeftEngineSpeed_global = 0;
 			RightEngineSpeed_global = 0;
 
-			a_pid.control = 0;
-			a_pid.integral = 0;
+			a_pid_left.integral = 0;
+			a_pid_right.integral = 0;
 
-			s_pid.control = 0;
-			s_pid.integral = 0;
+			s_pid_left.integral = 0;
+			s_pid_right.integral = 0;
 		}
 
 	/* -----------------> A4988 <----------------- */
-	/* 	Update engines speed and direction       */
+	/* 	Update engines speed and direction         */
 	if (Emergency_stop_global == 1) {
 
 		A4988_Power_on(&A4988_1);
 		A4988_Power_on(&A4988_2);
 
-		if( Speed_Set_point_left_global == Speed_Set_point_right_global ) {
+		if( LeftEngineSpeed_control_global == RightEngineSpeed_control_global ) {
 
 			A4988_Set_Speed(&A4988_1, LeftEngineSpeed_global);
 			A4988_Set_Speed(&A4988_2, -RightEngineSpeed_global);
 		}
-		else if( Speed_Set_point_left_global > Speed_Set_point_right_global ) {
+		else if( LeftEngineSpeed_control_global > RightEngineSpeed_control_global ) {
 
-			A4988_Set_Speed(&A4988_1, LeftEngineSpeed_global);
-			A4988_Set_Speed(&A4988_2, -RightEngineSpeed_global - 50);
+			A4988_Set_Speed(&A4988_1, LeftEngineSpeed_global );
+			A4988_Set_Speed(&A4988_2, -RightEngineSpeed_global + 0.8 * (RightEngineSpeed_global) );
 		}
-		else if( Speed_Set_point_left_global < Speed_Set_point_right_global ) {
+		else if( LeftEngineSpeed_control_global < RightEngineSpeed_control_global ) {
 
-			A4988_Set_Speed(&A4988_1, LeftEngineSpeed_global + 50);
+			A4988_Set_Speed(&A4988_1, LeftEngineSpeed_global   - 0.8 * (LeftEngineSpeed_global) );
 			A4988_Set_Speed(&A4988_2, -RightEngineSpeed_global);
 		}
 	}
@@ -380,8 +408,11 @@ void Start_Engines_Task(void const * argument)
 		A4988_Power_off(&A4988_1);
 		A4988_Power_off(&A4988_2);
 
-		a_pid.integral = 0;
-		s_pid.integral = 0;
+		a_pid_left.integral = 0;
+		a_pid_right.integral = 0;
+
+		s_pid_left.integral = 0;
+		s_pid_right.integral = 0;
 	}
 
 	osDelay(5);
@@ -409,6 +440,10 @@ void Start_IMU_Task(void const * argument)
 	uint32_t I_Time_Start = 0;
 
 	/* IMU task initialization */
+
+	HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+	osDelay(100);
+
 	if (MPU9250_Init(&hi2c1, &mpu1, MPU9250_Device_1, MPU9250_Acce_2G, MPU9250_Gyro_2000s) == MPU9250_Init_OK) {
 
 		MPU9250_Set_Offsets(&hi2c1, &mpu1, 0, 0, 0, 0, 0, 0, 24, 146, -92.5);
@@ -431,6 +466,9 @@ void Start_IMU_Task(void const * argument)
 
 		mpu9250_correct_init_global = 0;
 	}
+
+	osDelay(100);
+	HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 
   /* Infinite loop */
   for(;;)

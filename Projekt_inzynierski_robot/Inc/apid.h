@@ -10,11 +10,11 @@
 
 #include "math.h"
 
-#define APID_MAX_CONTROL  250
-#define APID_MIN_CONTROL -250
+#define APID_MAX_CONTROL  190
+#define APID_MIN_CONTROL -190
 
-#define APID_I_MAX	 250
-#define APID_I_MIN	-250
+#define APID_I_MAX	 100
+#define APID_I_MIN	-100
 
 struct Angle_PID{
 

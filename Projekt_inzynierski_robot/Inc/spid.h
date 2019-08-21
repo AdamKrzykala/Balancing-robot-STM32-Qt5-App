@@ -10,11 +10,11 @@
 
 #include "math.h"
 
-#define SPID_MAX_CONTROL  45000
-#define SPID_MIN_CONTROL -45000
+#define SPID_MAX_CONTROL  2000
+#define SPID_MIN_CONTROL -2000
 
-#define SPID_I_MAX	 45000
-#define SPID_I_MIN	-45000
+#define SPID_I_MAX	 2000
+#define SPID_I_MIN	-2000
 
 struct Speed_PID{
 
