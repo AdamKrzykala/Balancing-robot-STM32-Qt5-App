@@ -67,12 +67,12 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 
-/* -----------> MPU6050 variables <----------- */
-float a_x_g_global  = 0, a_y_g_global   = 0, a_z_g_global = 0;
-float a_roll_global = 0, a_pitch_global = 0, a_yaw_global = 0;
+/* ------------> MPU9250 variables <------------- */
+float a_roll_global = 0, a_pitch_global = 0;
 
-float g_x_dgs_global = 0, g_y_dgs_global = 0, g_z_dgs_global = 0;
 float g_roll_global  = 0, g_pitch_global = 0, g_yaw_global   = 0;
+
+float m_yaw_global = 0;
 
 int16_t a_x_offset_global = 0, a_y_offset_global = 0, a_z_offset_global = 0;
 int16_t g_x_offset_global = 0, g_y_offset_global = 0, g_z_offset_global = 0;
@@ -122,6 +122,7 @@ int16_t LiPol_voltage_global = 0;
 
 /* -----------> Additional variables    <----------- */
 uint8_t Emergency_stop_global = 0;
+uint8_t Robot_fell_over = 0;
 
 float dt = 0;
 
@@ -242,7 +243,7 @@ void Start_LiPol_Task(void const * argument)
 		  }
 	  }
 	  /* Case 3: Voltage lower than 10.0 V */
-	  else if( LiPol_voltage < 1000 ) {
+	  if( LiPol_voltage < 1000 ) {
 
 		  Emergency_stop_global = 0;
 	  }
@@ -326,58 +327,82 @@ void Start_Engines_Task(void const * argument)
 		/* ---------------------------------> Speed PID <--------------------------------- */
 		/* 					Update PID parameters and get PID output  	 				   */
 
-		if( LeftEngineSpeed_control_global == RightEngineSpeed_control_global ) {
+		if( Speed_Set_point_left_global != LeftEngineSpeed_global || Speed_Set_point_right_global != RightEngineSpeed_global ) {
 
-			/* Left engine */
-			Speed_PID_Set_parameters(&s_pid_left, Speed_Set_point_left_global, Speed_KP_global, Speed_KI_global, Speed_KD_global);
-			Speed_PID_Calculate(&s_pid_left, a_pid_left.control, I_Time_Start, I_Time_Stop);
+			if( Speed_Set_point_left_global == Speed_Set_point_right_global ) {
 
-			Angle_Set_point_left_global  = -s_pid_left.control / 1000;
+				/* Left engine */
+				Speed_PID_Set_parameters(&s_pid_left, Speed_Set_point_left_global, Speed_KP_global, Speed_KI_global, Speed_KD_global);
+				Speed_PID_Calculate(&s_pid_left, a_pid_left.control, I_Time_Start, I_Time_Stop);
 
-			/* Right engine */
-			Speed_PID_Set_parameters(&s_pid_right, Speed_Set_point_right_global, Speed_KP_global, Speed_KI_global, Speed_KD_global);
-			Speed_PID_Calculate(&s_pid_right, a_pid_right.control, I_Time_Start, I_Time_Stop);
+				/* Right engine */
+				Speed_PID_Set_parameters(&s_pid_right, Speed_Set_point_right_global, Speed_KP_global, Speed_KI_global, Speed_KD_global);
+				Speed_PID_Calculate(&s_pid_right, a_pid_right.control, I_Time_Start, I_Time_Stop);
 
-			Angle_Set_point_right_global = -s_pid_right.control / 1000;
+				Angle_Set_point_left_global  = -s_pid_left.control / 1000;
+				Angle_Set_point_right_global = -s_pid_right.control / 1000;
+			}
+			else if( Speed_Set_point_left_global != Speed_Set_point_right_global ) {
+
+				Speed_Set_point_left_global  = -50;
+				Speed_Set_point_right_global = -50;
+
+				/* Left engine */
+				Speed_PID_Set_parameters(&s_pid_left, Speed_Set_point_left_global, Speed_KP_global, Speed_KI_global, Speed_KD_global);
+				Speed_PID_Calculate(&s_pid_left, a_pid_left.control, I_Time_Start, I_Time_Stop);
+
+				/* Right engine */
+				Speed_PID_Set_parameters(&s_pid_right, Speed_Set_point_right_global, Speed_KP_global, Speed_KI_global, Speed_KD_global);
+				Speed_PID_Calculate(&s_pid_right, a_pid_right.control, I_Time_Start, I_Time_Stop);
+
+				Angle_Set_point_left_global  = -s_pid_left.control / 1000;
+				Angle_Set_point_right_global = -s_pid_right.control / 1000;
+			}
 		}
 		else {
 
-			Angle_Set_point_left_global  = 2;
-			Angle_Set_point_right_global = 2;
 
-			s_pid_left.integral = 0;
-			s_pid_right.integral = 0;
 		}
 
 		/* ---------------------------------> Angle PID <--------------------------------- */
 		/* 					Update PID parameters and get PID output  	 				   */
 
-		/* Left engine */
-		Angle_PID_Set_parameters(&a_pid_left, Angle_Set_point_left_global, Angle_KP_global, Angle_KI_global, Angle_KD_global);
-		Angle_PID_Calculate(&a_pid_left, Complementary_Pitch_global, I_Time_Start, I_Time_Stop);
+		if( Angle_Set_point_left_global != Complementary_Pitch_global || Angle_Set_point_right_global != Complementary_Pitch_global ) {
 
-		/* Right engine */
-		Angle_PID_Set_parameters(&a_pid_right, Angle_Set_point_right_global, Angle_KP_global, Angle_KI_global, Angle_KD_global);
-		Angle_PID_Calculate(&a_pid_right, Complementary_Pitch_global, I_Time_Start, I_Time_Stop);
+			/* Left engine */
+			Angle_PID_Set_parameters(&a_pid_left, Angle_Set_point_left_global, Angle_KP_global, Angle_KI_global, Angle_KD_global);
+			Angle_PID_Calculate(&a_pid_left, Complementary_Pitch_global, I_Time_Start, I_Time_Stop);
 
-		if ( fabs(Complementary_Pitch_global) < 40 ) {
+			/* Right engine */
+			Angle_PID_Set_parameters(&a_pid_right, Angle_Set_point_right_global, Angle_KP_global, Angle_KI_global, Angle_KD_global);
+			Angle_PID_Calculate(&a_pid_right, Complementary_Pitch_global, I_Time_Start, I_Time_Stop);
 
-			LeftEngineSpeed_global  = a_pid_left.control;
-			RightEngineSpeed_global = a_pid_right.control;
+			if ( fabs(Complementary_Pitch_global) < 40 && Robot_fell_over != 1) {
 
-		} else {
+				LeftEngineSpeed_global  = a_pid_left.control;
+				RightEngineSpeed_global = a_pid_right.control;
 
-			A4988_Power_off(&A4988_1);
-			A4988_Power_off(&A4988_2);
+			} else {
 
-			LeftEngineSpeed_global = 0;
-			RightEngineSpeed_global = 0;
+				Robot_fell_over = 1;
 
-			a_pid_left.integral = 0;
-			a_pid_right.integral = 0;
+				LeftEngineSpeed_global = 0;
+				RightEngineSpeed_global = 0;
 
-			s_pid_left.integral = 0;
-			s_pid_right.integral = 0;
+				a_pid_left.integral = 0;
+				a_pid_right.integral = 0;
+
+				s_pid_left.integral = 0;
+				s_pid_right.integral = 0;
+
+				if( fabs(Complementary_Pitch_global) < 5 ) {
+
+					Robot_fell_over = 0;
+				}
+			}
+		}
+		else {
+
 		}
 
 	/* -----------------> A4988 <----------------- */
@@ -394,13 +419,13 @@ void Start_Engines_Task(void const * argument)
 		}
 		else if( LeftEngineSpeed_control_global > RightEngineSpeed_control_global ) {
 
-			A4988_Set_Speed(&A4988_1, LeftEngineSpeed_global );
-			A4988_Set_Speed(&A4988_2, -RightEngineSpeed_global + 0.8 * (RightEngineSpeed_global) );
+			A4988_Set_Speed(&A4988_1, LeftEngineSpeed_global + 0.3 * (LeftEngineSpeed_global) );
+		    A4988_Set_Speed(&A4988_2, -RightEngineSpeed_global + 0.5 * (RightEngineSpeed_global) );
 		}
 		else if( LeftEngineSpeed_control_global < RightEngineSpeed_control_global ) {
 
-			A4988_Set_Speed(&A4988_1, LeftEngineSpeed_global   - 0.8 * (LeftEngineSpeed_global) );
-			A4988_Set_Speed(&A4988_2, -RightEngineSpeed_global);
+			A4988_Set_Speed(&A4988_1, LeftEngineSpeed_global - 0.5 * (LeftEngineSpeed_global) );
+			A4988_Set_Speed(&A4988_2, -RightEngineSpeed_global - 0.3 * (RightEngineSpeed_global) );
 		}
 	}
 	else {
@@ -483,6 +508,10 @@ void Start_IMU_Task(void const * argument)
 
 		  /* Case 2: RPY calculation */
 		  MPU9250_Calculate_RPY(&hi2c1, &mpu1, dt);
+
+		  a_roll_global = mpu1.Accelerometer_Roll, a_pitch_global = mpu1.Accelerometer_Pitch;
+		  g_roll_global = mpu1.Gyroscope_Roll, g_pitch_global = mpu1.Gyroscope_Pitch, g_yaw_global = mpu1.Gyroscope_Yaw;
+		  m_yaw_global = mpu1.Magnetometer_Yaw;
 
 		  /* Case 3: Filters using */
 		  //AlphaBeta_filter(&mpu1, 0.2, 0.05, 0, 0, 0, 0, dt);

@@ -315,7 +315,7 @@ void MPU9250_Calibration_Mag(I2C_HandleTypeDef *I2Cx,
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
-MPU9250_Error_code MPU9250_Set_Offsets(I2C_HandleTypeDef *I2Cx,
+void MPU9250_Set_Offsets(I2C_HandleTypeDef *I2Cx,
 	  	  	  	   	   	   	   	   	   struct MPU9250 *DataStructure,
 									   float Acce_X_offset, float Acce_Y_offset, float Acce_Z_offset,
 									   float Gyro_X_offset, float Gyro_Y_offset, float Gyro_Z_offset,
@@ -323,7 +323,7 @@ MPU9250_Error_code MPU9250_Set_Offsets(I2C_HandleTypeDef *I2Cx,
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
-MPU9250_Error_code MPU9250_Calculate_RPY(I2C_HandleTypeDef *I2Cx,
+void MPU9250_Calculate_RPY(I2C_HandleTypeDef *I2Cx,
 	      	  	  	  	  	  	  		 struct MPU9250 *DataStructure,
 										 float dt);
 

@@ -401,7 +401,7 @@ void MPU9250_Calibration_Mag(I2C_HandleTypeDef *I2Cx,
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
-MPU9250_Error_code MPU9250_Set_Offsets(I2C_HandleTypeDef *I2Cx,
+void MPU9250_Set_Offsets(I2C_HandleTypeDef *I2Cx,
 	      	  	  	  	  	  	  	   struct MPU9250 *DataStructure,
 									   float Acce_X_offset, float Acce_Y_offset, float Acce_Z_offset,
 									   float Gyro_X_offset, float Gyro_Y_offset, float Gyro_Z_offset,
@@ -418,15 +418,21 @@ MPU9250_Error_code MPU9250_Set_Offsets(I2C_HandleTypeDef *I2Cx,
 	DataStructure->Magnetometer_X_offset = Mag_X_offset;
 	DataStructure->Magnetometer_Y_offset = Mag_Y_offset;
 	DataStructure->Magnetometer_Z_offset = Mag_Z_offset;
-
-	return MPU9250_Offset_OK;
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
-float Roll_test = 0, Pitch_test = 0;
-float cosRoll_test = 0, cosPitch_test = 0, sinRoll_test = 0, sinPitch_test = 0;
-float H_X_test = 0, H_Y_test = 0;
-MPU9250_Error_code MPU9250_Calculate_RPY(I2C_HandleTypeDef *I2Cx,
+int16_t Magnetometer_X_test = 0, Magnetometer_Y_test = 0, Magnetometer_Z_test = 0;
+
+float Roll_test  = 0;
+float Pitch_test = 0;
+
+float cosRoll_test = 0, cosPitch_test = 0;
+float sinRoll_test = 0, sinPitch_test = 0;
+
+float X_h_test = 0;
+float Y_h_test = 0;
+
+void MPU9250_Calculate_RPY(I2C_HandleTypeDef *I2Cx,
 	      	  	  	  	  	  	  		 struct MPU9250 *DataStructure,
 										 float dt) {
 
@@ -444,29 +450,38 @@ MPU9250_Error_code MPU9250_Calculate_RPY(I2C_HandleTypeDef *I2Cx,
 	DataStructure->Gyroscope_Pitch -= ( 0.5 * dt * (DataStructure->Gyroscope_Y_dgs + DataStructure->Gyroscope_Y_dgs_past) );
 	DataStructure->Gyroscope_Yaw   += ( 0.5 * dt * (DataStructure->Gyroscope_Z_dgs + DataStructure->Gyroscope_Z_dgs_past) );
 
-	// Save actual dgs/s value to data structure
+	/* Save actual dgs/s value to data structure */
 	DataStructure->Gyroscope_X_dgs_past = DataStructure->Gyroscope_X_dgs;
 	DataStructure->Gyroscope_Y_dgs_past = DataStructure->Gyroscope_Y_dgs;
 	DataStructure->Gyroscope_Z_dgs_past = DataStructure->Gyroscope_Z_dgs;
 
 	/* Case 4: Calculate magnetometer Yaw */
-	float Roll  = DataStructure->Accelerometer_Roll;
-	float Pitch = DataStructure->Accelerometer_Pitch;
+	int16_t m_y = DataStructure->Magnetometer_X;
+	int16_t m_x = DataStructure->Magnetometer_Y;
+	int16_t m_z = DataStructure->Magnetometer_Z;
 
-	float cosRoll = cosf(Roll * (M_PI / 180)), cosPitch = cosf(Pitch * (M_PI / 180));
-	float sinRoll = sinf(Roll * (M_PI / 180)), sinPitch = sinf(Pitch * (M_PI / 180));
+	float Roll  = -DataStructure->Accelerometer_Roll  * (M_PI / 180);
+	float Pitch = DataStructure->Accelerometer_Pitch * (M_PI / 180);
 
-	float H_X = (DataStructure->Magnetometer_X_uT * cosPitch) - (DataStructure->Magnetometer_Y_uT * sinRoll * sinPitch) - (DataStructure->Magnetometer_Z_uT * cosRoll * sinPitch);
-	float H_Y = (DataStructure->Magnetometer_Y_uT * cosRoll)  + (DataStructure->Magnetometer_Z_uT * sinRoll);
+	float cosRoll = cos(Roll), cosPitch = cos(Pitch);
+	float sinRoll = sin(Roll), sinPitch = sin(Pitch);
 
-	DataStructure->Magnetometer_Yaw = atan2f(-H_Y, H_X) * (180 / M_PI) + MAGNETIC_DECLINATION;
+	float X_h = m_x * cosPitch + m_y * sinRoll * sinPitch + m_z * cosRoll * sinPitch;
+	float Y_h = m_y * cosRoll  - m_z * sinRoll;
 
-	/* global variables test */
-	Roll_test = Roll, Pitch_test = Pitch;
-	cosRoll_test = cosRoll, cosPitch_test = cosPitch, sinRoll_test = sinRoll, sinPitch_test = sinPitch;
-	H_X_test = H_X, H_Y_test = H_Y;
+	DataStructure->Magnetometer_Yaw = atan2f(X_h, Y_h) * (180 / M_PI) + MAGNETIC_DECLINATION;
 
-	return MPU9250_Calculate_RPY_OK;
+	//
+	Magnetometer_X_test = m_x, Magnetometer_Y_test = m_y, Magnetometer_Z_test = m_z;
+
+	Roll_test  = DataStructure->Accelerometer_Roll  * (M_PI / 180);
+	Pitch_test = DataStructure->Accelerometer_Pitch * (M_PI / 180);
+
+	cosRoll_test = cosRoll, cosPitch_test = cosPitch;
+	sinRoll_test = sinRoll, sinPitch_test = sinPitch;
+
+	X_h_test = X_h;
+	Y_h_test = Y_h;
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
