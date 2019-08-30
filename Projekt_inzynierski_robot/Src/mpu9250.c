@@ -486,6 +486,50 @@ void MPU9250_Calculate_RPY(I2C_HandleTypeDef *I2Cx,
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
+void AlphaBeta_filter(struct MPU9250 *DataStructure,
+					  float Acce_alpha, float Acce_beta,
+					  float Gyro_alpha, float Gyro_beta,
+					  float Mag_alpha, float Mag_beta,
+					  float dt) {
+
+	/* Case 1: Accelerometer */
+	DataStructure->x_Acce_Roll_pri  = DataStructure->x_Acce_Roll_post + dt * DataStructure->v_Acce_Roll_post;
+	DataStructure->v_Acce_Roll_pri  = DataStructure->v_Acce_Roll_post;
+	DataStructure->x_Acce_Roll_post = DataStructure->x_Acce_Roll_pri + Acce_alpha * (DataStructure->Accelerometer_Roll - DataStructure->x_Acce_Roll_pri);
+	DataStructure->v_Acce_Roll_post = DataStructure->v_Acce_Roll_pri + Acce_beta  * (DataStructure->Accelerometer_Roll - DataStructure->x_Acce_Roll_pri) / dt;
+
+	DataStructure->x_Acce_Pitch_pri  = DataStructure->x_Acce_Pitch_post + dt * DataStructure->v_Acce_Pitch_post;
+	DataStructure->v_Acce_Pitch_pri  = DataStructure->v_Acce_Pitch_post;
+	DataStructure->x_Acce_Pitch_post = DataStructure->x_Acce_Pitch_pri + Acce_alpha * (DataStructure->Accelerometer_Pitch - DataStructure->x_Acce_Pitch_pri);
+	DataStructure->v_Acce_Pitch_post = DataStructure->v_Acce_Pitch_pri + Acce_beta  * (DataStructure->Accelerometer_Pitch - DataStructure->x_Acce_Pitch_pri) / dt;
+
+	/* Case 2: Gyroscope */
+	DataStructure->x_Gyro_Roll_pri  = DataStructure->x_Gyro_Roll_post + dt * DataStructure->v_Gyro_Roll_post;
+	DataStructure->v_Gyro_Roll_pri  = DataStructure->v_Gyro_Roll_post;
+	DataStructure->x_Gyro_Roll_post = DataStructure->x_Gyro_Roll_pri + Gyro_alpha * (DataStructure->Gyroscope_Roll - DataStructure->x_Gyro_Roll_pri);
+	DataStructure->v_Gyro_Roll_post = DataStructure->v_Gyro_Roll_pri + Gyro_beta  * (DataStructure->Gyroscope_Roll - DataStructure->x_Gyro_Roll_pri) / dt;
+
+	DataStructure->x_Gyro_Pitch_pri  = DataStructure->x_Gyro_Pitch_post + dt * DataStructure->v_Gyro_Pitch_post;
+	DataStructure->v_Gyro_Pitch_pri  = DataStructure->v_Gyro_Pitch_post;
+	DataStructure->x_Gyro_Pitch_post = DataStructure->x_Gyro_Pitch_pri + Gyro_alpha * (DataStructure->Gyroscope_Pitch - DataStructure->x_Gyro_Pitch_pri);
+	DataStructure->v_Gyro_Pitch_post = DataStructure->v_Gyro_Pitch_pri + Gyro_beta  * (DataStructure->Gyroscope_Pitch - DataStructure->x_Gyro_Pitch_pri) / dt;
+
+	DataStructure->x_Gyro_Yaw_pri  = DataStructure->x_Gyro_Yaw_post + dt * DataStructure->v_Gyro_Yaw_post;
+	DataStructure->v_Gyro_Yaw_pri  = DataStructure->v_Gyro_Yaw_post;
+	DataStructure->x_Gyro_Yaw_post = DataStructure->x_Gyro_Yaw_pri + Gyro_alpha * (DataStructure->Gyroscope_Yaw - DataStructure->x_Gyro_Yaw_pri);
+	DataStructure->v_Gyro_Yaw_post = DataStructure->v_Gyro_Yaw_pri + Gyro_beta  * (DataStructure->Gyroscope_Yaw - DataStructure->x_Gyro_Yaw_pri) / dt;
+
+	/* Case 3: Magnetometer */
+	DataStructure->x_Mag_Yaw_pri  = DataStructure->x_Mag_Yaw_post + dt * DataStructure->v_Mag_Yaw_post;
+	DataStructure->v_Mag_Yaw_pri  = DataStructure->v_Mag_Yaw_post;
+	DataStructure->x_Mag_Yaw_post = DataStructure->x_Mag_Yaw_pri + Mag_alpha * (DataStructure->Magnetometer_Yaw - DataStructure->x_Mag_Yaw_pri);
+	DataStructure->v_Mag_Yaw_post = DataStructure->v_Mag_Yaw_pri + Mag_beta  * (DataStructure->Magnetometer_Yaw - DataStructure->x_Mag_Yaw_pri) / dt;
+
+	DataStructure->Acce_AlphaBeta_Roll = DataStructure->x_Acce_Roll_post;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
 void Complementary_filter(struct MPU9250 *DataStructure,
 						  float weight,
 						  float dt) {
@@ -495,55 +539,4 @@ void Complementary_filter(struct MPU9250 *DataStructure,
 	DataStructure->Complementary_filter_Yaw    = ( (1-weight) * (DataStructure->Complementary_filter_Yaw   - (DataStructure->Gyroscope_Z_dgs * dt) ) + (weight * DataStructure->Magnetometer_Yaw) );
 }
 
-/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
-float x_Acce_Roll_pri = 0, v_Acce_Roll_pri = 0, x_Acce_Roll_post = 0, v_Acce_Roll_post = 0;
-float x_Acce_Pitch_pri = 0, v_Acce_Pitch_pri = 0, x_Acce_Pitch_post = 0, v_Acce_Pitch_post = 0;
-
-float x_Gyro_Roll_pri = 0, v_Gyro_Roll_pri = 0, x_Gyro_Roll_post = 0, v_Gyro_Roll_post = 0;
-float x_Gyro_Pitch_pri = 0, v_Gyro_Pitch_pri = 0, x_Gyro_Pitch_post = 0, v_Gyro_Pitch_post = 0;
-float x_Gyro_Yaw_pri = 0, v_Gyro_Yaw_pri = 0, x_Gyro_Yaw_post = 0, v_Gyro_Yaw_post = 0;
-
-float x_Mag_Yaw_pri = 0, v_Mag_Yaw_pri = 0, x_Mag_Yaw_post = 0, v_Mag_Yaw_post = 0;
-
-void AlphaBeta_filter(struct MPU9250 *DataStructure,
-					  float Acce_alpha, float Acce_beta,
-					  float Gyro_alpha, float Gyro_beta,
-					  float Mag_alpha, float Mag_beta,
-					  float dt) {
-
-	/* Case 1: Accelerometer */
-	x_Acce_Roll_pri  = x_Acce_Roll_post + dt * v_Acce_Roll_post;
-	v_Acce_Roll_pri  = v_Acce_Roll_post;
-	x_Acce_Roll_post = x_Acce_Roll_pri + Acce_alpha * (DataStructure->Accelerometer_Roll - x_Acce_Roll_pri);
-	v_Acce_Roll_post = v_Acce_Roll_pri + Acce_beta  * (DataStructure->Accelerometer_Roll - x_Acce_Roll_pri) / dt;
-
-	x_Acce_Pitch_pri  = x_Acce_Pitch_post + dt * v_Acce_Pitch_post;
-	v_Acce_Pitch_pri  = v_Acce_Pitch_post;
-	x_Acce_Pitch_post = x_Acce_Pitch_pri + Acce_alpha * (DataStructure->Accelerometer_Pitch - x_Acce_Pitch_pri);
-	v_Acce_Pitch_post = v_Acce_Pitch_pri + Acce_beta  * (DataStructure->Accelerometer_Pitch - x_Acce_Pitch_pri) / dt;
-
-	/* Case 2: Gyroscope */
-	x_Gyro_Roll_pri  = x_Gyro_Roll_post + dt * v_Gyro_Roll_post;
-	v_Gyro_Roll_pri  = v_Gyro_Roll_post;
-	x_Gyro_Roll_post = x_Gyro_Roll_pri + Gyro_alpha * (DataStructure->Gyroscope_Roll - x_Gyro_Roll_pri);
-	v_Gyro_Roll_post = v_Gyro_Roll_pri + Gyro_beta  * (DataStructure->Gyroscope_Roll - x_Gyro_Roll_pri) / dt;
-
-	x_Gyro_Pitch_pri  = x_Gyro_Pitch_post + dt * v_Gyro_Pitch_post;
-	v_Gyro_Pitch_pri  = v_Gyro_Pitch_post;
-	x_Gyro_Pitch_post = x_Gyro_Pitch_pri + Gyro_alpha * (DataStructure->Gyroscope_Pitch - x_Gyro_Pitch_pri);
-	v_Gyro_Pitch_post = v_Gyro_Pitch_pri + Gyro_beta  * (DataStructure->Gyroscope_Pitch - x_Gyro_Pitch_pri) / dt;
-
-	x_Gyro_Yaw_pri  = x_Gyro_Yaw_post + dt * v_Gyro_Yaw_post;
-	v_Gyro_Yaw_pri  = v_Gyro_Yaw_post;
-	x_Gyro_Yaw_post = x_Gyro_Yaw_pri + Gyro_alpha * (DataStructure->Gyroscope_Yaw - x_Gyro_Yaw_pri);
-	v_Gyro_Yaw_post = v_Gyro_Yaw_pri + Gyro_beta  * (DataStructure->Gyroscope_Yaw - x_Gyro_Yaw_pri) / dt;
-
-	/* Case 3: Magnetometer */
-	x_Mag_Yaw_pri  = x_Mag_Yaw_post + dt * v_Mag_Yaw_post;
-	v_Mag_Yaw_pri  = v_Mag_Yaw_post;
-	x_Mag_Yaw_post = x_Mag_Yaw_pri + Mag_alpha * (DataStructure->Magnetometer_Yaw - x_Mag_Yaw_pri);
-	v_Mag_Yaw_post = v_Mag_Yaw_pri + Mag_beta  * (DataStructure->Magnetometer_Yaw - x_Mag_Yaw_pri) / dt;
-
-	DataStructure->Acce_AlphaBeta_Roll = x_Acce_Roll_post;
-}
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */

@@ -69,15 +69,14 @@
 
 /* ------------> MPU9250 variables <------------- */
 float a_roll_global = 0, a_pitch_global = 0;
-
 float g_roll_global  = 0, g_pitch_global = 0, g_yaw_global   = 0;
-
 float m_yaw_global = 0;
 
 int16_t a_x_offset_global = 0, a_y_offset_global = 0, a_z_offset_global = 0;
 int16_t g_x_offset_global = 0, g_y_offset_global = 0, g_z_offset_global = 0;
 
-float  Complementary_Pitch_global = 0, Complementary_Roll_global = 0, Complementary_Yaw_global = 0;
+float Complementary_Roll_global = 0, Complementary_Pitch_global = 0, Complementary_Yaw_global = 0;
+float Kalman_Roll_global = 0, Kalman_Pitch_global = 0, Kalman_Yaw_global = 0;
 
 float Filter_weight_global = FILTER_WEIGHT;
 
@@ -477,6 +476,8 @@ void Start_IMU_Task(void const * argument)
 		MPU9250_Calibration_Gyro(&hi2c1, &mpu1);
 		//MPU9250_Calibration_Mag(&hi2c1, &mpu1);
 
+		Kalman_filter_init(0.02, mpu1.Accelerometer_Pitch);
+
 		for (int i = 0; i < 3; ++i) {
 
 			HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
@@ -515,14 +516,20 @@ void Start_IMU_Task(void const * argument)
 
 		  /* Case 3: Filters using */
 		  //AlphaBeta_filter(&mpu1, 0.2, 0.05, 0, 0, 0, 0, dt);
+
+		  /* Complementary filter */
 		  Complementary_filter(&mpu1, Filter_weight_global, dt);
 
 		  Complementary_Roll_global  = mpu1.Complementary_filter_Roll;
 		  Complementary_Pitch_global = mpu1.Complementary_filter_Pitch;
 		  Complementary_Yaw_global   = mpu1.Complementary_filter_Yaw;
+
+		  /* Kalman filter */
+		  Kalman_Pitch_global = Kalman_filter_calculate(mpu1.Accelerometer_Pitch, mpu1.Gyroscope_Z_dgs);
 	  }
 
 	  osDelay(5);
+	  //osDelay(20);
   }
   /* USER CODE END Start_IMU_Task */
 }

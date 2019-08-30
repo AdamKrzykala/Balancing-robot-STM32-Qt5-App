@@ -11,6 +11,8 @@
 #include "i2c.h"
 #include "math.h"
 
+#include "kalman.h"
+
 #define MAGNETIC_DECLINATION	( 4 + (29 / 60) ) /* <- for Boleslawiec */
 #define Z_AXIS_ORIENTATION		-1
 
@@ -180,12 +182,6 @@ typedef enum {
 	MPU9250_Calib_OK   						= 10,
 	MPU9250_Calib_FAIL 						= 11,
 
-	MPU9250_Offset_OK						= 99,
-	MPU9250_Offset_FAIL						= 101,
-
-	MPU9250_Calculate_RPY_OK				= 12,
-	MPU9250_Calculate_RPY_FAIL				= 13
-
 } MPU9250_Error_code;
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -250,10 +246,21 @@ struct MPU9250 {
 	float Gyroscope_Roll, Gyroscope_Pitch, Gyroscope_Yaw;
 	float Magnetometer_Roll, Magnetometer_Pitch, Magnetometer_Yaw;
 
+	/* Alpha-beta filter variables */
+	float x_Acce_Roll_pri, v_Acce_Roll_pri, x_Acce_Roll_post, v_Acce_Roll_post;
+	float x_Acce_Pitch_pri, v_Acce_Pitch_pri, x_Acce_Pitch_post, v_Acce_Pitch_post;
+
+	float x_Gyro_Roll_pri, v_Gyro_Roll_pri, x_Gyro_Roll_post, v_Gyro_Roll_post;
+	float x_Gyro_Pitch_pri, v_Gyro_Pitch_pri, x_Gyro_Pitch_post, v_Gyro_Pitch_post;
+	float x_Gyro_Yaw_pri, v_Gyro_Yaw_pri, x_Gyro_Yaw_post, v_Gyro_Yaw_post;
+
+	float x_Mag_Yaw_pri, v_Mag_Yaw_pri, x_Mag_Yaw_post, v_Mag_Yaw_post;
+
 	float Acce_AlphaBeta_Roll, Acce_AlphaBeta_Pitch;
 	float Gyroscope_AlphaBeta_Roll, Gyroscope_AlphaBeta_Pitch, Gyroscope_AlphaBeta_Yaw;
 	float Magnetometer_AlphaBeta_Yaw;
 
+	/* Complementary filter variables */
 	float Complementary_filter_Roll, Complementary_filter_Pitch, Complementary_filter_Yaw;
 };
 
@@ -329,17 +336,17 @@ void MPU9250_Calculate_RPY(I2C_HandleTypeDef *I2Cx,
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
-void Complementary_filter(struct MPU9250 *DataStructure,
-						  float weight,
-						  float dt);
-
-/* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
-
 void AlphaBeta_filter(struct MPU9250 *DataStructure,
 					  float Acce_alpha, float Acce_beta,
 					  float Gyro_alpha, float Gyro_beta,
 					  float Mag_alpha, float Mag_beta,
 					  float dt);
+
+/* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+void Complementary_filter(struct MPU9250 *DataStructure,
+						  float weight,
+						  float dt);
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
