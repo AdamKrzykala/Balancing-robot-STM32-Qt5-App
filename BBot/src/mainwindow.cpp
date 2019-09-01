@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent) :
     Data_to.Speed_Kd = 0; Data_to.Speed_Ki = 0; Data_to.Speed_Kp = 0;
     Data_to.Complementary_filter_weight = 0;
     Data_to.Left_engine_speed = 0; Data_to.Right_engine_speed = 0;
-    Data_to.Emergency_stop = 0;
+    Data_to.Emergency_stop = 1;
 
     m_sSettingsFile = QApplication::applicationDirPath().left(1) + ":/main_settings.ini";
     loadSettings();
@@ -1122,11 +1122,11 @@ void MainWindow::on_pushButton_EmergencyStop_clicked()
 
     if( ui->pushButton_EmergencyStop->isChecked() ) {
 
-        Data_to.Emergency_stop = 1;
+        Data_to.Emergency_stop = 0;
     }
     else {
 
-        Data_to.Emergency_stop = 0;
+        Data_to.Emergency_stop = 1;
     }
 
     CW->Fill_Data_to_robot(Data_to);
@@ -1202,8 +1202,8 @@ void MainWindow::on_pushButton_Forward_pressed()
     ui->pushButton_Forward->setIconSize(QSize(w,h));
 
     // Send data to robot
-    Data_to.Left_engine_speed = 10;
-    Data_to.Right_engine_speed = 10;
+    Data_to.Left_engine_speed  = -50;
+    Data_to.Right_engine_speed = -50;
 
     CW->Fill_Data_to_robot(Data_to);
 
@@ -1246,6 +1246,14 @@ void MainWindow::on_pushButton_Left_pressed()
 
     ui->pushButton_Left->setIcon(LeftButtonIcon);
     ui->pushButton_Left->setIconSize(QSize(w,h));
+
+    // Send data to robot
+    Data_to.Left_engine_speed  = 50;
+    Data_to.Right_engine_speed = -50;
+
+    CW->Fill_Data_to_robot(Data_to);
+
+    emit Send_data_Signal();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1261,6 +1269,14 @@ void MainWindow::on_pushButton_Left_released()
 
     ui->pushButton_Left->setIcon(LeftButtonIcon);
     ui->pushButton_Left->setIconSize(QSize(w,h));
+
+    // Send data to robot
+    Data_to.Left_engine_speed = 0;
+    Data_to.Right_engine_speed = 0;
+
+    CW->Fill_Data_to_robot(Data_to);
+
+    emit Send_data_Signal();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1276,6 +1292,14 @@ void MainWindow::on_pushButton_Right_pressed()
 
     ui->pushButton_Right->setIcon(RightButtonIcon);
     ui->pushButton_Right->setIconSize(QSize(w,h));
+
+    // Send data to robot
+    Data_to.Left_engine_speed  = -50;
+    Data_to.Right_engine_speed = 50;
+
+    CW->Fill_Data_to_robot(Data_to);
+
+    emit Send_data_Signal();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1291,6 +1315,14 @@ void MainWindow::on_pushButton_Right_released()
 
     ui->pushButton_Right->setIcon(RightButtonIcon);
     ui->pushButton_Right->setIconSize(QSize(w,h));
+
+    // Send data to robot
+    Data_to.Left_engine_speed = 0;
+    Data_to.Right_engine_speed = 0;
+
+    CW->Fill_Data_to_robot(Data_to);
+
+    emit Send_data_Signal();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1308,8 +1340,8 @@ void MainWindow::on_pushButton_Backward_pressed()
     ui->pushButton_Backward->setIconSize(QSize(w,h));
 
     // Send data to robot
-    Data_to.Left_engine_speed = -10;
-    Data_to.Right_engine_speed = -10;
+    Data_to.Left_engine_speed  = 50;
+    Data_to.Right_engine_speed = 50;
 
     CW->Fill_Data_to_robot(Data_to);
 

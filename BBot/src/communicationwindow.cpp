@@ -389,7 +389,19 @@ QString CommunicationWindow::Get_PortName()
 
 void CommunicationWindow::on_pushButton_Cancel_clicked()
 {
-    exit(0);
+
+    QMessageBox messageBox(QMessageBox::Question,
+                           tr("BBot"),
+                           tr("Czy na pewno chcesz zakończyć ? \n"),
+                           QMessageBox::Yes | QMessageBox::No);
+
+    messageBox.setButtonText(QMessageBox::Yes, tr("Tak"));
+    messageBox.setButtonText(QMessageBox::No,  tr("Nie"));
+
+    if(messageBox.exec() == QMessageBox::Yes) {
+
+        exit(0);
+    }
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

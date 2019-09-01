@@ -196,12 +196,12 @@ void Bluetooth::Parse_data_frame()
     DF_Robot.Left_engine_speed  = static_cast<int16_t>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[8]),  static_cast<uint8_t>(Data_frame_from_robot[9])  ) );
     DF_Robot.Right_engine_speed = static_cast<int16_t>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[10]), static_cast<uint8_t>(Data_frame_from_robot[11]) ) );
 
-    qDebug() << "Napiecie LiPol: "             << DF_Robot.Lipol_voltage;
-    qDebug() << "Filtr komplementarny Roll: "  << DF_Robot.Complementary_roll;
-    qDebug() << "Filtr komplementarny Pitch: " << DF_Robot.Complementary_pitch;
-    qDebug() << "Filtr komplementarny Yaw: "   << DF_Robot.Complementary_yaw;
-    qDebug() << "Predkosc lewego silnika: "    << DF_Robot.Left_engine_speed;
-    qDebug() << "Predskoc prawego silnika: "   << DF_Robot.Right_engine_speed;
+    //qDebug() << "Napiecie LiPol: "             << DF_Robot.Lipol_voltage;
+    //qDebug() << "Filtr komplementarny Roll: "  << DF_Robot.Complementary_roll;
+    //qDebug() << "Filtr komplementarny Pitch: " << DF_Robot.Complementary_pitch;
+    //qDebug() << "Filtr komplementarny Yaw: "   << DF_Robot.Complementary_yaw;
+    //qDebug() << "Predkosc lewego silnika: "    << DF_Robot.Left_engine_speed;
+    //qDebug() << "Predskoc prawego silnika: "   << DF_Robot.Right_engine_speed;
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -333,7 +333,7 @@ void Bluetooth::Communication()
 void Bluetooth::Start_communication_thread()
 {
     f = &Bluetooth::Communication;
-    this->start(Priority::NormalPriority);
+    this->start(Priority::IdlePriority);
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
