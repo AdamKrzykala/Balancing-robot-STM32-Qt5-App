@@ -408,6 +408,10 @@ void MainWindow::MainWindow_Display_IMU_data()
     ui->widget_RPY_Visualisation->setXRotation(Complementary_Filter_Pitch);
     ui->widget_RPY_Visualisation->setYRotation(Complementary_Filter_Yaw);
     ui->widget_RPY_Visualisation->setZRotation(Complementary_Filter_Roll);
+
+    //ui->widget_RPY_Visualisation->setXRotation(0);
+    //ui->widget_RPY_Visualisation->setYRotation(180);
+    //ui->widget_RPY_Visualisation->setZRotation(0);
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -619,7 +623,7 @@ void MainWindow::MainWindow_Setup_Icons()
     QPixmap Green_dot(":/new/prefix1/png/Green_dot.png");
     QPixmap Blue_dot(":/new/prefix1/png/Blue_dot.png");
     QPixmap Battery_null(":/new/prefix1/png/Battery_null.png");
-    QPixmap Connection(":/new/prefix1/png/Connection.png");
+    QPixmap Connection(":/new/prefix1/png/Bluetooth.png");
     QPixmap Stop(":/new/prefix1/png/Stop_button.png");
     QPixmap RPY(":/new/prefix1/png/RPY.png");
     QPixmap StepperMotor(":/new/prefix1/png/StepperMotor.png");
@@ -629,13 +633,10 @@ void MainWindow::MainWindow_Setup_Icons()
     QPixmap RedArrowLeft(":/new/prefix1/png/RedArrowLeft.png");
     QPixmap RedArrowRight(":/new/prefix1/png/RedArrowRight.png");
 
-    w = ui->label_StepperMotor->width();
-    h = ui->label_StepperMotor->height();
-    ui->label_StepperMotor->setPixmap( StepperMotor.scaled(w, h, Qt::KeepAspectRatio) );
-
-    w = ui->label_RPY->width();
-    h = ui->label_RPY->height();
-    ui->label_RPY->setPixmap( RPY.scaled(w, h, Qt::KeepAspectRatio) );
+    QPixmap Speed(":/new/prefix1/png/Speed.png");
+    QPixmap Angle(":/new/prefix1/png/Angle.png");
+    QPixmap Fusion(":/new/prefix1/png/Fusion.png");
+    QPixmap Variables(":/new/prefix1/png/Variables.png");
 
     w = ui->label_Connection->width();
     h = ui->label_Connection->height();
@@ -728,6 +729,22 @@ void MainWindow::MainWindow_Setup_Icons()
     w = ui->label_Complementary_Filter_Yaw->width();
     h = ui->label_Complementary_Filter_Yaw->height();
     ui->label_Complementary_Filter_Yaw->setPixmap( Blue_dot.scaled(w, h, Qt::KeepAspectRatio) );
+
+    w = ui->label_Speed->width();
+    h = ui->label_Speed->height();
+    ui->label_Speed->setPixmap( Speed.scaled(w, h, Qt::KeepAspectRatio) );
+
+    w = ui->label_Angle->width();
+    h = ui->label_Angle->height();
+    ui->label_Angle->setPixmap( Angle.scaled(w, h, Qt::KeepAspectRatio) );
+
+    w = ui->label_Fusion->width();
+    h = ui->label_Fusion->height();
+    ui->label_Fusion->setPixmap( Fusion.scaled(w, h, Qt::KeepAspectRatio) );
+
+    w = ui->label_Variables->width();
+    h = ui->label_Variables->height();
+    ui->label_Variables->setPixmap( Variables.scaled(w, h, Qt::KeepAspectRatio) );
 
     w = ui->pushButton_EmergencyStop->width();
     h = ui->pushButton_EmergencyStop->height();
@@ -1102,7 +1119,7 @@ void MainWindow::on_doubleSpinBox_PID_Kp_valueChanged(double arg1)
 
 void MainWindow::on_doubleSpinBox_PID_Kd_valueChanged(double arg1)
 {
-    ui->progressBar_PID_Kd->setValue( static_cast<int>(arg1) );
+    ui->progressBar_PID_Kd->setValue( static_cast<int>(arg1* 100) );
     saveSettings();
 }
 
@@ -1154,7 +1171,7 @@ void MainWindow::on_doubleSpinBox_Speed_PID_Ki_valueChanged(double arg1)
 
 void MainWindow::on_doubleSpinBox_Speed_PID_Kd_valueChanged(double arg1)
 {
-    ui->progressBar_Speed_PID_Kd->setValue( static_cast<int>(arg1) );
+    ui->progressBar_Speed_PID_Kd->setValue( static_cast<int>(arg1* 100) );
     saveSettings();
 }
 
@@ -1184,7 +1201,18 @@ void MainWindow::on_pushButton_Send_clicked()
 
 void MainWindow::on_pushButton_Exit_clicked()
 {
-    exit(0);
+    QMessageBox messageBox(QMessageBox::Question,
+                           tr("BBot"),
+                           tr("Czy na pewno chcesz zakończyć ? \n"),
+                           QMessageBox::Yes | QMessageBox::No);
+
+    messageBox.setButtonText(QMessageBox::Yes, tr("Tak"));
+    messageBox.setButtonText(QMessageBox::No,  tr("Nie"));
+
+    if(messageBox.exec() == QMessageBox::Yes) {
+
+        exit(0);
+    }
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

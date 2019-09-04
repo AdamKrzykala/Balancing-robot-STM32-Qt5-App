@@ -25,7 +25,7 @@ void CommunicationWindow::Serial_Interface_Slot(Status_Codes status)
         case Open_connection_FAIL:
 
             this->CommunicationWindow_addToLogs("Otwarcie portu szeregowego się nie powiodło !");
-            ui->label_ConnectionStatus->setText("<font color='red'>Coś poszło nie tak</font>");
+            ui->label_ConnectionStatus->setText("<font color='red'>Otwarcie zakończone niepowodzeniem</font>");
             break;
 
         case Close_connection_OK:
@@ -37,7 +37,7 @@ void CommunicationWindow::Serial_Interface_Slot(Status_Codes status)
 
         case Close_connection_FAIL:
 
-            this->CommunicationWindow_addToLogs("Port już jest otwarty !");
+            this->CommunicationWindow_addToLogs("Brak otwartego portu !");
             break;
 
         case Port_is_busy:
@@ -74,6 +74,13 @@ CommunicationWindow::CommunicationWindow(QWidget *parent) :
     // CONNECT:
     connect(BT, SIGNAL( Serial_Interface_Signal(Status_Codes) ), this, SLOT( Serial_Interface_Slot(Status_Codes) ));
     connect(BT, SIGNAL( Parsed_frame_OK_Signal() ), this, SLOT( Parsed_frame_OK_Slot() ));
+
+    QPixmap Bluetooth(":/new/prefix1/png/Bluetooth.png");
+
+    int w = ui->label_Bluetooth->width();
+    int h = ui->label_Bluetooth->height();
+
+    ui->label_Bluetooth->setPixmap( Bluetooth.scaled(w, h, Qt::KeepAspectRatio) );
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
