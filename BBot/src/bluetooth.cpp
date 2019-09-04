@@ -158,7 +158,7 @@ void Bluetooth::Close_connection()
 
 void Bluetooth::Receive_frame()
 {
-    //qDebug() << "Odbieram ! \n";
+    qDebug() << "Odbieram ! \n";
 
     if( Device->isOpen() && Device->isReadable()) {
 
@@ -179,6 +179,7 @@ void Bluetooth::Receive_frame()
         if( CRC_actual == CRC_received ) {
 
             Parse_data_frame();
+            //qDebug() << "Parsuje !";
         }
     }
 }
@@ -281,7 +282,6 @@ void Bluetooth::Send_frame()
         qDebug() << "Predkosc lewego silnika: "     << Left_engine_speed;
         qDebug() << "Predkosc prawego silnika: "    << Right_engine_speed;
         qDebug() << "Przycisk awaryjny: "           << Emergency_stop;
-
 
         Device->write( Data, DATA_FRAME_TO_ROBOT_SIZE);
         Device->waitForBytesWritten(20);
