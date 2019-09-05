@@ -116,6 +116,12 @@ private slots:
 
     void on_pushButton_Speed_PID_Clear_clicked();
 
+    void on_checkBox_Kalman_Filter_Roll_clicked();
+
+    void on_checkBox_Kalman_Filter_Pitch_clicked();
+
+    void on_checkBox_Kalman_Filter_Yaw_clicked();
+
 signals:
 
     void Disconnect_Signal();

@@ -106,10 +106,27 @@ void CommunicationWindow::on_pushButton_Search_clicked()
     QList<QSerialPortInfo> devices;
     devices = QSerialPortInfo::availablePorts();
 
+    int repeat = 0;
+
     for(int i = 0; i < devices.count(); i++) {
 
-        this->CommunicationWindow_addToLogs("Znalazłem urządzenie: " + devices.at(i).portName() + " " + devices.at(i).description());
-        ui->comboBox_Devices->addItem(devices.at(i).portName() + "\t" + devices.at(i).description());
+        for (int j = 0; j < devices.count(); j++) {
+
+            if( devices.at(i).portName() + "\t" + devices.at(i).description() == ui->comboBox_Devices->itemText(j) ) {
+
+                qDebug() << "Powtorka !";
+                repeat = 1;
+                break;
+            }
+        }
+
+        if( repeat == 0 ) {
+
+            this->CommunicationWindow_addToLogs("Znalazłem urządzenie: " + devices.at(i).portName() + " " + devices.at(i).description());
+            ui->comboBox_Devices->addItem(devices.at(i).portName() + "\t" + devices.at(i).description());
+        }
+
+        repeat = 0;
     }
 }
 

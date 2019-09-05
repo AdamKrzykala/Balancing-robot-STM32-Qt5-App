@@ -199,7 +199,6 @@ void MainWindow::MainWindow_Display_IMU_data()
 
 void MainWindow::MainWindow_Display_Battery_data(double voltage)
 {
-
     QPixmap Battery_null(":/new/prefix1/png/Battery_null.png");
     QPixmap Battery_low(":/new/prefix1/png/Battery_low.png");
     QPixmap Battery_medium(":/new/prefix1/png/Battery_medium.png");
@@ -366,6 +365,10 @@ void MainWindow::MainWindow_Default_View()
    if(Show_Complementary_Filter_Pitch == true) ui->checkBox_Complementary_Filter_Pitch->setChecked(true);
    if(Show_Complementary_Filter_Yaw   == true) ui->checkBox_Complementary_Filter_Yaw->setChecked(true);
 
+   if(Show_Kalman_Filter_Roll  == true) ui->checkBox_Kalman_Filter_Roll->setChecked(true);
+   if(Show_Kalman_Filter_Pitch == true) ui->checkBox_Kalman_Filter_Pitch->setChecked(true);
+   if(Show_Kalman_Filter_Yaw   == true) ui->checkBox_Kalman_Filter_Yaw->setChecked(true);
+
    ui->label_Voltage->setNum(0);
 }
 
@@ -403,6 +406,7 @@ void MainWindow::MainWindow_Setup_Icons()
     h = ui->label_Battery->height();
     ui->label_Battery->setPixmap( Battery_null.scaled(w, h, Qt::KeepAspectRatio) );
 
+    // Complementary filter RGB dots
     w = ui->label_Complementary_Filter_Roll->width();
     h = ui->label_Complementary_Filter_Roll->height();
     ui->label_Complementary_Filter_Roll->setPixmap( Red_dot.scaled(w, h, Qt::KeepAspectRatio) );
@@ -414,6 +418,19 @@ void MainWindow::MainWindow_Setup_Icons()
     w = ui->label_Complementary_Filter_Yaw->width();
     h = ui->label_Complementary_Filter_Yaw->height();
     ui->label_Complementary_Filter_Yaw->setPixmap( Blue_dot.scaled(w, h, Qt::KeepAspectRatio) );
+
+    // Kalman filter RGB dots
+    w = ui->label_Kalman_Filter_Roll->width();
+    h = ui->label_Kalman_Filter_Roll->height();
+    ui->label_Kalman_Filter_Roll->setPixmap( Red_dot.scaled(w, h, Qt::KeepAspectRatio) );
+
+    w = ui->label_Kalman_Filter_Pitch->width();
+    h = ui->label_Kalman_Filter_Pitch->height();
+    ui->label_Kalman_Filter_Pitch->setPixmap( Green_dot.scaled(w, h, Qt::KeepAspectRatio) );
+
+    w = ui->label_Kalman_Filter_Yaw->width();
+    h = ui->label_Kalman_Filter_Yaw->height();
+    ui->label_Kalman_Filter_Yaw->setPixmap( Blue_dot.scaled(w, h, Qt::KeepAspectRatio) );
 
     w = ui->label_Speed->width();
     h = ui->label_Speed->height();
@@ -855,6 +872,48 @@ void MainWindow::on_pushButton_Speed_PID_Clear_clicked()
     ui->doubleSpinBox_Speed_PID_Kp->setValue(0);
     ui->doubleSpinBox_Speed_PID_Ki->setValue(0);
     ui->doubleSpinBox_Speed_PID_Kd->setValue(0);
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_checkBox_Kalman_Filter_Roll_clicked()
+{
+    if( ui->checkBox_Kalman_Filter_Roll->isChecked() ) {
+
+        Show_Kalman_Filter_Roll = true;
+    }
+    else {
+
+        Show_Kalman_Filter_Roll = false;
+    }
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_checkBox_Kalman_Filter_Pitch_clicked()
+{
+    if( ui->checkBox_Kalman_Filter_Pitch->isChecked() ) {
+
+        Show_Kalman_Filter_Pitch = true;
+    }
+    else {
+
+        Show_Kalman_Filter_Pitch = false;
+    }
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_checkBox_Kalman_Filter_Yaw_clicked()
+{
+    if( ui->checkBox_Kalman_Filter_Yaw->isChecked() ) {
+
+        Show_Kalman_Filter_Yaw = true;
+    }
+    else {
+
+        Show_Kalman_Filter_Yaw = false;
+    }
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
