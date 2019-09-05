@@ -25,7 +25,7 @@ void CommunicationWindow::Serial_Interface_Slot(Status_Codes status)
         case Open_connection_FAIL:
 
             this->CommunicationWindow_addToLogs("Otwarcie portu szeregowego się nie powiodło !");
-            ui->label_ConnectionStatus->setText("<font color='red'>Otwarcie zakończone niepowodzeniem</font>");
+            ui->label_ConnectionStatus->setText("<font color='red'>Niepowodzenie</font>");
             break;
 
         case Close_connection_OK:
@@ -114,15 +114,15 @@ void CommunicationWindow::on_pushButton_Search_clicked()
 
             if( devices.at(i).portName() + "\t" + devices.at(i).description() == ui->comboBox_Devices->itemText(j) ) {
 
-                qDebug() << "Powtorka !";
                 repeat = 1;
                 break;
             }
         }
 
+        this->CommunicationWindow_addToLogs("Znalazłem urządzenie: " + devices.at(i).portName() + " " + devices.at(i).description());
+
         if( repeat == 0 ) {
 
-            this->CommunicationWindow_addToLogs("Znalazłem urządzenie: " + devices.at(i).portName() + " " + devices.at(i).description());
             ui->comboBox_Devices->addItem(devices.at(i).portName() + "\t" + devices.at(i).description());
         }
 

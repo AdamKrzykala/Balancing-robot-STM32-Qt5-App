@@ -58,6 +58,9 @@ private:
     bool Show_Complementary_Filter_Roll, Show_Complementary_Filter_Pitch, Show_Complementary_Filter_Yaw;
     bool Show_Kalman_Filter_Roll, Show_Kalman_Filter_Pitch, Show_Kalman_Filter_Yaw;
 
+    bool Complementary_Filter_Graph_Run;
+    bool Kalman_Filter_Graph_Run;
+
     void loadSettings();
     void saveSettings();
 
@@ -121,6 +124,10 @@ private slots:
     void on_checkBox_Kalman_Filter_Pitch_clicked();
 
     void on_checkBox_Kalman_Filter_Yaw_clicked();
+
+    void on_pushButton_Plots_Center_clicked();
+
+    void on_pushButton_Plots_Start_Stop_clicked();
 
 signals:
 

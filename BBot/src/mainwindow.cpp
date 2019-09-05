@@ -22,6 +22,9 @@ MainWindow::MainWindow(QWidget *parent) :
     Show_Complementary_Filter_Roll = true; Show_Complementary_Filter_Pitch = true; Show_Complementary_Filter_Yaw = true;
     Show_Kalman_Filter_Roll = true; Show_Kalman_Filter_Pitch = true; Show_Kalman_Filter_Yaw = true;
 
+    Complementary_Filter_Graph_Run = true;
+    Kalman_Filter_Graph_Run = true;
+
     Data_to.Angle_Kd = 0; Data_to.Angle_Ki = 0; Data_to.Angle_Kp = 0;
     Data_to.Speed_Kd = 0; Data_to.Speed_Ki = 0; Data_to.Speed_Kp = 0;
     Data_to.Complementary_filter_weight = 0;
@@ -142,7 +145,7 @@ void MainWindow::MainWindow_Display_IMU_data()
 {
     static QTime time(QTime::currentTime());
     // calculate two new data points:
-    double key = time.elapsed()/1000.0; // time elapsed since start of demo, in seconds
+    double key = time.elapsed() / 1000.0; // time elapsed since start of demo, in seconds
 
     // Fusion data
     double Complementary_Filter_Roll  = Data_from.Complementary_roll;
@@ -156,14 +159,6 @@ void MainWindow::MainWindow_Display_IMU_data()
     ui->label_Roll_View->setNum(Complementary_Filter_Roll);
     ui->label_Pitch_View->setNum(Complementary_Filter_Pitch);
     ui->label_Yaw_View->setNum(Complementary_Filter_Yaw);
-
-    ui->lcdNumber_Complementary_Filter_Roll->display(Complementary_Filter_Roll);
-    ui->lcdNumber_Complementary_Filter_Pitch->display(Complementary_Filter_Pitch);
-    ui->lcdNumber_Complementary_Filter_Yaw->display(Complementary_Filter_Yaw);
-
-    ui->lcdNumber_Kalman_Filter_Roll->display(Kalman_Filter_Roll);
-    ui->lcdNumber_Kalman_Filter_Pitch->display(Kalman_Filter_Pitch);
-    ui->lcdNumber_Kalman_Filter_Yaw->display(Kalman_Filter_Yaw);
 
     // add data to lines:
     if(Show_Complementary_Filter_Roll  == true) ui->Complementary_Filter_Graph->graph(0)->addData(key, Complementary_Filter_Roll);
@@ -184,10 +179,26 @@ void MainWindow::MainWindow_Display_IMU_data()
 
     // make key axis range scroll with the data (at a constant range size of 8):
     ui->Complementary_Filter_Graph->xAxis->setRange(key, 20, Qt::AlignRight);
-    ui->Complementary_Filter_Graph->replot();
+
+    if( Complementary_Filter_Graph_Run == true ) {
+
+        ui->Complementary_Filter_Graph->replot();
+
+        ui->lcdNumber_Complementary_Filter_Roll->display(Complementary_Filter_Roll);
+        ui->lcdNumber_Complementary_Filter_Pitch->display(Complementary_Filter_Pitch);
+        ui->lcdNumber_Complementary_Filter_Yaw->display(Complementary_Filter_Yaw);
+    }
 
     ui->Kalman_Filter_Graph->xAxis->setRange(key, 20, Qt::AlignRight);
-    ui->Kalman_Filter_Graph->replot();
+
+    if( Kalman_Filter_Graph_Run == true ) {
+
+        ui->Kalman_Filter_Graph->replot();
+
+        ui->lcdNumber_Kalman_Filter_Roll->display(Kalman_Filter_Roll);
+        ui->lcdNumber_Kalman_Filter_Pitch->display(Kalman_Filter_Pitch);
+        ui->lcdNumber_Kalman_Filter_Yaw->display(Kalman_Filter_Yaw);
+    }
 
     // OpenGL visualisation
     ui->widget_RPY_Visualisation->setXRotation(Complementary_Filter_Pitch);
@@ -370,6 +381,10 @@ void MainWindow::MainWindow_Default_View()
    if(Show_Kalman_Filter_Yaw   == true) ui->checkBox_Kalman_Filter_Yaw->setChecked(true);
 
    ui->label_Voltage->setNum(0);
+
+   ui->pushButton_EmergencyStop->setCheckable(true);
+
+   ui->pushButton_Plots_Start_Stop->setText("Stop");
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -913,6 +928,49 @@ void MainWindow::on_checkBox_Kalman_Filter_Yaw_clicked()
     else {
 
         Show_Kalman_Filter_Yaw = false;
+    }
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_Plots_Center_clicked()
+{
+    //ui->groupBox_Complementary_Filter->maximumSize();
+    //ui->groupBox_Kalman_Filter->maximumSize();
+
+    ui->splitter->update();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_Plots_Start_Stop_clicked()
+{
+
+    if( ui->pushButton_Plots_Start_Stop->text() == "Start" ) {
+
+        ui->pushButton_Plots_Start_Stop->setText("Stop");
+    }
+    else {
+
+        ui->pushButton_Plots_Start_Stop->setText("Start");
+    }
+
+    if(Complementary_Filter_Graph_Run == true) {
+
+        Complementary_Filter_Graph_Run = false;
+    }
+    else {
+
+        Complementary_Filter_Graph_Run = true;
+    }
+
+    if(Kalman_Filter_Graph_Run == true) {
+
+        Kalman_Filter_Graph_Run = false;
+    }
+    else {
+
+        Kalman_Filter_Graph_Run = true;
     }
 }
 
