@@ -76,6 +76,8 @@ private:
 
     void closeEvent(QCloseEvent *event) override;
 
+    QList<int> Splitter_Position;
+
 private slots:
 
     void on_checkBox_Complementary_Filter_Roll_clicked();

@@ -62,6 +62,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Setup CommunicationWindow
     CW->exec();
+
+    Splitter_Position = ui->splitter->sizes();
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -935,9 +937,7 @@ void MainWindow::on_checkBox_Kalman_Filter_Yaw_clicked()
 
 void MainWindow::on_pushButton_Plots_Center_clicked()
 {
-    //ui->groupBox_Complementary_Filter->maximumSize();
-    //ui->groupBox_Kalman_Filter->maximumSize();
-
+    ui->splitter->setSizes( Splitter_Position );
     ui->splitter->update();
 }
 
