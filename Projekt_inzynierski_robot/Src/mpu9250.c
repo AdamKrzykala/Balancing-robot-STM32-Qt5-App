@@ -448,7 +448,7 @@ void MPU9250_Calculate_RPY(I2C_HandleTypeDef *I2Cx,
 	/* Case 3: Calculate gyroscope Roll, Pitch and Yaw */
 	DataStructure->Gyroscope_Roll  += ( 0.5 * dt * (DataStructure->Gyroscope_X_dgs + DataStructure->Gyroscope_X_dgs_past) );
 	DataStructure->Gyroscope_Pitch -= ( 0.5 * dt * (DataStructure->Gyroscope_Y_dgs + DataStructure->Gyroscope_Y_dgs_past) );
-	DataStructure->Gyroscope_Yaw   += ( 0.5 * dt * (DataStructure->Gyroscope_Z_dgs + DataStructure->Gyroscope_Z_dgs_past) );
+	DataStructure->Gyroscope_Yaw   += Z_AXIS_ORIENTATION * ( 0.5 * dt * (DataStructure->Gyroscope_Z_dgs + DataStructure->Gyroscope_Z_dgs_past) );
 
 	/* Save actual dgs/s value to data structure */
 	DataStructure->Gyroscope_X_dgs_past = DataStructure->Gyroscope_X_dgs;
@@ -469,7 +469,7 @@ void MPU9250_Calculate_RPY(I2C_HandleTypeDef *I2Cx,
 	float X_h = m_x * cosPitch + m_y * sinRoll * sinPitch + m_z * cosRoll * sinPitch;
 	float Y_h = m_y * cosRoll  - m_z * sinRoll;
 
-	DataStructure->Magnetometer_Yaw = atan2f(X_h, Y_h) * (180 / M_PI) + MAGNETIC_DECLINATION;
+	DataStructure->Magnetometer_Yaw = Z_AXIS_ORIENTATION * (atan2f(X_h, Y_h) * (180 / M_PI) + MAGNETIC_DECLINATION);
 
 	//
 	Magnetometer_X_test = m_x, Magnetometer_Y_test = m_y, Magnetometer_Z_test = m_z;
@@ -536,7 +536,7 @@ void Complementary_filter(struct MPU9250 *DataStructure,
 
 	DataStructure->Complementary_filter_Roll   = ( (1-weight) * (DataStructure->Complementary_filter_Roll  + (DataStructure->Gyroscope_X_dgs * dt) ) + (weight * DataStructure->Accelerometer_Roll)  );
 	DataStructure->Complementary_filter_Pitch  = ( (1-weight) * (DataStructure->Complementary_filter_Pitch - (DataStructure->Gyroscope_Y_dgs * dt) ) + (weight * DataStructure->Accelerometer_Pitch) );
-	DataStructure->Complementary_filter_Yaw    = ( (1-weight) * (DataStructure->Complementary_filter_Yaw   - (DataStructure->Gyroscope_Z_dgs * dt) ) + (weight * DataStructure->Magnetometer_Yaw) );
+	DataStructure->Complementary_filter_Yaw    = ( (0.98) * (DataStructure->Complementary_filter_Yaw   - (DataStructure->Gyroscope_Z_dgs * dt) ) + (0.02 * DataStructure->Magnetometer_Yaw) );
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */

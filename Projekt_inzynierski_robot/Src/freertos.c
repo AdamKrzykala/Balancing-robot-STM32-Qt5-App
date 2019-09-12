@@ -46,14 +46,14 @@
 #define SETPOINT_ANGLE			0
 #define HYSTERESIS_ANGLE		0
 #define KP_ANGLE				10
-#define KI_ANGLE				120
-#define KD_ANGLE				0.05
+#define KI_ANGLE				100
+#define KD_ANGLE				0.1
 
 #define SETPOINT_SPEED			0
 #define HYSTERESIS_SPEED		0
-#define KP_SPEED				1
-#define KI_SPEED				2
-#define KD_SPEED				0
+#define KP_SPEED				20
+#define KI_SPEED				15
+#define KD_SPEED				0.1
 
 #define FILTER_WEIGHT 			0.001
 
