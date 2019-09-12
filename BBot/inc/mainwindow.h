@@ -118,18 +118,16 @@ private slots:
     void on_doubleSpinBox_Complementary_filter_weight_valueChanged(double arg1);
 
     void on_pushButton_Speed_PID_Default_clicked();
-
     void on_pushButton_Speed_PID_Clear_clicked();
 
     void on_checkBox_Kalman_Filter_Roll_clicked();
-
     void on_checkBox_Kalman_Filter_Pitch_clicked();
-
     void on_checkBox_Kalman_Filter_Yaw_clicked();
 
     void on_pushButton_Plots_Center_clicked();
-
     void on_pushButton_Plots_Start_Stop_clicked();
+
+    void on_pushButton_Reset_Plots_Range_clicked();
 
 signals:
 

@@ -41,9 +41,6 @@ MainWindow::MainWindow(QWidget *parent) :
     MainWindow_Setup_Complementary_Filter_Graph();
     MainWindow_Setup_Kalman_Filter_Graph();
 
-    // Connection with BT
-    //connect(BT, SIGNAL( Parsed_Frame_OK() ), this, SLOT( MainWindow_realtimeDataSlot() ));
-
     // Connection with CommunicationWindow
     connect(this, SIGNAL( Disconnect_Signal() ), CW, SLOT( Disconnect_Slot() ) );
     connect(this, SIGNAL( Send_data_Signal() ), CW, SLOT( Send_Data_to_robot_Slot() ) );
@@ -111,7 +108,7 @@ void MainWindow::MainWindow_Setup_Complementary_Filter_Graph()
 
     ui->Complementary_Filter_Graph->xAxis->setTicker(timeTicker);
     ui->Complementary_Filter_Graph->axisRect()->setupFullAxesBox();
-    ui->Complementary_Filter_Graph->yAxis->setRange(-1.2, 1.2);
+    ui->Complementary_Filter_Graph->yAxis->setRange(-1, 1);
 
     // make left and bottom axes transfer their ranges to right and top axes:
     connect(ui->Complementary_Filter_Graph->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->Complementary_Filter_Graph->xAxis2, SLOT(setRange(QCPRange)));
@@ -134,7 +131,7 @@ void MainWindow::MainWindow_Setup_Kalman_Filter_Graph()
 
     ui->Kalman_Filter_Graph->xAxis->setTicker(timeTicker);
     ui->Kalman_Filter_Graph->axisRect()->setupFullAxesBox();
-    ui->Kalman_Filter_Graph->yAxis->setRange(-1.2, 1.2);
+    ui->Kalman_Filter_Graph->yAxis->setRange(-1, 1);
 
     // make left and bottom axes transfer their ranges to right and top axes:
     connect(ui->Kalman_Filter_Graph->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->Kalman_Filter_Graph->xAxis2, SLOT(setRange(QCPRange)));
@@ -972,6 +969,17 @@ void MainWindow::on_pushButton_Plots_Start_Stop_clicked()
 
         Kalman_Filter_Graph_Run = true;
     }
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_pushButton_Reset_Plots_Range_clicked()
+{
+    ui->Complementary_Filter_Graph->clearGraphs();
+    ui->Kalman_Filter_Graph->clearGraphs();
+
+    MainWindow_Setup_Complementary_Filter_Graph();
+    MainWindow_Setup_Kalman_Filter_Graph();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

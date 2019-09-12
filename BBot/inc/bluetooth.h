@@ -75,41 +75,29 @@ private:
     Data_from_Robot DF_Robot;
     Data_to_Robot   DT_Robot;
 
-    bool Send_flag;
-    bool Receive_flag;
+    //bool Send_flag;
+    //bool Receive_flag;
 
-    void (Bluetooth::*f)();
-
-    void Receive_frame();
     void Parse_data_frame();
-    void Send_frame();
-
-    void Communication();
 
 public:
 
     Bluetooth();
     ~Bluetooth();
 
-    void run() {
-
-        (this->*f)();
-    }
-
     void Open_connection(QString portName);
     void Close_connection();
 
-    void Start_communication_thread();
-
     void Set_DT_Robot(Data_to_Robot Data);
     Data_from_Robot Get_DF_Robot();
-    void Set_Send_Flag();
+    //void Set_Send_Flag();
 
 private slots:
 
 public slots:
 
-    void Receiving_test();
+    void Receive_frame();
+    void Send_frame();
 
 signals:
 

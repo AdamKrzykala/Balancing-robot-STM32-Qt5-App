@@ -89,10 +89,7 @@ Bluetooth::Bluetooth()
     DF_Robot.Left_engine_speed = 0;
     DF_Robot.Right_engine_speed = 0;
 
-    Send_flag = false;
-    Receive_flag = false;
-
-    connect(Device, SIGNAL( readyRead() ), this, SLOT( Receiving_test() ));
+    connect(Device, SIGNAL( readyRead() ), this, SLOT( Receive_frame() ));
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -106,8 +103,6 @@ Bluetooth::~Bluetooth()
 
 void Bluetooth::Open_connection(QString portName)
 {
-
-    //Device = new QSerialPort;
     this->Device->setPortName(portName);
 
     // OTWÓRZ I SKONFIGURUJ PORT:
@@ -158,7 +153,7 @@ void Bluetooth::Close_connection()
 
 void Bluetooth::Receive_frame()
 {
-    qDebug() << "Odbieram ! \n";
+    //qDebug() << "Odbieram ! \n";
 
     if( Device->isOpen() && Device->isReadable()) {
 
@@ -176,10 +171,9 @@ void Bluetooth::Receive_frame()
         int8_t CRC_received = Data_frame_from_robot[DATA_FRAME_FROM_ROBOT_SIZE - 1];
         int8_t CRC_actual = CRC8_DataArray(Data_frame_from_robot, DATA_FRAME_FROM_ROBOT_SIZE - 1);
 
-        if( CRC_actual == CRC_received ) {
+        if( CRC_actual == CRC_received && CRC_received != 0 ) {
 
             Parse_data_frame();
-            //qDebug() << "Parsuje !";
         }
     }
 }
@@ -196,6 +190,8 @@ void Bluetooth::Parse_data_frame()
 
     DF_Robot.Left_engine_speed  = static_cast<int16_t>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[8]),  static_cast<uint8_t>(Data_frame_from_robot[9])  ) );
     DF_Robot.Right_engine_speed = static_cast<int16_t>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[10]), static_cast<uint8_t>(Data_frame_from_robot[11]) ) );
+
+    emit Parsed_frame_OK_Signal();
 
     //qDebug() << "Napiecie LiPol: "             << DF_Robot.Lipol_voltage;
     //qDebug() << "Filtr komplementarny Roll: "  << DF_Robot.Complementary_roll;
@@ -287,53 +283,6 @@ void Bluetooth::Send_frame()
         Device->waitForBytesWritten(20);
         Device->flush();
     }
-
-    Send_flag = false;
-}
-
-// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-void Bluetooth::Communication()
-{
-    while(1) {
-
-        if( Device->isOpen() ) {
-
-            /*
-            if(Receive_flag == true) {
-
-                // Receiving
-                //Receive_frame();
-
-                // Parsing
-                //Parse_frame();
-
-                Receive_flag = false;
-            }*/
-
-            if(Send_flag == true) {
-
-                // Sending
-                Send_frame();
-            }
-
-            emit Parsed_frame_OK_Signal();
-
-            msleep(100);
-        }
-        else {
-
-            break;
-        }
-    }
-}
-
-// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-void Bluetooth::Start_communication_thread()
-{
-    f = &Bluetooth::Communication;
-    this->start(Priority::IdlePriority);
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -348,26 +297,6 @@ void Bluetooth::Set_DT_Robot(Data_to_Robot Data)
 Data_from_Robot Bluetooth::Get_DF_Robot()
 {
     return DF_Robot;
-}
-
-// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-void Bluetooth::Set_Send_Flag()
-{
-    Send_flag = true;
-}
-
-// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-void Bluetooth::Receiving_test()
-{
-    Receive_flag = true;
-
-    // Receiving
-    Receive_frame();
-
-    // Parsing
-    //Parse_frame();
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

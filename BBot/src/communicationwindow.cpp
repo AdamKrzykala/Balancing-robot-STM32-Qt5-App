@@ -51,12 +51,14 @@ void CommunicationWindow::Serial_Interface_Slot(Status_Codes status)
 
 void CommunicationWindow::Send_Data_to_robot_Slot()
 {
-    BT->Set_Send_Flag();
+    BT->Send_frame();
 }
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 void CommunicationWindow::Parsed_frame_OK_Slot()
 {
-    emit Parsed_frame_OK_Signal(BT->Get_DF_Robot());
+    emit Parsed_frame_OK_Signal( BT->Get_DF_Robot() );
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -173,7 +175,6 @@ void CommunicationWindow::on_pushButton_Connect_clicked()
     PortName = ui->comboBox_Devices->currentText().split("\t").first();
 
     BT->Open_connection(PortName);
-    BT->Start_communication_thread();
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
