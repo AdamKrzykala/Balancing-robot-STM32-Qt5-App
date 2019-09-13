@@ -536,7 +536,31 @@ void Complementary_filter(struct MPU9250 *DataStructure,
 
 	DataStructure->Complementary_filter_Roll   = ( (1-weight) * (DataStructure->Complementary_filter_Roll  + (DataStructure->Gyroscope_X_dgs * dt) ) + (weight * DataStructure->Accelerometer_Roll)  );
 	DataStructure->Complementary_filter_Pitch  = ( (1-weight) * (DataStructure->Complementary_filter_Pitch - (DataStructure->Gyroscope_Y_dgs * dt) ) + (weight * DataStructure->Accelerometer_Pitch) );
-	DataStructure->Complementary_filter_Yaw    = ( (0.98) * (DataStructure->Complementary_filter_Yaw   - (DataStructure->Gyroscope_Z_dgs * dt) ) + (0.02 * DataStructure->Magnetometer_Yaw) );
+	DataStructure->Complementary_filter_Yaw    = ( 0.98       * (DataStructure->Complementary_filter_Yaw   - (DataStructure->Gyroscope_Z_dgs * dt) ) + (0.02   * DataStructure->Magnetometer_Yaw) );
+}
+
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
+void Kalman_filter(struct MPU9250 *DataStructure,
+				   float Q, float R,
+				   float dt) {
+
+	/* Case 1: Update Q and R value */
+	if( DataStructure->Kalman_R.kalman_Q != Q || DataStructure->Kalman_R.kalman_R != R ||
+	    DataStructure->Kalman_P.kalman_Q != Q || DataStructure->Kalman_P.kalman_R != R ||
+		DataStructure->Kalman_Y.kalman_Q != Q || DataStructure->Kalman_Y.kalman_R != R ) {
+
+		Kalman_filter_init(&DataStructure->Kalman_R, Q, R);
+		Kalman_filter_init(&DataStructure->Kalman_P, Q, R);
+		Kalman_filter_init(&DataStructure->Kalman_Y, Q, R);
+
+		return;
+	}
+
+	/* Case 2: */
+	DataStructure->Kalman_filter_Roll  = Kalman_filter_calculate(&DataStructure->Kalman_R, DataStructure->Accelerometer_Roll,   DataStructure->Gyroscope_X_dgs, dt);
+	DataStructure->Kalman_filter_Pitch = Kalman_filter_calculate(&DataStructure->Kalman_P, DataStructure->Accelerometer_Pitch, -DataStructure->Gyroscope_Y_dgs, dt);
+	DataStructure->Kalman_filter_Yaw   = Kalman_filter_calculate(&DataStructure->Kalman_Y, DataStructure->Magnetometer_Yaw,    -DataStructure->Gyroscope_Z_dgs, dt);
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */

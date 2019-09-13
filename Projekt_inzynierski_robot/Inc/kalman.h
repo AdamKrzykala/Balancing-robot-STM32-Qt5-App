@@ -10,34 +10,35 @@
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
-float dt;
+struct Kalman {
 
-float x_post[2];
+	double stan_theta; /* odchylenie */
+	double stan_omega; /* predkosc odchylania */
+	double stan_pomiar_theta; /* odchylenie */
+	double stan_pomiar_omega; /* predkosc katowa */
 
-float A[4], B[2], C[2];
-float std_dev_v, std_dev_w;
-float V[4], W[1];
-float P_pri[4], P_post[4];
-float x_pri[2];
-float eps[1], S[1], K[2];
-float u[1], y[1];
-float acc_x, acc_y;
-
-float Ax[2], Bu[2];
-float AP[4], AT[4], APAT[4];
-float Cx[1];
-float CP[2], CPCT[1];
-float PCT[2], S1[1];
-float Keps[2];
-float KS[2], KSKT[2];
-
-/* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
-
-void Kalman_filter_init(float dt, float Acce_pitch);
+	double kalman_Q; /* Wartosci przekatnej macierzy Q */
+	double kalman_R; /* Wariancja pomiaru */
+	double kalman_theta; /* odchylenie */
+	double kalman_omega; /* predkosc katowa */
+	double kalman_g_bias; /* dryft zyroskopu */
+	double kalman_P11; /* wartosci macierzy kowariancji P */
+	double kalman_P13;
+	double kalman_P21;
+	double kalman_P31;
+	double kalman_P33;
+	double kalman_K1; /* wartosci macierzy K */
+	double kalman_K2;
+	double kalman_K3;
+};
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
-float Kalman_filter_calculate(float Acce_pitch, float Gyro_Z);
+void Kalman_filter_init(struct Kalman *k, double q, double r);
+
+/* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+float Kalman_filter_calculate(struct Kalman *k, float Acce, float Gyro, float dt);
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 

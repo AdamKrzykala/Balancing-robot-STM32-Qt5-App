@@ -262,6 +262,11 @@ struct MPU9250 {
 
 	/* Complementary filter variables */
 	float Complementary_filter_Roll, Complementary_filter_Pitch, Complementary_filter_Yaw;
+
+	/* Kalman filter variables */
+	float Kalman_filter_Roll, Kalman_filter_Pitch, Kalman_filter_Yaw;
+
+	struct Kalman Kalman_R, Kalman_P, Kalman_Y;
 };
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -347,6 +352,12 @@ void AlphaBeta_filter(struct MPU9250 *DataStructure,
 void Complementary_filter(struct MPU9250 *DataStructure,
 						  float weight,
 						  float dt);
+
+/* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+void Kalman_filter(struct MPU9250 *DataStructure,
+				   float Q, float R,
+				   float dt);
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
