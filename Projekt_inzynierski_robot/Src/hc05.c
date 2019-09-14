@@ -114,16 +114,18 @@ int HC05_Parse_Data_frame(struct Data_frame_from_PC *_data, uint8_t *_frame) {
 
 	/* Filters data */
 	_data->Complementary_filter_weight = _frame[13];
+	_data->Kalman_filter_process_variance = HC05_Merge_bytes(_frame[14], _frame[15]);
 
 	/* Engines data */
-	_data->Left_engine_speed  = HC05_Merge_bytes(_frame[14], _frame[15]);
-	_data->Right_engine_speed = HC05_Merge_bytes(_frame[16], _frame[17]);
+	_data->Left_engine_speed  = HC05_Merge_bytes(_frame[16], _frame[17]);
+	_data->Right_engine_speed = HC05_Merge_bytes(_frame[18], _frame[19]);
 
 	/* Additional data */
-	_data->Emergency_stop = _frame[18];
+	_data->Emergency_stop = _frame[20];
+	_data->Which_filter = _frame[21];
 
 	/* CRC test */
-	Received_CRC = _frame[19];
+	Received_CRC = _frame[22];
 	Actual_CRC = CRC8_DataArray(_frame, DATA_FRAME_FROM_PC_SIZE - 1);
 
 	if( Actual_CRC != Received_CRC ) {

@@ -56,6 +56,7 @@
 #define KD_SPEED				0.1
 
 #define FILTER_WEIGHT 			0.001
+#define VARIANCE				10000
 
 /* USER CODE END PD */
 
@@ -79,6 +80,7 @@ float Complementary_Roll_global = 0, Complementary_Pitch_global = 0, Complementa
 float Kalman_Roll_global = 0, Kalman_Pitch_global = 0, Kalman_Yaw_global = 0;
 
 float Filter_weight_global = FILTER_WEIGHT;
+int16_t Kalman_filter_process_variance = VARIANCE;
 
 /* -----------> Angle PID variables <------------- */
 double Angle_Set_point_left_global  = SETPOINT_ANGLE;
@@ -121,7 +123,8 @@ int16_t LiPol_voltage_global = 0;
 
 /* -----------> Additional variables    <----------- */
 uint8_t Emergency_stop_global = 0;
-uint8_t Robot_fell_over = 0;
+uint8_t Robot_fell_over_global = 0;
+uint8_t Which_filter_global = 0;
 
 float dt = 0;
 
@@ -429,11 +432,7 @@ void Start_IMU_Task(void const * argument)
 		  Complementary_Yaw_global   = mpu1.Complementary_filter_Yaw;
 
 		  /* Kalman filter */
-<<<<<<< Updated upstream
-		  Kalman_filter(&mpu1, 0, 10000, dt);
-=======
-		  Kalman_filter(&mpu1, 0.00001, 10000, dt);
->>>>>>> Stashed changes
+		  Kalman_filter(&mpu1, 0.00001, Kalman_filter_process_variance, dt);
 
 		  Kalman_Roll_global  = mpu1.Kalman_filter_Roll;
 		  Kalman_Pitch_global = mpu1.Kalman_filter_Pitch;
@@ -511,8 +510,16 @@ void Start_Control_Task(void const * argument)
 		Speed_Set_point_left_global = LeftEngineSpeed_control_global;
 		Speed_Set_point_right_global = RightEngineSpeed_control_global;
 
-		//Actual_angle = Complementary_Pitch_global;
-		Actual_angle = Kalman_Pitch_global;
+		switch( Which_filter_global ) {
+
+			case 0:
+				Actual_angle = Complementary_Pitch_global;
+				break;
+
+			case 1:
+				Actual_angle = Kalman_Pitch_global;
+				break;
+		}
 
 		/* ---------------------------------> Speed PID <--------------------------------- */
 		/* 					Update PID parameters and get PID output  	 				   */
@@ -581,14 +588,14 @@ void Start_Control_Task(void const * argument)
 			Angle_PID_Calculate(&a_pid_right, Actual_angle,
 					I_Time_Start, I_Time_Stop);
 
-			if (fabs(Actual_angle) < 40 && Robot_fell_over != 1) {
+			if (fabs(Actual_angle) < 40 && Robot_fell_over_global != 1) {
 
 				LeftEngineSpeed_global = a_pid_left.control;
 				RightEngineSpeed_global = a_pid_right.control;
 
 			} else {
 
-				Robot_fell_over = 1;
+				Robot_fell_over_global = 1;
 
 				LeftEngineSpeed_global = 0;
 				RightEngineSpeed_global = 0;
@@ -601,7 +608,7 @@ void Start_Control_Task(void const * argument)
 
 				if( fabs(Actual_angle) < 5 ) {
 
-					Robot_fell_over = 0;
+					Robot_fell_over_global = 0;
 				}
 			}
 		}
@@ -645,6 +652,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 
 			/* Filters data from PC */
 			Filter_weight_global = (double) DF_PC.Complementary_filter_weight / 1000;
+			Kalman_filter_process_variance = DF_PC.Kalman_filter_process_variance;
 
 			/* Engines speed data from PC */
 			LeftEngineSpeed_control_global  = DF_PC.Left_engine_speed;
@@ -652,6 +660,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 
 			/* Additional data from PC */
 			Emergency_stop_global = DF_PC.Emergency_stop;
+			Which_filter_global = DF_PC.Which_filter;
 		}
 	}
 }
