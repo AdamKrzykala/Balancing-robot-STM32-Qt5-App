@@ -151,9 +151,9 @@ void MainWindow::MainWindow_Display_IMU_data()
     double Complementary_Filter_Pitch = Data_from.Complementary_pitch;
     double Complementary_Filter_Yaw   = Data_from.Complementary_yaw;
 
-    double Kalman_Filter_Roll  = qSin(key)+qrand()/static_cast<double>(RAND_MAX)*1*qSin(key/0.3843);
-    double Kalman_Filter_Pitch = qCos(key)+qrand()/static_cast<double>(RAND_MAX)*0.5*qSin(key/0.4364);
-    double Kalman_Filter_Yaw   = qCos(key)+qrand()/static_cast<double>(RAND_MAX)*0.8*qSin(key/0.4364);
+    double Kalman_Filter_Roll  = Data_from.Kalman_roll;
+    double Kalman_Filter_Pitch = Data_from.Kalman_pitch;
+    double Kalman_Filter_Yaw   = Data_from.Kalman_yaw;
 
     ui->label_Roll_View->setNum(Complementary_Filter_Roll);
     ui->label_Pitch_View->setNum(Complementary_Filter_Pitch);

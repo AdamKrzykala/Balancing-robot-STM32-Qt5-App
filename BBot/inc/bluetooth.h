@@ -5,7 +5,9 @@
 #include <QDebug>
 #include <QSerialPort>
 
-#define DATA_FRAME_FROM_ROBOT_SIZE      13
+#include "math.h"
+
+#define DATA_FRAME_FROM_ROBOT_SIZE      19
 #define DATA_FRAME_TO_ROBOT_SIZE        20
 
 #define POLYNOMIAL_9	0x31
@@ -36,6 +38,7 @@ struct Data_from_Robot
     double Lipol_voltage;   // <- in volts
 
     double Complementary_roll, Complementary_pitch, Complementary_yaw;
+    double Kalman_roll, Kalman_pitch, Kalman_yaw;
 
     int Left_engine_speed, Right_engine_speed;
 };
@@ -75,9 +78,6 @@ private:
     Data_from_Robot DF_Robot;
     Data_to_Robot   DT_Robot;
 
-    //bool Send_flag;
-    //bool Receive_flag;
-
     void Parse_data_frame();
 
 public:
@@ -90,7 +90,6 @@ public:
 
     void Set_DT_Robot(Data_to_Robot Data);
     Data_from_Robot Get_DF_Robot();
-    //void Set_Send_Flag();
 
 private slots:
 

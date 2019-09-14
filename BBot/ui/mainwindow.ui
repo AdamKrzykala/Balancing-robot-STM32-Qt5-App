@@ -206,16 +206,16 @@
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_Plots_Center">
+       <widget class="QPushButton" name="pushButton_Reset_Plots_Range">
         <property name="text">
-         <string>Wyśrodkuj</string>
+         <string>Resetuj</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_Reset_Plots_Range">
+       <widget class="QPushButton" name="pushButton_Plots_Center">
         <property name="text">
-         <string>Resetuj zakresy osi</string>
+         <string>Wyśrodkuj</string>
         </property>
        </widget>
       </item>
@@ -558,7 +558,7 @@
            </size>
           </property>
           <property name="cursor">
-           <cursorShape>SplitVCursor</cursorShape>
+           <cursorShape>ArrowCursor</cursorShape>
           </property>
           <property name="layoutDirection">
            <enum>Qt::LeftToRight</enum>
