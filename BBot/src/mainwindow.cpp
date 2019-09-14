@@ -304,6 +304,7 @@ void MainWindow::loadSettings()
     double Speed_PID_Kd = settings.value("Speed_PID_Kd").toDouble();
 
     double Complementary_weight = settings.value("Complementary_weight").toDouble();
+    int Variance = settings.value("Variance").toInt();
 
     int Which_filter = settings.value("Which_filter").toInt();
 
@@ -326,6 +327,7 @@ void MainWindow::loadSettings()
     ui->doubleSpinBox_Speed_PID_Kd->setValue(Speed_PID_Kd);
 
     ui->doubleSpinBox_Complementary_filter_weight->setValue(Complementary_weight);
+    ui->doubleSpinBox_Kalman_filter_variance->setValue(Variance);
 
     if( Which_filter == 0 ) ui->radioButton_Complementary_filter->setChecked(true);
     else if( Which_filter == 1 ) ui->radioButton_Kalman_filter->setChecked(true);
@@ -339,6 +341,7 @@ void MainWindow::loadSettings()
     qDebug() << "Wczytano Speed_PID_Kd: " << Speed_PID_Kd;
 
     qDebug() << "Wczytano Complementary_weight: " << Complementary_weight;
+    qDebug() << "Wczytano wariancje: "            << Variance;
     qDebug() << "Wczytano Which_filter: "         << Which_filter;
 }
 
@@ -357,6 +360,7 @@ void MainWindow::saveSettings()
     double Speed_PID_Kd = ui->doubleSpinBox_Speed_PID_Kd->value();
 
     double Complementary_weight = ui->doubleSpinBox_Complementary_filter_weight->value();
+    int Kalman_filter_process_variance = static_cast<int>( ui->doubleSpinBox_Kalman_filter_variance->value() );
 
     int Which_filter = 0;
 
@@ -372,6 +376,7 @@ void MainWindow::saveSettings()
     settings.setValue("Speed_PID_Kd", Speed_PID_Kd);
 
     settings.setValue("Complementary_weight", Complementary_weight);
+    settings.setValue("Variance", Kalman_filter_process_variance);
 
     settings.setValue("Which_filter", Which_filter);
 
@@ -382,6 +387,7 @@ void MainWindow::saveSettings()
     qDebug() << "Zapisano Speed_PID_Ki: "           << Speed_PID_Ki;
     qDebug() << "Zapisano Speed_PID_Kd: "           << Speed_PID_Kd;
     qDebug() << "Zapisano Complementary_weight: "   << Complementary_weight;
+    qDebug() << "Zapisano Variance: "               << Kalman_filter_process_variance;
     qDebug() << "Zapisano Which_filter: "           << Which_filter;
 }
 
@@ -1021,6 +1027,14 @@ void MainWindow::on_radioButton_Kalman_filter_toggled(bool checked)
         Data_to.Which_filter = 1;
     }
 
+    saveSettings();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_doubleSpinBox_Kalman_filter_variance_valueChanged(double arg1)
+{
+    Data_to.Kalman_procces_variance = static_cast<int>(arg1);
     saveSettings();
 }
 

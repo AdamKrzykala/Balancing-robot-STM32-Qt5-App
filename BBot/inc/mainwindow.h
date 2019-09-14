@@ -133,6 +133,8 @@ private slots:
 
     void on_radioButton_Kalman_filter_toggled(bool checked);
 
+    void on_doubleSpinBox_Kalman_filter_variance_valueChanged(double arg1);
+
 signals:
 
     void Disconnect_Signal();
