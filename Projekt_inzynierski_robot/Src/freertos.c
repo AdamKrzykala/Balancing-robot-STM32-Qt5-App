@@ -429,7 +429,11 @@ void Start_IMU_Task(void const * argument)
 		  Complementary_Yaw_global   = mpu1.Complementary_filter_Yaw;
 
 		  /* Kalman filter */
+<<<<<<< Updated upstream
 		  Kalman_filter(&mpu1, 0, 10000, dt);
+=======
+		  Kalman_filter(&mpu1, 0.00001, 10000, dt);
+>>>>>>> Stashed changes
 
 		  Kalman_Roll_global  = mpu1.Kalman_filter_Roll;
 		  Kalman_Pitch_global = mpu1.Kalman_filter_Pitch;
@@ -461,6 +465,7 @@ void Start_USART_Task(void const * argument)
 	  HC05_Fill_Data_frame_to_PC(&DT_PC, Data_to_PC,
 			  	  	  	   	     LiPol_voltage_global,
 								 Complementary_Roll_global, Complementary_Pitch_global, Complementary_Yaw_global,
+								 Kalman_Roll_global, Kalman_Pitch_global, Kalman_Yaw_global,
 								 LeftEngineSpeed_global, RightEngineSpeed_global);
 
 	  HAL_UART_Transmit_DMA(HC05_handle, Data_to_PC, DATA_FRAME_TO_PC_SIZE);

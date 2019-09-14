@@ -12,7 +12,7 @@
 #include "crc.h"
 
 #define DATA_FRAME_FROM_PC_SIZE 	20
-#define DATA_FRAME_TO_PC_SIZE 		13
+#define DATA_FRAME_TO_PC_SIZE 		19
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 struct Data_frame_to_PC {
@@ -22,6 +22,9 @@ struct Data_frame_to_PC {
 
 	/* Complementary filter data */
 	int16_t Complementary_Roll, Complementary_Pitch, Complementary_Yaw;
+
+	/* Kalman filter data */
+	int16_t Kalman_Roll, Kalman_Pitch, Kalman_Yaw;
 
 	/* Engines data */
 	int16_t Left_engine_speed, Right_engine_speed;
@@ -54,6 +57,7 @@ int16_t HC05_Merge_bytes(uint8_t _lower_byte, uint8_t _higher_byte);
 void HC05_Fill_Data_frame_to_PC(struct Data_frame_to_PC *_data, uint8_t *_frame,
 								int16_t LiPol_voltage,
 				   			    float Complementary_Roll, float Complementary_Pitch, float Complementary_Yaw,
+								float Kalman_Roll, float Kalman_Pitch, float Kalman_Yaw,
 								int16_t Left_engine_speed, int16_t Right_engine_speed);
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
