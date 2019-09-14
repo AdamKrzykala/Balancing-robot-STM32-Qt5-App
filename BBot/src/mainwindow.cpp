@@ -159,6 +159,10 @@ void MainWindow::MainWindow_Display_IMU_data()
     ui->label_Pitch_View->setNum(Complementary_Filter_Pitch);
     ui->label_Yaw_View->setNum(Complementary_Filter_Yaw);
 
+    ui->label_Kalman_Roll_View->setNum(Kalman_Filter_Roll);
+    ui->label_Kalman_Pitch_View->setNum(Kalman_Filter_Pitch);
+    ui->label_Kalman_Yaw_View->setNum(Kalman_Filter_Yaw);
+
     // add data to lines:
     if(Show_Complementary_Filter_Roll  == true) ui->Complementary_Filter_Graph->graph(0)->addData(key, Complementary_Filter_Roll);
     if(Show_Complementary_Filter_Pitch == true) ui->Complementary_Filter_Graph->graph(1)->addData(key, Complementary_Filter_Pitch);
@@ -301,6 +305,8 @@ void MainWindow::loadSettings()
 
     double Complementary_weight = settings.value("Complementary_weight").toDouble();
 
+    int Which_filter = settings.value("Which_filter").toInt();
+
     settings.setValue("PID_Kp", PID_Kp);
     settings.setValue("PID_Ki", PID_Ki);
     settings.setValue("PID_Kd", PID_Kd);
@@ -321,6 +327,9 @@ void MainWindow::loadSettings()
 
     ui->doubleSpinBox_Complementary_filter_weight->setValue(Complementary_weight);
 
+    if( Which_filter == 0 ) ui->radioButton_Complementary_filter->setChecked(true);
+    else if( Which_filter == 1 ) ui->radioButton_Kalman_filter->setChecked(true);
+
     qDebug() << "Wczytano PID_Kp: " << PID_Kp;
     qDebug() << "Wczytano PID_Ki: " << PID_Ki;
     qDebug() << "Wczytano PID_Kd: " << PID_Kd;
@@ -330,6 +339,7 @@ void MainWindow::loadSettings()
     qDebug() << "Wczytano Speed_PID_Kd: " << Speed_PID_Kd;
 
     qDebug() << "Wczytano Complementary_weight: " << Complementary_weight;
+    qDebug() << "Wczytano Which_filter: "         << Which_filter;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -348,6 +358,11 @@ void MainWindow::saveSettings()
 
     double Complementary_weight = ui->doubleSpinBox_Complementary_filter_weight->value();
 
+    int Which_filter = 0;
+
+    if( ui->radioButton_Complementary_filter->isChecked() ) Which_filter = 0;
+    else if(ui->radioButton_Kalman_filter->isChecked() )    Which_filter = 1;
+
     settings.setValue("PID_Kp", PID_Kp);
     settings.setValue("PID_Ki", PID_Ki);
     settings.setValue("PID_Kd", PID_Kd);
@@ -358,13 +373,16 @@ void MainWindow::saveSettings()
 
     settings.setValue("Complementary_weight", Complementary_weight);
 
-    qDebug() << "Zapisano PID_Kp: " << PID_Kp;
-    qDebug() << "Zapisano PID_Ki: " << PID_Ki;
-    qDebug() << "Zapisano PID_Kd: " << PID_Kd;
-    qDebug() << "Zapisano Speed_PID_Kp: " << Speed_PID_Kp;
-    qDebug() << "Zapisano Speed_PID_Ki: " << Speed_PID_Ki;
-    qDebug() << "Zapisano Speed_PID_Kd: " << Speed_PID_Kd;
-    qDebug() << "Zapisano Complementary_weight: " << Complementary_weight;
+    settings.setValue("Which_filter", Which_filter);
+
+    qDebug() << "Zapisano PID_Kp: "                 << PID_Kp;
+    qDebug() << "Zapisano PID_Ki: "                 << PID_Ki;
+    qDebug() << "Zapisano PID_Kd: "                 << PID_Kd;
+    qDebug() << "Zapisano Speed_PID_Kp: "           << Speed_PID_Kp;
+    qDebug() << "Zapisano Speed_PID_Ki: "           << Speed_PID_Ki;
+    qDebug() << "Zapisano Speed_PID_Kd: "           << Speed_PID_Kd;
+    qDebug() << "Zapisano Complementary_weight: "   << Complementary_weight;
+    qDebug() << "Zapisano Which_filter: "           << Which_filter;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -983,3 +1001,27 @@ void MainWindow::on_pushButton_Reset_Plots_Range_clicked()
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_radioButton_Complementary_filter_toggled(bool checked)
+{
+    if( checked == true ) {
+
+        Data_to.Which_filter = 0;
+    }
+
+    saveSettings();
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_radioButton_Kalman_filter_toggled(bool checked)
+{
+    if( checked == true ) {
+
+        Data_to.Which_filter = 1;
+    }
+
+    saveSettings();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

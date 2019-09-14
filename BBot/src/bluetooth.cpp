@@ -88,8 +88,10 @@ Bluetooth::Bluetooth()
     DT_Robot.Speed_Kp = 0;
     DT_Robot.Left_engine_speed = 0;
     DT_Robot.Right_engine_speed = 0;
-    DT_Robot.Emergency_stop = 0;
+    DT_Robot.Emergency_stop = 0;    
     DT_Robot.Complementary_filter_weight = 0;
+    DT_Robot.Kalman_procces_variance = 0;
+    DT_Robot.Which_filter = 0;
 
     DF_Robot.Lipol_voltage = 0;
     DF_Robot.Complementary_roll = 0;
@@ -247,6 +249,7 @@ void Bluetooth::Send_frame()
 
     // Filters data
     int8_t Complementary_filter_weight = static_cast<int8_t>(DT_Robot.Complementary_filter_weight * 1000);
+    //int8_t Kalman_filter_process_variance = static_cast<int8_t>(DT_Robot.Kalman_procces_variance * 1000);
 
     // Engines speed data
     int16_t Left_engine_speed  = static_cast<int16_t>(DT_Robot.Left_engine_speed);
@@ -254,6 +257,7 @@ void Bluetooth::Send_frame()
 
     // Additional data
     int8_t Emergency_stop = static_cast<int8_t>(DT_Robot.Emergency_stop);
+    int8_t Which_filter = static_cast<int8_t>(DT_Robot.Which_filter);
 
     int8_t Data_frame[DATA_FRAME_TO_ROBOT_SIZE];
 
@@ -281,8 +285,9 @@ void Bluetooth::Send_frame()
     Data_frame[17] = Divide_bytes(Right_engine_speed, 'H');
 
     Data_frame[18] = Emergency_stop;
+    Data_frame[19] = Which_filter;
 
-    Data_frame[19] = CRC8_DataArray(Data_frame, DATA_FRAME_TO_ROBOT_SIZE - 1);
+    Data_frame[20] = CRC8_DataArray(Data_frame, DATA_FRAME_TO_ROBOT_SIZE - 1);
 
     // Case 2: Save data frame as char array
     char Data[DATA_FRAME_TO_ROBOT_SIZE];
@@ -306,6 +311,7 @@ void Bluetooth::Send_frame()
         qDebug() << "Predkosc lewego silnika: "     << Left_engine_speed;
         qDebug() << "Predkosc prawego silnika: "    << Right_engine_speed;
         qDebug() << "Przycisk awaryjny: "           << Emergency_stop;
+        qDebug() << "Ktory filtr: "                 << Which_filter;
 
         Device->write( Data, DATA_FRAME_TO_ROBOT_SIZE);
         Device->waitForBytesWritten(20);

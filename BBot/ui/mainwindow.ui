@@ -536,7 +536,7 @@
        </size>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_4">
        <attribute name="title">
@@ -2163,20 +2163,8 @@
           <property name="title">
            <string>Filtry</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_7">
-           <property name="leftMargin">
-            <number>20</number>
-           </property>
-           <property name="topMargin">
-            <number>20</number>
-           </property>
-           <property name="rightMargin">
-            <number>20</number>
-           </property>
-           <property name="bottomMargin">
-            <number>20</number>
-           </property>
-           <item row="1" column="0">
+          <layout class="QGridLayout" name="gridLayout_5">
+           <item row="0" column="0">
             <widget class="QLabel" name="label_Fusion">
              <property name="minimumSize">
               <size>
@@ -2195,7 +2183,7 @@
              </property>
             </widget>
            </item>
-           <item row="1" column="2">
+           <item row="0" column="2" rowspan="2">
             <layout class="QVBoxLayout" name="verticalLayout_5">
              <item>
               <widget class="QGroupBox" name="groupBox_9">
@@ -2244,7 +2232,7 @@
               </widget>
              </item>
              <item>
-              <spacer name="verticalSpacer_7">
+              <spacer name="verticalSpacer_2">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>
                </property>
@@ -2254,7 +2242,7 @@
                <property name="sizeHint" stdset="0">
                 <size>
                  <width>20</width>
-                 <height>20</height>
+                 <height>10</height>
                 </size>
                </property>
               </spacer>
@@ -2297,7 +2285,7 @@
              </item>
             </layout>
            </item>
-           <item row="1" column="1">
+           <item row="0" column="1" rowspan="2">
             <spacer name="horizontalSpacer_61">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
@@ -2312,6 +2300,69 @@
               </size>
              </property>
             </spacer>
+           </item>
+           <item row="0" column="3">
+            <spacer name="horizontalSpacer_13">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>10</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="4" rowspan="2">
+            <widget class="QGroupBox" name="groupBox_12">
+             <property name="title">
+              <string>Filtr wykorzystywany w algorytmie</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_3">
+              <item row="0" column="0">
+               <layout class="QVBoxLayout" name="verticalLayout_2">
+                <item>
+                 <layout class="QVBoxLayout" name="verticalLayout">
+                  <item>
+                   <widget class="QRadioButton" name="radioButton_Complementary_filter">
+                    <property name="text">
+                     <string>Filtr komplementarny</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="verticalSpacer">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::Fixed</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>10</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QRadioButton" name="radioButton_Kalman_filter">
+                    <property name="text">
+                     <string>Filtr Kalmana</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
            </item>
           </layout>
          </widget>

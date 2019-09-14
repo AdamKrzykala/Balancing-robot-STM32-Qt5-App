@@ -129,6 +129,10 @@ private slots:
 
     void on_pushButton_Reset_Plots_Range_clicked();
 
+    void on_radioButton_Complementary_filter_toggled(bool checked);
+
+    void on_radioButton_Kalman_filter_toggled(bool checked);
+
 signals:
 
     void Disconnect_Signal();
