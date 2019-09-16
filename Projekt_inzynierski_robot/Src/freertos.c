@@ -57,6 +57,7 @@
 
 #define FILTER_WEIGHT 			0.001
 #define VARIANCE				10000
+#define BETA					0.001
 
 /* USER CODE END PD */
 
@@ -86,6 +87,7 @@ float Madgwick_Roll_global = 0, Madgwick_Pitch_global = 0, Madgwick_Yaw_global =
 
 float Filter_weight_global = FILTER_WEIGHT;
 int16_t Kalman_filter_process_variance = VARIANCE;
+float Madgwick_filter_beta = BETA;
 
 float q1_test_global = 0, q2_test_global = 0, q3_test_global = 0, q4_test_global = 0;
 
@@ -450,7 +452,7 @@ void Start_IMU_Task(void const * argument)
 		  Kalman_Yaw_global   = mpu1.Kalman_filter_Yaw;
 
 		  /* Madgwick filter */
-		  Madgwick_filter(&mpu1, dt);
+		  Madgwick_filter(&mpu1, Madgwick_filter_beta, dt);
 
 		  Madgwick_Roll_global  = mpu1.Madgwick_filter_Roll;
 		  Madgwick_Pitch_global = mpu1.Madgwick_filter_Pitch;
@@ -528,6 +530,8 @@ void Start_Control_Task(void const * argument)
 
 		Speed_Set_point_left_global = LeftEngineSpeed_control_global;
 		Speed_Set_point_right_global = RightEngineSpeed_control_global;
+
+		Which_filter_global = 2;
 
 		switch( Which_filter_global ) {
 
@@ -674,8 +678,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 			Speed_KD_global = (double) DF_PC.Speed_KD / 100;
 
 			/* Filters data from PC */
-			Filter_weight_global = (double) DF_PC.Complementary_filter_weight / 1000;
+			Filter_weight_global = (float) DF_PC.Complementary_filter_weight / 1000;
 			Kalman_filter_process_variance = DF_PC.Kalman_filter_process_variance;
+			Madgwick_filter_beta = (float) DF_PC.Madgwick_filter_beta / 1000;
 
 			/* Engines speed data from PC */
 			LeftEngineSpeed_control_global  = DF_PC.Left_engine_speed;

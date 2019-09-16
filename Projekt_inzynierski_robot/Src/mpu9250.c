@@ -553,9 +553,11 @@ void Kalman_filter(struct MPU9250 *DataStructure,
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
 
 void Madgwick_filter(struct MPU9250 *DataStructure,
+					 float beta,
 					 float dt) {
 
-	MadgwickAHRSupdate(DataStructure->Gyroscope_X_dgs * (M_PI / 180), DataStructure->Gyroscope_Y_dgs * (M_PI / 180), DataStructure->Gyroscope_Z_dgs * (M_PI / 180),
+	MadgwickAHRSupdate(beta,
+					   DataStructure->Gyroscope_X_dgs * (M_PI / 180), DataStructure->Gyroscope_Y_dgs * (M_PI / 180), DataStructure->Gyroscope_Z_dgs * (M_PI / 180),
 					   DataStructure->Accelerometer_X_g, DataStructure->Accelerometer_Y_g, DataStructure->Accelerometer_Z_g,
 					   DataStructure->Magnetometer_X_uT, DataStructure->Magnetometer_Y_uT, DataStructure->Magnetometer_Z_uT,
 					   dt);

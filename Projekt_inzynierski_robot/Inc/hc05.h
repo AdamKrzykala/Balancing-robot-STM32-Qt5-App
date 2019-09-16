@@ -11,7 +11,7 @@
 #include "usart.h"
 #include "crc.h"
 
-#define DATA_FRAME_FROM_PC_SIZE 	23
+#define DATA_FRAME_FROM_PC_SIZE 	26
 #define DATA_FRAME_TO_PC_SIZE 		25
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -41,8 +41,9 @@ struct Data_frame_from_PC {
 	int16_t Speed_KP, Speed_KI, Speed_KD;
 
 	/* Filters data */
-	int8_t Complementary_filter_weight;
+	int16_t Complementary_filter_weight;
 	int16_t Kalman_filter_process_variance;
+	int16_t Madgwick_filter_beta;
 
 	/* Engines data */
 	int16_t Left_engine_speed, Right_engine_speed;

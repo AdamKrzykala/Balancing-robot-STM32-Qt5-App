@@ -27,9 +27,7 @@
 
 //---------------------------------------------------------------------------------------------------
 // Definitions
-
-//#define sampleFreq	512.0f		// sample frequency in Hz
-#define betaDef		0.1f		// 2 * proportional gain
+#define betaDef		0.0001f		// 2 * proportional gain
 
 //---------------------------------------------------------------------------------------------------
 // Variable definitions
@@ -48,7 +46,12 @@ float invSqrt(float x);
 //---------------------------------------------------------------------------------------------------
 // AHRS algorithm update
 
-void MadgwickAHRSupdate(float gx, float gy, float gz, float ax, float ay, float az, float mx, float my, float mz, float dt) {
+void MadgwickAHRSupdate(float beta,
+						float gx, float gy, float gz,
+						float ax, float ay, float az,
+						float mx, float my, float mz,
+						float dt) {
+
 	float sampleFreq = 1 / dt;
 	float recipNorm;
 	float s0, s1, s2, s3;
