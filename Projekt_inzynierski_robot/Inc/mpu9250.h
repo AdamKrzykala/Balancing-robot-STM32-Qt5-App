@@ -12,6 +12,7 @@
 #include "math.h"
 
 #include "kalman.h"
+#include "madgwick.h"
 
 #define MAGNETIC_DECLINATION	( 4 + (29 / 60) ) /* <- for Boleslawiec */
 #define Z_AXIS_ORIENTATION		-1
@@ -264,9 +265,13 @@ struct MPU9250 {
 	float Complementary_filter_Roll, Complementary_filter_Pitch, Complementary_filter_Yaw;
 
 	/* Kalman filter variables */
+	struct Kalman Kalman_R, Kalman_P, Kalman_Y;
 	float Kalman_filter_Roll, Kalman_filter_Pitch, Kalman_filter_Yaw;
 
-	struct Kalman Kalman_R, Kalman_P, Kalman_Y;
+	/* Madgwick filter variables */
+	//struct Madgwick Madgwick_filter;
+	//uint8_t First_time;
+	float Madgwick_filter_Roll, Madgwick_filter_Pitch, Madgwick_filter_Yaw;
 };
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
@@ -358,6 +363,11 @@ void Complementary_filter(struct MPU9250 *DataStructure,
 void Kalman_filter(struct MPU9250 *DataStructure,
 				   float Q, float R,
 				   float dt);
+
+/* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
+
+void Madgwick_filter(struct MPU9250 *DataStructure,
+					 float dt);
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 

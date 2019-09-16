@@ -236,6 +236,15 @@ MPU9250_Error_code MPU9250_Init(I2C_HandleTypeDef *I2Cx,
 		//HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 		return MPU9250_Magnetometer_Config_FAIL;
 	}
+	//
+	//
+	//
+	//
+	//MadgwickQuaternionInit(&DataStructure->Madgwick_filter);
+	//
+	//
+	//
+	//
 
 	return MPU9250_Init_OK;
 }
@@ -421,16 +430,6 @@ void MPU9250_Set_Offsets(I2C_HandleTypeDef *I2Cx,
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
-int16_t Magnetometer_X_test = 0, Magnetometer_Y_test = 0, Magnetometer_Z_test = 0;
-
-float Roll_test  = 0;
-float Pitch_test = 0;
-
-float cosRoll_test = 0, cosPitch_test = 0;
-float sinRoll_test = 0, sinPitch_test = 0;
-
-float X_h_test = 0;
-float Y_h_test = 0;
 
 void MPU9250_Calculate_RPY(I2C_HandleTypeDef *I2Cx,
 	      	  	  	  	  	  	  		 struct MPU9250 *DataStructure,
@@ -470,18 +469,6 @@ void MPU9250_Calculate_RPY(I2C_HandleTypeDef *I2Cx,
 	float Y_h = m_y * cosRoll  - m_z * sinRoll;
 
 	DataStructure->Magnetometer_Yaw = Z_AXIS_ORIENTATION * (atan2f(X_h, Y_h) * (180 / M_PI) + MAGNETIC_DECLINATION);
-
-	//
-	Magnetometer_X_test = m_x, Magnetometer_Y_test = m_y, Magnetometer_Z_test = m_z;
-
-	Roll_test  = DataStructure->Accelerometer_Roll  * (M_PI / 180);
-	Pitch_test = DataStructure->Accelerometer_Pitch * (M_PI / 180);
-
-	cosRoll_test = cosRoll, cosPitch_test = cosPitch;
-	sinRoll_test = sinRoll, sinPitch_test = sinPitch;
-
-	X_h_test = X_h;
-	Y_h_test = Y_h;
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
@@ -560,7 +547,31 @@ void Kalman_filter(struct MPU9250 *DataStructure,
 	/* Case 2: */
 	DataStructure->Kalman_filter_Roll  = Kalman_filter_calculate(&DataStructure->Kalman_R, DataStructure->Accelerometer_Roll,   DataStructure->Gyroscope_X_dgs, dt);
 	DataStructure->Kalman_filter_Pitch = Kalman_filter_calculate(&DataStructure->Kalman_P, DataStructure->Accelerometer_Pitch, -DataStructure->Gyroscope_Y_dgs, dt);
-	DataStructure->Kalman_filter_Yaw   = Kalman_filter_calculate(&DataStructure->Kalman_Y, DataStructure->Magnetometer_Yaw,    -DataStructure->Gyroscope_Z_dgs, dt);
+	DataStructure->Kalman_filter_Yaw   = Kalman_filter_calculate(&DataStructure->Kalman_Y, DataStructure->Magnetometer_Yaw,    -DataStructure->Gyroscope_Z_dgs, dt) - MAGNETIC_DECLINATION;
+}
+
+/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
+
+void Madgwick_filter(struct MPU9250 *DataStructure,
+					 float dt) {
+
+	MadgwickAHRSupdate(DataStructure->Gyroscope_X_dgs * (M_PI / 180), DataStructure->Gyroscope_Y_dgs * (M_PI / 180), DataStructure->Gyroscope_Z_dgs * (M_PI / 180),
+					   DataStructure->Accelerometer_X_g, DataStructure->Accelerometer_Y_g, DataStructure->Accelerometer_Z_g,
+					   DataStructure->Magnetometer_X_uT, DataStructure->Magnetometer_Y_uT, DataStructure->Magnetometer_Z_uT,
+					   dt);
+
+	float real_part = q0;
+	float x =  q1;
+	float y =  q2;
+	float z =  q3;
+
+	float Roll  = atan2f( 2 * ( (real_part * x) + (y * z) ), 1 - (2 * ( (x * x) + (y * y) ) ) ) * (180 / M_PI);
+	float Pitch = -asinf( 2 * ( (real_part * y) - (z * x) ) ) * (180 / M_PI);
+	float Yaw   = atan2f( 2 * ( (real_part * z) + (x * y) ), 1 - (2 * ( (y * y) + (z * z) ) ) ) * (180 / M_PI);
+
+	DataStructure->Madgwick_filter_Roll  = Roll;
+	DataStructure->Madgwick_filter_Pitch = Pitch;
+	DataStructure->Madgwick_filter_Yaw   = Yaw - MAGNETIC_DECLINATION;
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */

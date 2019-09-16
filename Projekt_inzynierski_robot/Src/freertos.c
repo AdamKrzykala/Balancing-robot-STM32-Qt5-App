@@ -69,6 +69,10 @@
 /* USER CODE BEGIN Variables */
 
 /* ------------> MPU9250 variables <------------- */
+float a_x_g = 0, a_y_g = 0, a_z_g = 0;
+float g_x_dgs = 0, g_y_dgs = 0, g_z_dgs = 0;
+float m_x_uT = 0, m_y_uT = 0, m_z_uT = 0;
+
 float a_roll_global = 0, a_pitch_global = 0;
 float g_roll_global  = 0, g_pitch_global = 0, g_yaw_global   = 0;
 float m_yaw_global = 0;
@@ -78,9 +82,12 @@ int16_t g_x_offset_global = 0, g_y_offset_global = 0, g_z_offset_global = 0;
 
 float Complementary_Roll_global = 0, Complementary_Pitch_global = 0, Complementary_Yaw_global = 0;
 float Kalman_Roll_global = 0, Kalman_Pitch_global = 0, Kalman_Yaw_global = 0;
+float Madgwick_Roll_global = 0, Madgwick_Pitch_global = 0, Madgwick_Yaw_global = 0;
 
 float Filter_weight_global = FILTER_WEIGHT;
 int16_t Kalman_filter_process_variance = VARIANCE;
+
+float q1_test_global = 0, q2_test_global = 0, q3_test_global = 0, q4_test_global = 0;
 
 /* -----------> Angle PID variables <------------- */
 double Angle_Set_point_left_global  = SETPOINT_ANGLE;
@@ -417,6 +424,10 @@ void Start_IMU_Task(void const * argument)
 		  /* Case 2: RPY calculation */
 		  MPU9250_Calculate_RPY(&hi2c1, &mpu1, dt);
 
+		  a_x_g = mpu1.Accelerometer_X_g, a_y_g = mpu1.Accelerometer_Y_g, a_z_g = mpu1.Accelerometer_Z_g;
+		  g_x_dgs = mpu1.Gyroscope_X_dgs, g_y_dgs = mpu1.Gyroscope_Y_dgs, g_z_dgs = mpu1.Gyroscope_Z_dgs;
+		  m_x_uT = mpu1.Magnetometer_X_uT, m_y_uT = mpu1.Magnetometer_Y_uT, m_z_uT = mpu1.Magnetometer_Z_uT;
+
 		  a_roll_global = mpu1.Accelerometer_Roll, a_pitch_global = mpu1.Accelerometer_Pitch;
 		  g_roll_global = mpu1.Gyroscope_Roll, g_pitch_global = mpu1.Gyroscope_Pitch, g_yaw_global = mpu1.Gyroscope_Yaw;
 		  m_yaw_global  = mpu1.Magnetometer_Yaw;
@@ -437,6 +448,13 @@ void Start_IMU_Task(void const * argument)
 		  Kalman_Roll_global  = mpu1.Kalman_filter_Roll;
 		  Kalman_Pitch_global = mpu1.Kalman_filter_Pitch;
 		  Kalman_Yaw_global   = mpu1.Kalman_filter_Yaw;
+
+		  /* Madgwick filter */
+		  Madgwick_filter(&mpu1, dt);
+
+		  Madgwick_Roll_global  = mpu1.Madgwick_filter_Roll;
+		  Madgwick_Pitch_global = mpu1.Madgwick_filter_Pitch;
+		  Madgwick_Yaw_global   = mpu1.Madgwick_filter_Yaw;
 	  }
 
 	  osDelay(5);
