@@ -7,7 +7,7 @@
 
 #include "math.h"
 
-#define DATA_FRAME_FROM_ROBOT_SIZE      19
+#define DATA_FRAME_FROM_ROBOT_SIZE      25
 #define DATA_FRAME_TO_ROBOT_SIZE        23
 
 #define POLYNOMIAL_9	0x31
@@ -39,6 +39,7 @@ struct Data_from_Robot
 
     double Complementary_roll, Complementary_pitch, Complementary_yaw;
     double Kalman_roll, Kalman_pitch, Kalman_yaw;
+    double Madgwick_roll, Madgwick_pitch, Madgwick_yaw;
 
     int Left_engine_speed, Right_engine_speed;
 };
@@ -81,6 +82,8 @@ private:
     Data_to_Robot   DT_Robot;
 
     void Parse_data_frame();
+
+    int Error_frame_counter;
 
 public:
 

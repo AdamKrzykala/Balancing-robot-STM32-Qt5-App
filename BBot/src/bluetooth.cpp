@@ -40,18 +40,6 @@ byte CRC8_DataArray(byte *pData, byte Len) {
 
 int16_t Merge_bytes(uint8_t _lower_byte, uint8_t _higher_byte) {
 
-    /*
-    int16_t uint16_byte = static_cast<int16_t>( ( _higher_byte << 8 ) + _lower_byte );
-
-    if(uint16_byte >= 32767) {
-
-        int16_t int_byte =  static_cast<int16_t>( uint16_byte - (2 * 32768) );
-        return int_byte;
-    }
-
-    else return uint16_byte;
-    */
-
     int16_t dataBoth = 0x00;
 
     dataBoth = static_cast<int16_t>(_higher_byte << 8);
@@ -100,6 +88,9 @@ Bluetooth::Bluetooth()
     DF_Robot.Kalman_roll = 0;
     DF_Robot.Kalman_pitch = 0;
     DF_Robot.Kalman_yaw = 0;
+    DF_Robot.Madgwick_roll = 0;
+    DF_Robot.Madgwick_pitch = 0;
+    DF_Robot.Madgwick_yaw = 0;
     DF_Robot.Left_engine_speed = 0;
     DF_Robot.Right_engine_speed = 0;
 
@@ -213,10 +204,17 @@ void Bluetooth::Parse_data_frame()
     DF_Robot.Kalman_yaw   = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[12]),
                                                              static_cast<uint8_t>(Data_frame_from_robot[13])  ) ) / 100;
 
-    DF_Robot.Left_engine_speed  = static_cast<int16_t>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[14]),
-                                                                    static_cast<uint8_t>(Data_frame_from_robot[15])  ) );
-    DF_Robot.Right_engine_speed = static_cast<int16_t>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[16]),
-                                                                    static_cast<uint8_t>(Data_frame_from_robot[17]) ) );
+    DF_Robot.Madgwick_roll  = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[14]),
+                                                             static_cast<uint8_t>(Data_frame_from_robot[15])  ) ) / 100;
+    DF_Robot.Madgwick_pitch = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[16]),
+                                                             static_cast<uint8_t>(Data_frame_from_robot[17])  ) ) / 100;
+    DF_Robot.Madgwick_yaw   = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[18]),
+                                                             static_cast<uint8_t>(Data_frame_from_robot[19])  ) ) / 100;
+
+    DF_Robot.Left_engine_speed  = static_cast<int16_t>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[20]),
+                                                                    static_cast<uint8_t>(Data_frame_from_robot[21])  ) );
+    DF_Robot.Right_engine_speed = static_cast<int16_t>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[22]),
+                                                                    static_cast<uint8_t>(Data_frame_from_robot[23]) ) );
 
     emit Parsed_frame_OK_Signal();
 
@@ -227,6 +225,9 @@ void Bluetooth::Parse_data_frame()
     //qDebug() << "Filtr kalmana Roll: "         << DF_Robot.Kalman_roll;
     //qDebug() << "Filtr kalmana Pitch: "        << DF_Robot.Kalman_pitch;
     //qDebug() << "Filtr kalmana Yaw: "          << DF_Robot.Kalman_yaw;
+    //qDebug() << "Filtr madgwicka Roll: "         << DF_Robot.Madgwick_roll;
+    //qDebug() << "Filtr madgwicka Pitch: "        << DF_Robot.Kalman_pitch;
+    //qDebug() << "Filtr madgwicka Yaw: "          << DF_Robot.Kalman_yaw;
     //qDebug() << "Predkosc lewego silnika: "    << DF_Robot.Left_engine_speed;
     //qDebug() << "Predskoc prawego silnika: "   << DF_Robot.Right_engine_speed;
 }

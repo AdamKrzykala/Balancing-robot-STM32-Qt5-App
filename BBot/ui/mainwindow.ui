@@ -1652,6 +1652,35 @@
            <property name="bottomMargin">
             <number>20</number>
            </property>
+           <item row="0" column="3">
+            <spacer name="horizontalSpacer_3">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>10</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_Variables">
+             <property name="minimumSize">
+              <size>
+               <width>100</width>
+               <height>100</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>Variables.png</string>
+             </property>
+            </widget>
+           </item>
            <item row="0" column="4">
             <widget class="QGroupBox" name="groupBox_7">
              <property name="title">
@@ -1710,7 +1739,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>wartość</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -1753,7 +1782,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>wartość</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -1796,7 +1825,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>wartość</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -1819,6 +1848,112 @@
               </item>
              </layout>
             </widget>
+           </item>
+           <item row="0" column="7">
+            <widget class="QGroupBox" name="groupBox_11">
+             <property name="title">
+              <string>Silniki</string>
+             </property>
+             <layout class="QGridLayout" name="gridLayout_17">
+              <item row="0" column="0">
+               <layout class="QVBoxLayout" name="verticalLayout_8">
+                <item>
+                 <spacer name="verticalSpacer_8">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_39">
+                  <item>
+                   <widget class="QLabel" name="label_49">
+                    <property name="text">
+                     <string>Lewy:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_Left_engine_speed_View">
+                    <property name="minimumSize">
+                     <size>
+                      <width>50</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>50</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>0</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_40">
+                  <item>
+                   <widget class="QLabel" name="label_51">
+                    <property name="text">
+                     <string>Prawy:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_Right_engine_speed_View">
+                    <property name="minimumSize">
+                     <size>
+                      <width>50</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>0</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_13">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <spacer name="horizontalSpacer_53">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
            </item>
            <item row="0" column="5">
             <spacer name="horizontalSpacer_59">
@@ -1894,7 +2029,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>wartość</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -1937,7 +2072,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>wartość</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -1980,7 +2115,7 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>wartość</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
@@ -2004,29 +2139,16 @@
              </layout>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_Variables">
-             <property name="minimumSize">
-              <size>
-               <width>100</width>
-               <height>100</height>
-              </size>
-             </property>
-             <property name="text">
-              <string>Variables.png</string>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="6">
-            <widget class="QGroupBox" name="groupBox_11">
+            <widget class="QGroupBox" name="groupBox_13">
              <property name="title">
-              <string>Silniki</string>
+              <string>F.Madgwicka</string>
              </property>
-             <layout class="QGridLayout" name="gridLayout_17">
+             <layout class="QGridLayout" name="gridLayout_7">
               <item row="0" column="0">
-               <layout class="QVBoxLayout" name="verticalLayout_8">
+               <layout class="QVBoxLayout" name="verticalLayout_16">
                 <item>
-                 <spacer name="verticalSpacer_8">
+                 <spacer name="verticalSpacer_25">
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
                   </property>
@@ -2039,16 +2161,29 @@
                  </spacer>
                 </item>
                 <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_39">
+                 <layout class="QHBoxLayout" name="horizontalLayout_62">
                   <item>
-                   <widget class="QLabel" name="label_49">
+                   <widget class="QLabel" name="label_65">
                     <property name="text">
-                     <string>Prędkość lewego silnika:</string>
+                     <string>Roll:</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QLabel" name="label_Left_engine_speed_View">
+                   <spacer name="horizontalSpacer_17">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_Madgwick_Roll_View">
                     <property name="minimumSize">
                      <size>
                       <width>50</width>
@@ -2062,38 +2197,100 @@
                      </size>
                     </property>
                     <property name="text">
-                     <string>wartość</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
                  </layout>
                 </item>
                 <item>
-                 <layout class="QHBoxLayout" name="horizontalLayout_40">
+                 <layout class="QHBoxLayout" name="horizontalLayout_63">
                   <item>
-                   <widget class="QLabel" name="label_51">
+                   <widget class="QLabel" name="label_66">
                     <property name="text">
-                     <string>Prędkość prawego silnika: </string>
+                     <string>Pitch:</string>
                     </property>
                    </widget>
                   </item>
                   <item>
-                   <widget class="QLabel" name="label_Right_engine_speed_View">
+                   <spacer name="horizontalSpacer_18">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_Madgwick_Pitch_View">
                     <property name="minimumSize">
                      <size>
                       <width>50</width>
                       <height>20</height>
                      </size>
                     </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>50</width>
+                      <height>20</height>
+                     </size>
+                    </property>
                     <property name="text">
-                     <string>wartość</string>
+                     <string>0</string>
                     </property>
                    </widget>
                   </item>
                  </layout>
                 </item>
                 <item>
-                 <spacer name="verticalSpacer_13">
+                 <layout class="QHBoxLayout" name="horizontalLayout_64">
+                  <item>
+                   <widget class="QLabel" name="label_67">
+                    <property name="text">
+                     <string>Yaw:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_19">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_Madgwick_Yaw_View">
+                    <property name="minimumSize">
+                     <size>
+                      <width>50</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                    <property name="maximumSize">
+                     <size>
+                      <width>50</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                    <property name="text">
+                     <string>0</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_26">
                   <property name="orientation">
                    <enum>Qt::Vertical</enum>
                   </property>
@@ -2109,35 +2306,6 @@
               </item>
              </layout>
             </widget>
-           </item>
-           <item row="0" column="1">
-            <spacer name="horizontalSpacer_53">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item row="0" column="3">
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeType">
-              <enum>QSizePolicy::Fixed</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>10</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
            </item>
           </layout>
          </widget>
@@ -2370,6 +2538,29 @@
                    <widget class="QRadioButton" name="radioButton_Kalman_filter">
                     <property name="text">
                      <string>Filtr Kalmana</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="verticalSpacer_3">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                    <property name="sizeType">
+                     <enum>QSizePolicy::Fixed</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>10</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QRadioButton" name="radioButton_Madgwick_filter">
+                    <property name="text">
+                     <string>Filtr Madgwicka</string>
                     </property>
                    </widget>
                   </item>

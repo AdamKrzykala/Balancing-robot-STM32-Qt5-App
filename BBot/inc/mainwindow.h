@@ -135,6 +135,8 @@ private slots:
 
     void on_doubleSpinBox_Kalman_filter_variance_valueChanged(double arg1);
 
+    void on_radioButton_Madgwick_filter_toggled(bool checked);
+
 signals:
 
     void Disconnect_Signal();

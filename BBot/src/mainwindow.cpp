@@ -155,6 +155,10 @@ void MainWindow::MainWindow_Display_IMU_data()
     double Kalman_Filter_Pitch = Data_from.Kalman_pitch;
     double Kalman_Filter_Yaw   = Data_from.Kalman_yaw;
 
+    double Madgwick_Filter_Roll  = Data_from.Madgwick_roll;
+    double Madgwick_Filter_Pitch = Data_from.Madgwick_pitch;
+    double Madgwick_Filter_Yaw   = Data_from.Madgwick_yaw;
+
     ui->label_Roll_View->setNum(Complementary_Filter_Roll);
     ui->label_Pitch_View->setNum(Complementary_Filter_Pitch);
     ui->label_Yaw_View->setNum(Complementary_Filter_Yaw);
@@ -162,6 +166,10 @@ void MainWindow::MainWindow_Display_IMU_data()
     ui->label_Kalman_Roll_View->setNum(Kalman_Filter_Roll);
     ui->label_Kalman_Pitch_View->setNum(Kalman_Filter_Pitch);
     ui->label_Kalman_Yaw_View->setNum(Kalman_Filter_Yaw);
+
+    ui->label_Madgwick_Roll_View->setNum(Madgwick_Filter_Roll);
+    ui->label_Madgwick_Pitch_View->setNum(Madgwick_Filter_Pitch);
+    ui->label_Madgwick_Yaw_View->setNum(Madgwick_Filter_Yaw);
 
     // add data to lines:
     if(Show_Complementary_Filter_Roll  == true) ui->Complementary_Filter_Graph->graph(0)->addData(key, Complementary_Filter_Roll);
@@ -204,9 +212,9 @@ void MainWindow::MainWindow_Display_IMU_data()
     }
 
     // OpenGL visualisation
-    ui->widget_RPY_Visualisation->setXRotation(Complementary_Filter_Pitch);
-    ui->widget_RPY_Visualisation->setYRotation(Complementary_Filter_Yaw);
-    ui->widget_RPY_Visualisation->setZRotation(Complementary_Filter_Roll);
+    ui->widget_RPY_Visualisation->setXRotation(Kalman_Filter_Pitch);
+    ui->widget_RPY_Visualisation->setYRotation(Kalman_Filter_Yaw);
+    ui->widget_RPY_Visualisation->setZRotation(Kalman_Filter_Roll);
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1035,6 +1043,18 @@ void MainWindow::on_radioButton_Kalman_filter_toggled(bool checked)
 void MainWindow::on_doubleSpinBox_Kalman_filter_variance_valueChanged(double arg1)
 {
     Data_to.Kalman_procces_variance = static_cast<int>(arg1);
+    saveSettings();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_radioButton_Madgwick_filter_toggled(bool checked)
+{
+    if( checked == true ) {
+
+        Data_to.Which_filter = 2;
+    }
+
     saveSettings();
 }
 
