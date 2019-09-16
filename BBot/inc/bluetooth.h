@@ -8,7 +8,7 @@
 #include "math.h"
 
 #define DATA_FRAME_FROM_ROBOT_SIZE      25
-#define DATA_FRAME_TO_ROBOT_SIZE        23
+#define DATA_FRAME_TO_ROBOT_SIZE        26
 
 #define POLYNOMIAL_9	0x31
 
@@ -56,7 +56,8 @@ struct Data_to_Robot
 
     // Filters data
     double Complementary_filter_weight;
-    int Kalman_procces_variance;
+    double Kalman_procces_variance;
+    double Madgwick_filter_beta;
 
     // Engines speed data
     int Left_engine_speed, Right_engine_speed;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 4.10.0, 2019-09-16T19:18:18. -->
+<!-- Written by QtCreator 4.9.2, 2019-09-15T12:34:11. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -327,10 +327,10 @@
  </data>
  <data>
   <variable>ProjectExplorer.Project.Updater.FileVersion</variable>
-  <value type="int">22</value>
+  <value type="int">21</value>
  </data>
  <data>
   <variable>Version</variable>
-  <value type="int">22</value>
+  <value type="int">21</value>
  </data>
 </qtcreator>

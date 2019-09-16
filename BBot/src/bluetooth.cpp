@@ -249,8 +249,9 @@ void Bluetooth::Send_frame()
     int16_t Speed_Kd = static_cast<int16_t>(DT_Robot.Speed_Kd * 100);
 
     // Filters data
-    int8_t Complementary_filter_weight = static_cast<int8_t>(DT_Robot.Complementary_filter_weight * 1000);
+    int16_t Complementary_filter_weight = static_cast<int16_t>(DT_Robot.Complementary_filter_weight * 1000);
     int16_t Kalman_filter_process_variance = static_cast<int16_t>(DT_Robot.Kalman_procces_variance);
+    int16_t Madgwick_filter_beta = static_cast<int16_t>(DT_Robot.Madgwick_filter_beta * 1000);
 
     // Engines speed data
     int16_t Left_engine_speed  = static_cast<int16_t>(DT_Robot.Left_engine_speed);
@@ -278,19 +279,22 @@ void Bluetooth::Send_frame()
     Data_frame[11] = Divide_bytes(Speed_Kd, 'L');
     Data_frame[12] = Divide_bytes(Speed_Kd, 'H');
 
-    Data_frame[13] = Complementary_filter_weight;
-    Data_frame[14] = Divide_bytes(Kalman_filter_process_variance, 'L');
-    Data_frame[15] = Divide_bytes(Kalman_filter_process_variance, 'H');
+    Data_frame[13] = Divide_bytes(Complementary_filter_weight, 'L');
+    Data_frame[14] = Divide_bytes(Complementary_filter_weight, 'H');
+    Data_frame[15] = Divide_bytes(Kalman_filter_process_variance, 'L');
+    Data_frame[16] = Divide_bytes(Kalman_filter_process_variance, 'H');
+    Data_frame[17] = Divide_bytes(Madgwick_filter_beta, 'L');
+    Data_frame[18] = Divide_bytes(Madgwick_filter_beta, 'H');
 
-    Data_frame[16] = Divide_bytes(Left_engine_speed, 'L');
-    Data_frame[17] = Divide_bytes(Left_engine_speed, 'H');
-    Data_frame[18] = Divide_bytes(Right_engine_speed, 'L');
-    Data_frame[19] = Divide_bytes(Right_engine_speed, 'H');
+    Data_frame[19] = Divide_bytes(Left_engine_speed, 'L');
+    Data_frame[20] = Divide_bytes(Left_engine_speed, 'H');
+    Data_frame[21] = Divide_bytes(Right_engine_speed, 'L');
+    Data_frame[22] = Divide_bytes(Right_engine_speed, 'H');
 
-    Data_frame[20] = Emergency_stop;
-    Data_frame[21] = Which_filter;
+    Data_frame[23] = Emergency_stop;
+    Data_frame[24] = Which_filter;
 
-    Data_frame[22] = CRC8_DataArray(Data_frame, DATA_FRAME_TO_ROBOT_SIZE - 1);
+    Data_frame[25] = CRC8_DataArray(Data_frame, DATA_FRAME_TO_ROBOT_SIZE - 1);
 
     // Case 2: Save data frame as char array
     char Data[DATA_FRAME_TO_ROBOT_SIZE];
@@ -312,6 +316,7 @@ void Bluetooth::Send_frame()
         qDebug() << "Kd (predkosc): "               << Speed_Kd;
         qDebug() << "Waga filtru: "                 << Complementary_filter_weight;
         qDebug() << "Wariancja procesu: "           << Kalman_filter_process_variance;
+        qDebug() << "Wzmocnienie beta: "            << Madgwick_filter_beta;
         qDebug() << "Predkosc lewego silnika: "     << Left_engine_speed;
         qDebug() << "Predkosc prawego silnika: "    << Right_engine_speed;
         qDebug() << "Przycisk awaryjny: "           << Emergency_stop;

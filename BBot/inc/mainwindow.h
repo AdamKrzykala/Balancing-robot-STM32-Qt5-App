@@ -137,6 +137,8 @@ private slots:
 
     void on_radioButton_Madgwick_filter_toggled(bool checked);
 
+    void on_doubleSpinBox_Madgwick_beta_valueChanged(double arg1);
+
 signals:
 
     void Disconnect_Signal();

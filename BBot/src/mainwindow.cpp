@@ -313,6 +313,7 @@ void MainWindow::loadSettings()
 
     double Complementary_weight = settings.value("Complementary_weight").toDouble();
     int Variance = settings.value("Variance").toInt();
+    double Madgwick_beta = settings.value("Madgwick_beta").toDouble();
 
     int Which_filter = settings.value("Which_filter").toInt();
 
@@ -336,9 +337,11 @@ void MainWindow::loadSettings()
 
     ui->doubleSpinBox_Complementary_filter_weight->setValue(Complementary_weight);
     ui->doubleSpinBox_Kalman_filter_variance->setValue(Variance);
+    ui->doubleSpinBox_Madgwick_beta->setValue(Madgwick_beta);
 
     if( Which_filter == 0 ) ui->radioButton_Complementary_filter->setChecked(true);
     else if( Which_filter == 1 ) ui->radioButton_Kalman_filter->setChecked(true);
+    else if( Which_filter == 2 ) ui->radioButton_Madgwick_filter->setChecked(true);
 
     qDebug() << "Wczytano PID_Kp: " << PID_Kp;
     qDebug() << "Wczytano PID_Ki: " << PID_Ki;
@@ -350,6 +353,7 @@ void MainWindow::loadSettings()
 
     qDebug() << "Wczytano Complementary_weight: " << Complementary_weight;
     qDebug() << "Wczytano wariancje: "            << Variance;
+    qDebug() << "Wczytano beta: "                 << Madgwick_beta;
     qDebug() << "Wczytano Which_filter: "         << Which_filter;
 }
 
@@ -369,11 +373,13 @@ void MainWindow::saveSettings()
 
     double Complementary_weight = ui->doubleSpinBox_Complementary_filter_weight->value();
     int Kalman_filter_process_variance = static_cast<int>( ui->doubleSpinBox_Kalman_filter_variance->value() );
+    double Madgwick_beta = ui->doubleSpinBox_Madgwick_beta->value();
 
     int Which_filter = 0;
 
     if( ui->radioButton_Complementary_filter->isChecked() ) Which_filter = 0;
     else if(ui->radioButton_Kalman_filter->isChecked() )    Which_filter = 1;
+    else if(ui->radioButton_Madgwick_filter->isChecked() )  Which_filter = 2;
 
     settings.setValue("PID_Kp", PID_Kp);
     settings.setValue("PID_Ki", PID_Ki);
@@ -385,6 +391,7 @@ void MainWindow::saveSettings()
 
     settings.setValue("Complementary_weight", Complementary_weight);
     settings.setValue("Variance", Kalman_filter_process_variance);
+    settings.setValue("Madgwick_beta", Madgwick_beta);
 
     settings.setValue("Which_filter", Which_filter);
 
@@ -396,6 +403,7 @@ void MainWindow::saveSettings()
     qDebug() << "Zapisano Speed_PID_Kd: "           << Speed_PID_Kd;
     qDebug() << "Zapisano Complementary_weight: "   << Complementary_weight;
     qDebug() << "Zapisano Variance: "               << Kalman_filter_process_variance;
+    qDebug() << "Zapisano beta: "                   << Madgwick_beta;
     qDebug() << "Zapisano Which_filter: "           << Which_filter;
 }
 
@@ -1055,6 +1063,14 @@ void MainWindow::on_radioButton_Madgwick_filter_toggled(bool checked)
         Data_to.Which_filter = 2;
     }
 
+    saveSettings();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_doubleSpinBox_Madgwick_beta_valueChanged(double arg1)
+{
+    Data_to.Madgwick_filter_beta = arg1;
     saveSettings();
 }
 
