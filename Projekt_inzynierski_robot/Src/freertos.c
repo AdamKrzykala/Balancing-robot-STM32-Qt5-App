@@ -483,6 +483,7 @@ void Start_USART_Task(void const * argument)
 			  	  	  	   	     LiPol_voltage_global,
 								 Complementary_Roll_global, Complementary_Pitch_global, Complementary_Yaw_global,
 								 Kalman_Roll_global, Kalman_Pitch_global, Kalman_Yaw_global,
+								 Madgwick_Roll_global, Madgwick_Pitch_global, Madgwick_Yaw_global,
 								 LeftEngineSpeed_global, RightEngineSpeed_global);
 
 	  HAL_UART_Transmit_DMA(HC05_handle, Data_to_PC, DATA_FRAME_TO_PC_SIZE);
@@ -536,6 +537,10 @@ void Start_Control_Task(void const * argument)
 
 			case 1:
 				Actual_angle = Kalman_Pitch_global;
+				break;
+
+			case 2:
+				Actual_angle = Madgwick_Pitch_global;
 				break;
 		}
 

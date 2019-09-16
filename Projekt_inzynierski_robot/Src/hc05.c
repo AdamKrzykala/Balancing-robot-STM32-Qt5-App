@@ -45,6 +45,7 @@ void HC05_Fill_Data_frame_to_PC(struct Data_frame_to_PC *_data, uint8_t *_frame,
 								int16_t LiPol_voltage,
 								float Complementary_Roll, float Complementary_Pitch, float Complementary_Yaw,
 								float Kalman_Roll, float Kalman_Pitch, float Kalman_Yaw,
+								float Madgwick_Roll, float Madgwick_Pitch, float Madgwick_Yaw,
 								int16_t Left_engine_speed, int16_t Right_engine_speed) {
 
 	_data->Lipol_voltage = LiPol_voltage;
@@ -56,6 +57,10 @@ void HC05_Fill_Data_frame_to_PC(struct Data_frame_to_PC *_data, uint8_t *_frame,
 	_data->Kalman_Roll  = Kalman_Roll  * 100;
 	_data->Kalman_Pitch = Kalman_Pitch * 100;
 	_data->Kalman_Yaw   = Kalman_Yaw   * 100;
+
+	_data->Madgwick_Roll  = Madgwick_Roll  * 100;
+	_data->Madgwick_Pitch = Madgwick_Pitch * 100;
+	_data->Madgwick_Yaw   = Madgwick_Yaw   * 100;
 
 	_data->Left_engine_speed  = Left_engine_speed;
 	_data->Right_engine_speed = Right_engine_speed;
@@ -84,15 +89,25 @@ void HC05_Fill_Data_frame_to_PC(struct Data_frame_to_PC *_data, uint8_t *_frame,
 	_frame[12] = HC05_Divide_int16(_data->Kalman_Yaw, 'L');
 	_frame[13] = HC05_Divide_int16(_data->Kalman_Yaw, 'H');
 
-	/* Engines data */
-	_frame[14] = HC05_Divide_int16(_data->Left_engine_speed, 'L');
-	_frame[15] = HC05_Divide_int16(_data->Left_engine_speed, 'H');
+	/* Madgwick filter data */
+	_frame[14] = HC05_Divide_int16(_data->Madgwick_Roll, 'L');
+	_frame[15] = HC05_Divide_int16(_data->Madgwick_Roll, 'H');
 
-	_frame[16] = HC05_Divide_int16(_data->Right_engine_speed, 'L');
-	_frame[17] = HC05_Divide_int16(_data->Right_engine_speed, 'H');
+	_frame[16] = HC05_Divide_int16(_data->Madgwick_Pitch, 'L');
+	_frame[17] = HC05_Divide_int16(_data->Madgwick_Pitch, 'H');
+
+	_frame[18] = HC05_Divide_int16(_data->Madgwick_Yaw, 'L');
+	_frame[19] = HC05_Divide_int16(_data->Madgwick_Yaw, 'H');
+
+	/* Engines data */
+	_frame[20] = HC05_Divide_int16(_data->Left_engine_speed, 'L');
+	_frame[21] = HC05_Divide_int16(_data->Left_engine_speed, 'H');
+
+	_frame[22] = HC05_Divide_int16(_data->Right_engine_speed, 'L');
+	_frame[23] = HC05_Divide_int16(_data->Right_engine_speed, 'H');
 
 	/* CRC */
-	_frame[18] = CRC8_DataArray(_frame, DATA_FRAME_TO_PC_SIZE - 1);
+	_frame[24] = CRC8_DataArray(_frame, DATA_FRAME_TO_PC_SIZE - 1);
 }
 
 /* --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
