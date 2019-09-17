@@ -4,6 +4,8 @@
 #include <QThread>
 #include <QDebug>
 #include <QSerialPort>
+#include <QTimer>
+#include <QMessageBox>
 
 #include "math.h"
 
@@ -23,6 +25,8 @@ typedef enum {
     Close_connection_FAIL   =   4,
 
     Port_is_busy            =   5,
+
+    TimeoutError            =   6,
 
 } Status_Codes;
 
@@ -86,6 +90,7 @@ private:
 
     int Error_frame_counter;
 
+    QTimer *TimeoutTimer;
 public:
 
     Bluetooth();
@@ -103,6 +108,7 @@ public slots:
 
     void Receive_frame();
     void Send_frame();
+    void Timeout_Test();
 
 signals:
 

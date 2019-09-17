@@ -44,6 +44,11 @@ void CommunicationWindow::Serial_Interface_Slot(Status_Codes status)
 
             this->CommunicationWindow_addToLogs("Port już jest otwarty !");
             break;
+
+        case TimeoutError:
+
+            emit Timeout_Error();
+            break;
     }
 }
 

@@ -21,9 +21,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     Show_Complementary_Filter_Roll = true; Show_Complementary_Filter_Pitch = true; Show_Complementary_Filter_Yaw = true;
     Show_Kalman_Filter_Roll = true; Show_Kalman_Filter_Pitch = true; Show_Kalman_Filter_Yaw = true;
+    Show_Madgwick_Filter_Roll = true; Show_Madgwick_Filter_Pitch = true; Show_Madgwick_Filter_Yaw = true;
 
     Complementary_Filter_Graph_Run = true;
     Kalman_Filter_Graph_Run = true;
+    Madgwick_Filter_Graph_Run = true;
 
     Data_to.Angle_Kd = 0; Data_to.Angle_Ki = 0; Data_to.Angle_Kp = 0;
     Data_to.Speed_Kd = 0; Data_to.Speed_Ki = 0; Data_to.Speed_Kp = 0;
@@ -40,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Setup real time graphs
     MainWindow_Setup_Complementary_Filter_Graph();
     MainWindow_Setup_Kalman_Filter_Graph();
+    MainWindow_Setup_Madgwick_Filter_Graph();
 
     // Connection with CommunicationWindow
     connect(this, SIGNAL( Disconnect_Signal() ), CW, SLOT( Disconnect_Slot() ) );
@@ -47,6 +50,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(CW, SIGNAL( Connection_OK_Signal() ), this, SLOT( Connection_OK_Slot() ) );
     connect(CW, SIGNAL( Parsed_frame_OK_Signal(Data_from_Robot) ), this, SLOT( MainWindow_realtimeDataSlot(Data_from_Robot) ));
+
+    connect(CW, SIGNAL( Timeout_Error() ), this, SLOT( on_pushButton_ConnectDisconnect_clicked() ) );
 
     // Setup OpenGL visualisation
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -140,6 +145,29 @@ void MainWindow::MainWindow_Setup_Kalman_Filter_Graph()
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+void MainWindow::MainWindow_Setup_Madgwick_Filter_Graph()
+{
+    ui->Madgwick_Filter_Graph->addGraph(); // red line
+    ui->Madgwick_Filter_Graph->graph(0)->setPen(QPen(QColor(255, 0, 0)));
+    ui->Madgwick_Filter_Graph->addGraph(); // green line
+    ui->Madgwick_Filter_Graph->graph(1)->setPen(QPen(QColor(0, 255, 0)));
+    ui->Madgwick_Filter_Graph->addGraph(); // blue line
+    ui->Madgwick_Filter_Graph->graph(2)->setPen(QPen(QColor(0, 0, 255)));
+
+    QSharedPointer<QCPAxisTickerTime> timeTicker(new QCPAxisTickerTime);
+    timeTicker->setTimeFormat("%h:%m:%s");
+
+    ui->Madgwick_Filter_Graph->xAxis->setTicker(timeTicker);
+    ui->Madgwick_Filter_Graph->axisRect()->setupFullAxesBox();
+    ui->Madgwick_Filter_Graph->yAxis->setRange(-1, 1);
+
+    // make left and bottom axes transfer their ranges to right and top axes:
+    connect(ui->Madgwick_Filter_Graph->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->Madgwick_Filter_Graph->xAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->Madgwick_Filter_Graph->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->Madgwick_Filter_Graph->yAxis2, SLOT(setRange(QCPRange)));
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 void MainWindow::MainWindow_Display_IMU_data()
 {
     static QTime time(QTime::currentTime());
@@ -180,6 +208,10 @@ void MainWindow::MainWindow_Display_IMU_data()
     if(Show_Kalman_Filter_Pitch == true) ui->Kalman_Filter_Graph->graph(1)->addData(key, Kalman_Filter_Pitch);
     if(Show_Kalman_Filter_Yaw   == true) ui->Kalman_Filter_Graph->graph(2)->addData(key, Kalman_Filter_Yaw);
 
+    if(Show_Madgwick_Filter_Roll  == true) ui->Madgwick_Filter_Graph->graph(0)->addData(key, Madgwick_Filter_Roll);
+    if(Show_Madgwick_Filter_Pitch == true) ui->Madgwick_Filter_Graph->graph(1)->addData(key, Madgwick_Filter_Pitch);
+    if(Show_Madgwick_Filter_Yaw   == true) ui->Madgwick_Filter_Graph->graph(2)->addData(key, Madgwick_Filter_Yaw);
+
     ui->Complementary_Filter_Graph->graph(0)->rescaleValueAxis(true);
     ui->Complementary_Filter_Graph->graph(1)->rescaleValueAxis(true);
     ui->Complementary_Filter_Graph->graph(2)->rescaleValueAxis(true);
@@ -187,6 +219,10 @@ void MainWindow::MainWindow_Display_IMU_data()
     ui->Kalman_Filter_Graph->graph(0)->rescaleValueAxis(true);
     ui->Kalman_Filter_Graph->graph(1)->rescaleValueAxis(true);
     ui->Kalman_Filter_Graph->graph(2)->rescaleValueAxis(true);
+
+    ui->Madgwick_Filter_Graph->graph(0)->rescaleValueAxis(true);
+    ui->Madgwick_Filter_Graph->graph(1)->rescaleValueAxis(true);
+    ui->Madgwick_Filter_Graph->graph(2)->rescaleValueAxis(true);
 
     // make key axis range scroll with the data (at a constant range size of 8):
     ui->Complementary_Filter_Graph->xAxis->setRange(key, 20, Qt::AlignRight);
@@ -209,6 +245,17 @@ void MainWindow::MainWindow_Display_IMU_data()
         ui->lcdNumber_Kalman_Filter_Roll->display(Kalman_Filter_Roll);
         ui->lcdNumber_Kalman_Filter_Pitch->display(Kalman_Filter_Pitch);
         ui->lcdNumber_Kalman_Filter_Yaw->display(Kalman_Filter_Yaw);
+    }
+
+    ui->Madgwick_Filter_Graph->xAxis->setRange(key, 20, Qt::AlignRight);
+
+    if( Madgwick_Filter_Graph_Run == true ) {
+
+        ui->Madgwick_Filter_Graph->replot();
+
+        ui->lcdNumber_Madgwick_Filter_Roll->display(Madgwick_Filter_Roll);
+        ui->lcdNumber_Madgwick_Filter_Pitch->display(Madgwick_Filter_Pitch);
+        ui->lcdNumber_Madgwick_Filter_Yaw->display(Madgwick_Filter_Yaw);
     }
 
     // OpenGL visualisation
@@ -292,9 +339,6 @@ void MainWindow::Connection_OK_Slot()
     this->showMaximized();
 
     ui->label_PortName->setText( CW->Get_PortName() );
-
-    // Run communication thread
-    //BT->Start_communication_thread();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -418,6 +462,10 @@ void MainWindow::MainWindow_Default_View()
    if(Show_Kalman_Filter_Roll  == true) ui->checkBox_Kalman_Filter_Roll->setChecked(true);
    if(Show_Kalman_Filter_Pitch == true) ui->checkBox_Kalman_Filter_Pitch->setChecked(true);
    if(Show_Kalman_Filter_Yaw   == true) ui->checkBox_Kalman_Filter_Yaw->setChecked(true);
+
+   if(Show_Madgwick_Filter_Roll  == true) ui->checkBox_Madgwick_Filter_Roll->setChecked(true);
+   if(Show_Madgwick_Filter_Pitch == true) ui->checkBox_Madgwick_Filter_Pitch->setChecked(true);
+   if(Show_Madgwick_Filter_Yaw   == true) ui->checkBox_Madgwick_Filter_Yaw->setChecked(true);
 
    ui->label_Voltage->setNum(0);
 
@@ -1009,6 +1057,15 @@ void MainWindow::on_pushButton_Plots_Start_Stop_clicked()
 
         Kalman_Filter_Graph_Run = true;
     }
+
+    if(Madgwick_Filter_Graph_Run == true) {
+
+        Madgwick_Filter_Graph_Run = false;
+    }
+    else {
+
+        Madgwick_Filter_Graph_Run = true;
+    }
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1017,9 +1074,11 @@ void MainWindow::on_pushButton_Reset_Plots_Range_clicked()
 {
     ui->Complementary_Filter_Graph->clearGraphs();
     ui->Kalman_Filter_Graph->clearGraphs();
+    ui->Madgwick_Filter_Graph->clearGraphs();
 
     MainWindow_Setup_Complementary_Filter_Graph();
     MainWindow_Setup_Kalman_Filter_Graph();
+    MainWindow_Setup_Madgwick_Filter_Graph();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

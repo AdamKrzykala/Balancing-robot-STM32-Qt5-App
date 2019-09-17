@@ -79,6 +79,7 @@ Bluetooth::Bluetooth()
     DT_Robot.Emergency_stop = 0;    
     DT_Robot.Complementary_filter_weight = 0;
     DT_Robot.Kalman_procces_variance = 0;
+    DT_Robot.Madgwick_filter_beta = 0;
     DT_Robot.Which_filter = 0;
 
     DF_Robot.Lipol_voltage = 0;
@@ -94,6 +95,9 @@ Bluetooth::Bluetooth()
     DF_Robot.Left_engine_speed = 0;
     DF_Robot.Right_engine_speed = 0;
 
+    TimeoutTimer = new QTimer(this);
+
+    connect(TimeoutTimer, SIGNAL( timeout() ), this, SLOT( Timeout_Test() ) );
     connect(Device, SIGNAL( readyRead() ), this, SLOT( Receive_frame() ));
 }
 
@@ -122,6 +126,7 @@ void Bluetooth::Open_connection(QString portName)
             this->Device->setFlowControl(QSerialPort::FlowControl::NoFlowControl);
 
             emit Serial_Interface_Signal(Open_connection_OK);
+            TimeoutTimer->start(250);
         }
         else {
 
@@ -145,6 +150,7 @@ void Bluetooth::Close_connection()
         Device->close();
 
         emit Serial_Interface_Signal(Close_connection_OK);
+        TimeoutTimer->stop();
     }
     else {
 
@@ -179,6 +185,7 @@ void Bluetooth::Receive_frame()
         if( CRC_actual == CRC_received && CRC_received != 0 ) {
 
             Parse_data_frame();
+            TimeoutTimer->start(250);
         }
     }
 }
@@ -325,6 +332,24 @@ void Bluetooth::Send_frame()
         Device->write( Data, DATA_FRAME_TO_ROBOT_SIZE);
         Device->waitForBytesWritten(20);
         Device->flush();
+    }
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void Bluetooth::Timeout_Test()
+{
+    //Close_connection();
+    emit Serial_Interface_Signal(TimeoutError);
+
+    QMessageBox messageBox(QMessageBox::Information,
+                           tr("BBot"),
+                           tr("Nastąpiło automatyczne rozłączenie. Przekroczony limit czasu żądania ! \n"),
+                           QMessageBox::Ok);
+
+    if(messageBox.exec() == QMessageBox::Ok) {
+
+        messageBox.close();
     }
 }
 

@@ -85,6 +85,7 @@ signals:
     void Connection_OK_Signal();
     void Connection_FAIL_Signal();
     void Parsed_frame_OK_Signal(Data_from_Robot);
+    void Timeout_Error();
 };
 
 #endif // COMMUNICATIONWINDOW_H
