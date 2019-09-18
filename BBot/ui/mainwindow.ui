@@ -1166,7 +1166,7 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_60">
                 <item>
-                 <widget class="QLabel" name="label_Kalman_Filter_Roll_2">
+                 <widget class="QLabel" name="label_Madgwick_Filter_Roll">
                   <property name="maximumSize">
                    <size>
                     <width>20</width>
@@ -1225,7 +1225,7 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_61">
                 <item>
-                 <widget class="QLabel" name="label_Kalman_Filter_Pitch_2">
+                 <widget class="QLabel" name="label_Madgwick_Filter_Pitch">
                   <property name="maximumSize">
                    <size>
                     <width>20</width>
@@ -1284,7 +1284,7 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_65">
                 <item>
-                 <widget class="QLabel" name="label_Kalman_Filter_Yaw_2">
+                 <widget class="QLabel" name="label_Madgwick_Filter_Yaw">
                   <property name="maximumSize">
                    <size>
                     <width>20</width>
@@ -1745,13 +1745,6 @@
                     </property>
                    </widget>
                   </item>
-                  <item>
-                   <widget class="QLabel" name="label_2">
-                    <property name="text">
-                     <string>r.p.m</string>
-                    </property>
-                   </widget>
-                  </item>
                  </layout>
                 </item>
                 <item>
@@ -1773,13 +1766,6 @@
                     </property>
                     <property name="text">
                      <string>0</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QLabel" name="label_3">
-                    <property name="text">
-                     <string>r.p.m</string>
                     </property>
                    </widget>
                   </item>

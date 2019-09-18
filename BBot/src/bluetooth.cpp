@@ -126,7 +126,7 @@ void Bluetooth::Open_connection(QString portName)
             this->Device->setFlowControl(QSerialPort::FlowControl::NoFlowControl);
 
             emit Serial_Interface_Signal(Open_connection_OK);
-            TimeoutTimer->start(250);
+            TimeoutTimer->start(1000);
         }
         else {
 
@@ -185,7 +185,7 @@ void Bluetooth::Receive_frame()
         if( CRC_actual == CRC_received && CRC_received != 0 ) {
 
             Parse_data_frame();
-            TimeoutTimer->start(250);
+            TimeoutTimer->start(1000);
         }
     }
 }

@@ -144,6 +144,12 @@ private slots:
 
     void on_doubleSpinBox_Madgwick_beta_valueChanged(double arg1);
 
+    void on_checkBox_Madgwick_Filter_Roll_clicked();
+
+    void on_checkBox_Madgwick_Filter_Pitch_clicked();
+
+    void on_checkBox_Madgwick_Filter_Yaw_clicked();
+
 signals:
 
     void Disconnect_Signal();

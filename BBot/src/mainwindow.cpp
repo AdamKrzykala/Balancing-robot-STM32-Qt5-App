@@ -225,7 +225,7 @@ void MainWindow::MainWindow_Display_IMU_data()
     ui->Madgwick_Filter_Graph->graph(2)->rescaleValueAxis(true);
 
     // make key axis range scroll with the data (at a constant range size of 8):
-    ui->Complementary_Filter_Graph->xAxis->setRange(key, 20, Qt::AlignRight);
+    ui->Complementary_Filter_Graph->xAxis->setRange(key, 60, Qt::AlignRight);
 
     if( Complementary_Filter_Graph_Run == true ) {
 
@@ -236,7 +236,7 @@ void MainWindow::MainWindow_Display_IMU_data()
         ui->lcdNumber_Complementary_Filter_Yaw->display(Complementary_Filter_Yaw);
     }
 
-    ui->Kalman_Filter_Graph->xAxis->setRange(key, 20, Qt::AlignRight);
+    ui->Kalman_Filter_Graph->xAxis->setRange(key, 60, Qt::AlignRight);
 
     if( Kalman_Filter_Graph_Run == true ) {
 
@@ -247,7 +247,7 @@ void MainWindow::MainWindow_Display_IMU_data()
         ui->lcdNumber_Kalman_Filter_Yaw->display(Kalman_Filter_Yaw);
     }
 
-    ui->Madgwick_Filter_Graph->xAxis->setRange(key, 20, Qt::AlignRight);
+    ui->Madgwick_Filter_Graph->xAxis->setRange(key, 60, Qt::AlignRight);
 
     if( Madgwick_Filter_Graph_Run == true ) {
 
@@ -533,6 +533,19 @@ void MainWindow::MainWindow_Setup_Icons()
     w = ui->label_Kalman_Filter_Yaw->width();
     h = ui->label_Kalman_Filter_Yaw->height();
     ui->label_Kalman_Filter_Yaw->setPixmap( Blue_dot.scaled(w, h, Qt::KeepAspectRatio) );
+
+    // Madgwick filter RGB dots
+    w = ui->label_Madgwick_Filter_Roll->width();
+    h = ui->label_Madgwick_Filter_Roll->height();
+    ui->label_Madgwick_Filter_Roll->setPixmap( Red_dot.scaled(w, h, Qt::KeepAspectRatio) );
+
+    w = ui->label_Madgwick_Filter_Pitch->width();
+    h = ui->label_Madgwick_Filter_Pitch->height();
+    ui->label_Madgwick_Filter_Pitch->setPixmap( Green_dot.scaled(w, h, Qt::KeepAspectRatio) );
+
+    w = ui->label_Madgwick_Filter_Yaw->width();
+    h = ui->label_Madgwick_Filter_Yaw->height();
+    ui->label_Madgwick_Filter_Yaw->setPixmap( Blue_dot.scaled(w, h, Qt::KeepAspectRatio) );
 
     w = ui->label_Speed->width();
     h = ui->label_Speed->height();
@@ -1131,6 +1144,48 @@ void MainWindow::on_doubleSpinBox_Madgwick_beta_valueChanged(double arg1)
 {
     Data_to.Madgwick_filter_beta = arg1;
     saveSettings();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_checkBox_Madgwick_Filter_Roll_clicked()
+{
+    if( ui->checkBox_Madgwick_Filter_Roll->isChecked() ) {
+
+        Show_Madgwick_Filter_Roll = true;
+    }
+    else {
+
+        Show_Madgwick_Filter_Roll = false;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_checkBox_Madgwick_Filter_Pitch_clicked()
+{
+    if( ui->checkBox_Madgwick_Filter_Pitch->isChecked() ) {
+
+        Show_Madgwick_Filter_Pitch = true;
+    }
+    else {
+
+        Show_Madgwick_Filter_Pitch = false;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_checkBox_Madgwick_Filter_Yaw_clicked()
+{
+    if( ui->checkBox_Madgwick_Filter_Yaw->isChecked() ) {
+
+        Show_Madgwick_Filter_Yaw = true;
+    }
+    else {
+
+        Show_Madgwick_Filter_Yaw = false;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

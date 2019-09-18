@@ -44,7 +44,7 @@ static void qNormalizeAngle(double &angle)
 
 void GLWidget::setXRotation(double angle)
 {
-    //qNormalizeAngle(angle);
+    qNormalizeAngle(angle);
     if (angle != m_xRot) {
         m_xRot = angle;
         update();
@@ -55,7 +55,7 @@ void GLWidget::setXRotation(double angle)
 
 void GLWidget::setYRotation(double angle)
 {
-    //qNormalizeAngle(angle);
+    qNormalizeAngle(angle);
     if (angle != m_yRot) {
         m_yRot = angle;
         update();
@@ -66,7 +66,7 @@ void GLWidget::setYRotation(double angle)
 
 void GLWidget::setZRotation(double angle)
 {
-    //qNormalizeAngle(angle);
+    qNormalizeAngle(angle);
     if (angle != m_zRot) {
         m_zRot = angle;
         update();
@@ -133,11 +133,14 @@ void GLCreateCube(float x, float y, float z) {
     glVertex3f( -0.5, -0.5,  0.5);
     glVertex3f( -0.5, -0.5, -0.5);
     glEnd();
+
+    glPopMatrix();
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 void GLWidget::initializeGL() {
+
 
     // Enable background color
     glClearColor(static_cast<GLclampf>(0.2),
@@ -157,11 +160,11 @@ void GLWidget::paintGL() {
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(2,0,5, 0,0,0, 0,1,0);
+    gluLookAt(0,0,5, 0,0,0, 0,1,0);
 
-    glRotated(m_xRot,  1,0,0);
     glRotated(m_yRot,  0,1,0);
     glRotated(m_zRot,  0,0,1);
+    glRotated(m_xRot,  1,0,0);
 
     GLCreateCube(2.5, 3.0, 0.75);
 }
@@ -170,17 +173,13 @@ void GLWidget::paintGL() {
 
 void GLWidget::resizeGL(int w, int h) {
 
-    glViewport(0, 0, w, h);
+    glViewport(0,0,w,h);
     glMatrixMode(GL_PROJECTION);
-
-    // Calculate aspect ratio
-    qreal aspect = qreal(w) / qreal(h ? h : 1);
-    // Set near plane to 3.0, far plane to 7.0, field of view 45 degrees
-    const qreal zNear = 3.0, zFar = 7.0, fov = 45.0;
-    // Reset projection
     glLoadIdentity();
-    // Set perspective projection
-    gluPerspective(fov, aspect, zNear, zFar);
+    gluPerspective(45, (float)w/h, 0.01, 100.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(-0.5,0,4,0,0,-100,0,1,0);
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
