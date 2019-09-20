@@ -47,7 +47,6 @@ float Kalman_filter_calculate(struct Kalman *k, float Acce, float Gyro, float dt
 	// predykcja
 	k->kalman_theta = k->kalman_theta + ( k->stan_pomiar_omega - k->kalman_g_bias ) * dt;
 	k->kalman_omega = k->stan_pomiar_omega - k->kalman_g_bias;
-	// kalm.g_bias=kalm.g_bias;
 
 	k->kalman_P11 = k->kalman_P11 - k->kalman_P31 * dt + k->kalman_P33 * dt * dt - k->kalman_P13 * dt + k->kalman_Q;
 	k->kalman_P13 = k->kalman_P13 - k->kalman_P33 * dt;

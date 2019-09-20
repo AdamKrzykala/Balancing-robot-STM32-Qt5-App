@@ -48,6 +48,7 @@ void HC05_Fill_Data_frame_to_PC(struct Data_frame_to_PC *_data, uint8_t *_frame,
 								float Madgwick_Roll, float Madgwick_Pitch, float Madgwick_Yaw,
 								int16_t Left_engine_speed, int16_t Right_engine_speed) {
 
+	/*
 	_data->Lipol_voltage = LiPol_voltage;
 
 	_data->Complementary_Roll  = Complementary_Roll  * 100;
@@ -64,47 +65,48 @@ void HC05_Fill_Data_frame_to_PC(struct Data_frame_to_PC *_data, uint8_t *_frame,
 
 	_data->Left_engine_speed  = Left_engine_speed;
 	_data->Right_engine_speed = Right_engine_speed;
+	*/
 
 	/* LiPol data */
-	_frame[0] = HC05_Divide_int16(_data->Lipol_voltage, 'L');
-	_frame[1] = HC05_Divide_int16(_data->Lipol_voltage, 'H');
+	_frame[0] = HC05_Divide_int16(LiPol_voltage, 'L');
+	_frame[1] = HC05_Divide_int16(LiPol_voltage, 'H');
 
 	/* Complementary filter data */
-	_frame[2] = HC05_Divide_int16(_data->Complementary_Roll, 'L');
-	_frame[3] = HC05_Divide_int16(_data->Complementary_Roll, 'H');
+	_frame[2] = HC05_Divide_int16(Complementary_Roll * 100, 'L');
+	_frame[3] = HC05_Divide_int16(Complementary_Roll * 100, 'H');
 
-	_frame[4] = HC05_Divide_int16(_data->Complementary_Pitch, 'L');
-	_frame[5] = HC05_Divide_int16(_data->Complementary_Pitch, 'H');
+	_frame[4] = HC05_Divide_int16(Complementary_Pitch * 100, 'L');
+	_frame[5] = HC05_Divide_int16(Complementary_Pitch * 100, 'H');
 
-	_frame[6] = HC05_Divide_int16(_data->Complementary_Yaw, 'L');
-	_frame[7] = HC05_Divide_int16(_data->Complementary_Yaw, 'H');
+	_frame[6] = HC05_Divide_int16(Complementary_Yaw * 100, 'L');
+	_frame[7] = HC05_Divide_int16(Complementary_Yaw * 100, 'H');
 
 	/* Kalman filter data */
-	_frame[8] = HC05_Divide_int16(_data->Kalman_Roll, 'L');
-	_frame[9] = HC05_Divide_int16(_data->Kalman_Roll, 'H');
+	_frame[8] = HC05_Divide_int16(Kalman_Roll * 100, 'L');
+	_frame[9] = HC05_Divide_int16(Kalman_Roll * 100, 'H');
 
-	_frame[10] = HC05_Divide_int16(_data->Kalman_Pitch, 'L');
-	_frame[11] = HC05_Divide_int16(_data->Kalman_Pitch, 'H');
+	_frame[10] = HC05_Divide_int16(Kalman_Pitch * 100, 'L');
+	_frame[11] = HC05_Divide_int16(Kalman_Pitch * 100, 'H');
 
-	_frame[12] = HC05_Divide_int16(_data->Kalman_Yaw, 'L');
-	_frame[13] = HC05_Divide_int16(_data->Kalman_Yaw, 'H');
+	_frame[12] = HC05_Divide_int16(Kalman_Yaw * 100, 'L');
+	_frame[13] = HC05_Divide_int16(Kalman_Yaw * 100, 'H');
 
 	/* Madgwick filter data */
-	_frame[14] = HC05_Divide_int16(_data->Madgwick_Roll, 'L');
-	_frame[15] = HC05_Divide_int16(_data->Madgwick_Roll, 'H');
+	_frame[14] = HC05_Divide_int16(Madgwick_Roll * 100, 'L');
+	_frame[15] = HC05_Divide_int16(Madgwick_Roll * 100, 'H');
 
-	_frame[16] = HC05_Divide_int16(_data->Madgwick_Pitch, 'L');
-	_frame[17] = HC05_Divide_int16(_data->Madgwick_Pitch, 'H');
+	_frame[16] = HC05_Divide_int16(Madgwick_Pitch * 100, 'L');
+	_frame[17] = HC05_Divide_int16(Madgwick_Pitch * 100, 'H');
 
-	_frame[18] = HC05_Divide_int16(_data->Madgwick_Yaw, 'L');
-	_frame[19] = HC05_Divide_int16(_data->Madgwick_Yaw, 'H');
+	_frame[18] = HC05_Divide_int16(Madgwick_Yaw * 100, 'L');
+	_frame[19] = HC05_Divide_int16(Madgwick_Yaw * 100, 'H');
 
 	/* Engines data */
-	_frame[20] = HC05_Divide_int16(_data->Left_engine_speed, 'L');
-	_frame[21] = HC05_Divide_int16(_data->Left_engine_speed, 'H');
+	_frame[20] = HC05_Divide_int16(Left_engine_speed, 'L');
+	_frame[21] = HC05_Divide_int16(Left_engine_speed, 'H');
 
-	_frame[22] = HC05_Divide_int16(_data->Right_engine_speed, 'L');
-	_frame[23] = HC05_Divide_int16(_data->Right_engine_speed, 'H');
+	_frame[22] = HC05_Divide_int16(Right_engine_speed, 'L');
+	_frame[23] = HC05_Divide_int16(Right_engine_speed, 'H');
 
 	/* CRC */
 	_frame[24] = CRC8_DataArray(_frame, DATA_FRAME_TO_PC_SIZE - 1);

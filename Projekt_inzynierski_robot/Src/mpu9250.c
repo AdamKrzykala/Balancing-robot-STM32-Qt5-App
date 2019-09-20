@@ -190,20 +190,17 @@ MPU9250_Error_code MPU9250_Init(I2C_HandleTypeDef *I2Cx,
 	/* Case 1: Is device connected ? */
 	if( HAL_I2C_IsDeviceReady(I2Cx, DataStructure->Device_addres, 1, 1000) != HAL_OK ) {
 
-		//HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 		return MPU9250_Init_FAIL;
 	}
 
 	/* Case 2: Who am i test */
 	if( HAL_I2C_Mem_Read(I2Cx, DataStructure->Device_addres, MPU9250_WHO_AM_I, 1, &Byte_temp, 1, 1000) != HAL_OK ) {
 
-		//HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 		return MPU9250_Init_FAIL;
 	}
 
 	if( Byte_temp != 0x71 ) {
 
-		//HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 		return MPU9250_Init_FAIL;
 	}
 
@@ -212,39 +209,26 @@ MPU9250_Error_code MPU9250_Init(I2C_HandleTypeDef *I2Cx,
 
 	if( HAL_I2C_Mem_Write(I2Cx, DataStructure->Device_addres, MPU9250_PWR_MGMT_1, 1, &Byte_temp, 1, 1000) != HAL_OK ) {
 
-		//HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 		return MPU9250_Init_FAIL;
 	}
 
 	/* Case 4: Accelerometer configuration */
 	if( MPU9250_Accelerometer_Configuration(I2Cx, DataStructure, Acce_range) != MPU9250_Accelerometer_Config_OK ) {
 
-		//HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 		return MPU9250_Accelerometer_Config_FAIL;
 	}
 
 	/* Case 5: Gyroscope configuration */
 	if( MPU9250_Gyroscope_Configuration(I2Cx, DataStructure, Gyro_range) != MPU9250_Gyroscope_Config_OK ) {
 
-		//HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 		return MPU9250_Gyroscope_Config_FAIL;
 	}
 
 	/* Case 6: Magnetometer configuration */
 	if( MPU9250_Magnetometer_Configuration(I2Cx, DataStructure) != MPU9250_Magnetometer_Config_OK ) {
 
-		//HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 		return MPU9250_Magnetometer_Config_FAIL;
 	}
-	//
-	//
-	//
-	//
-	//MadgwickQuaternionInit(&DataStructure->Madgwick_filter);
-	//
-	//
-	//
-	//
 
 	return MPU9250_Init_OK;
 }
@@ -468,7 +452,34 @@ void MPU9250_Calculate_RPY(I2C_HandleTypeDef *I2Cx,
 	float X_h = m_x * cosPitch + m_y * sinRoll * sinPitch + m_z * cosRoll * sinPitch;
 	float Y_h = m_y * cosRoll  - m_z * sinRoll;
 
-	DataStructure->Magnetometer_Yaw = Z_AXIS_ORIENTATION * (atan2f(X_h, Y_h) * (180 / M_PI) + MAGNETIC_DECLINATION);
+	DataStructure->Magnetometer_Yaw = Z_AXIS_ORIENTATION * (atan2f(X_h, Y_h) * (180 / M_PI) /*+ MAGNETIC_DECLINATION*/);
+
+	/* Case 5: Clear gyro drift */
+	if( fabs(DataStructure->Gyroscope_Roll  - DataStructure->Accelerometer_Roll)  > 10 ||
+		fabs(DataStructure->Gyroscope_Pitch - DataStructure->Accelerometer_Pitch) > 10 ||
+		fabs(DataStructure->Gyroscope_Yaw   - DataStructure->Magnetometer_Yaw)    > 10 ) {
+
+		DataStructure->Gyroscope_Roll  = DataStructure->Accelerometer_Roll;
+		DataStructure->Gyroscope_Pitch = DataStructure->Accelerometer_Pitch;
+		DataStructure->Gyroscope_Yaw   = DataStructure->Magnetometer_Yaw;
+	}
+
+	/* Case 6: Clear magnetometer high tilt */
+	if( fabs(DataStructure->Accelerometer_Roll) >= 80 || fabs(DataStructure->Accelerometer_Pitch) >= 80 ) {
+
+		DataStructure->Magnetometer_Yaw = DataStructure->Gyroscope_Yaw;
+	}
+
+	/* Case 7: Clear accelerometer high tilt */
+	if( fabs(DataStructure->Accelerometer_Roll) >= 80 ) {
+
+		DataStructure->Accelerometer_Pitch = DataStructure->Gyroscope_Pitch;
+	}
+
+	if( fabs(DataStructure->Accelerometer_Pitch) >= 80 ) {
+
+		DataStructure->Accelerometer_Roll = DataStructure->Gyroscope_Roll;
+	}
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
@@ -523,7 +534,7 @@ void Complementary_filter(struct MPU9250 *DataStructure,
 
 	DataStructure->Complementary_filter_Roll   = ( (1-weight) * (DataStructure->Complementary_filter_Roll  + (DataStructure->Gyroscope_X_dgs * dt) ) + (weight * DataStructure->Accelerometer_Roll)  );
 	DataStructure->Complementary_filter_Pitch  = ( (1-weight) * (DataStructure->Complementary_filter_Pitch - (DataStructure->Gyroscope_Y_dgs * dt) ) + (weight * DataStructure->Accelerometer_Pitch) );
-	DataStructure->Complementary_filter_Yaw    = ( 0.98       * (DataStructure->Complementary_filter_Yaw   - (DataStructure->Gyroscope_Z_dgs * dt) ) + (0.02   * DataStructure->Magnetometer_Yaw) );
+	DataStructure->Complementary_filter_Yaw    = ( (0.99)     * (DataStructure->Complementary_filter_Yaw   - (DataStructure->Gyroscope_Z_dgs * dt) ) + (0.01   * DataStructure->Magnetometer_Yaw) );
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
@@ -547,7 +558,7 @@ void Kalman_filter(struct MPU9250 *DataStructure,
 	/* Case 2: */
 	DataStructure->Kalman_filter_Roll  = Kalman_filter_calculate(&DataStructure->Kalman_R, DataStructure->Accelerometer_Roll,   DataStructure->Gyroscope_X_dgs, dt);
 	DataStructure->Kalman_filter_Pitch = Kalman_filter_calculate(&DataStructure->Kalman_P, DataStructure->Accelerometer_Pitch, -DataStructure->Gyroscope_Y_dgs, dt);
-	DataStructure->Kalman_filter_Yaw   = Kalman_filter_calculate(&DataStructure->Kalman_Y, DataStructure->Magnetometer_Yaw,    -DataStructure->Gyroscope_Z_dgs, dt) - MAGNETIC_DECLINATION;
+	DataStructure->Kalman_filter_Yaw   = Kalman_filter_calculate(&DataStructure->Kalman_Y, DataStructure->Magnetometer_Yaw,    -DataStructure->Gyroscope_Z_dgs, dt) /*- MAGNETIC_DECLINATION*/;
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
@@ -557,9 +568,9 @@ void Madgwick_filter(struct MPU9250 *DataStructure,
 					 float dt) {
 
 	MadgwickAHRSupdate(beta,
-					   DataStructure->Gyroscope_X_dgs * (M_PI / 180), DataStructure->Gyroscope_Y_dgs * (M_PI / 180), DataStructure->Gyroscope_Z_dgs * (M_PI / 180),
+					   DataStructure->Gyroscope_X_dgs * (M_PI / 180), DataStructure->Gyroscope_Y_dgs * (M_PI / 180), -DataStructure->Gyroscope_Z_dgs * (M_PI / 180),
 					   DataStructure->Accelerometer_X_g, DataStructure->Accelerometer_Y_g, DataStructure->Accelerometer_Z_g,
-					   DataStructure->Magnetometer_X_uT, DataStructure->Magnetometer_Y_uT, DataStructure->Magnetometer_Z_uT,
+					   DataStructure->Magnetometer_X_uT, DataStructure->Magnetometer_Y_uT, -DataStructure->Magnetometer_Z_uT,
 					   dt);
 
 	float real_part = q0;
@@ -573,7 +584,7 @@ void Madgwick_filter(struct MPU9250 *DataStructure,
 
 	DataStructure->Madgwick_filter_Roll  = Roll;
 	DataStructure->Madgwick_filter_Pitch = Pitch;
-	DataStructure->Madgwick_filter_Yaw   = Yaw - MAGNETIC_DECLINATION;
+	DataStructure->Madgwick_filter_Yaw   = Yaw /*- MAGNETIC_DECLINATION*/;
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */

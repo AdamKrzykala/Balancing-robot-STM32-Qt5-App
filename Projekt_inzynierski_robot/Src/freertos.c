@@ -44,20 +44,19 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define SETPOINT_ANGLE			0
-#define HYSTERESIS_ANGLE		0
+#define HYSTERESIS_ANGLE		0.5
 #define KP_ANGLE				10
 #define KI_ANGLE				100
 #define KD_ANGLE				0.1
 
 #define SETPOINT_SPEED			0
-#define HYSTERESIS_SPEED		0
-#define KP_SPEED				20
-#define KI_SPEED				15
+#define KP_SPEED				10
+#define KI_SPEED				80
 #define KD_SPEED				0.1
 
 #define FILTER_WEIGHT 			0.001
 #define VARIANCE				10000
-#define BETA					0.001
+#define BETA					0.01
 
 /* USER CODE END PD */
 
@@ -89,11 +88,11 @@ float Filter_weight_global = FILTER_WEIGHT;
 int16_t Kalman_filter_process_variance = VARIANCE;
 float Madgwick_filter_beta = BETA;
 
-float q1_test_global = 0, q2_test_global = 0, q3_test_global = 0, q4_test_global = 0;
-
 /* -----------> Angle PID variables <------------- */
+struct Angle_PID a_pid_left, a_pid_right;
+
 double Angle_Set_point_left_global  = SETPOINT_ANGLE;
-double Angle_Set_point_right_global  = SETPOINT_ANGLE;
+double Angle_Set_point_right_global = SETPOINT_ANGLE;
 
 double Angle_Hysteresis_global = HYSTERESIS_ANGLE;
 
@@ -102,10 +101,10 @@ double Angle_KP_global = KP_ANGLE,
 	   Angle_KD_global = KD_ANGLE;
 
 /* -----------> Speed PID variables <------------- */
+struct Speed_PID s_pid_left, s_pid_right;
+
 double Speed_Set_point_left_global  = SETPOINT_SPEED;
 double Speed_Set_point_right_global = SETPOINT_SPEED;
-
-double Speed_Hysteresis_global = HYSTERESIS_SPEED;
 
 double Speed_KP_global = KP_SPEED,
 	   Speed_KI_global = KI_SPEED,
@@ -193,7 +192,7 @@ void MX_FREERTOS_Init(void) {
   Engines_TaskHandle = osThreadCreate(osThread(Engines_Task), NULL);
 
   /* definition and creation of IMU_Task */
-  osThreadDef(IMU_Task, Start_IMU_Task, osPriorityAboveNormal, 0, 512);
+  osThreadDef(IMU_Task, Start_IMU_Task, osPriorityRealtime, 0, 512);
   IMU_TaskHandle = osThreadCreate(osThread(IMU_Task), NULL);
 
   /* definition and creation of USART_Task */
@@ -229,9 +228,11 @@ void Start_LiPol_Task(void const * argument)
 
 	const float Supply_voltage = 3.3;
 	const float ADC_resolution = 4096.0;
-	const float Voltage_divider_ratio = 4.73725;
+	const float Voltage_divider_ratio = 4.7341;
 
-	float LiPol_voltage = 0;
+	uint16_t Measurement_counter = 1;
+	float   LiPol_voltage = 0;
+	float LiPol_voltage_sum = 0;
 
 	/* LiPol_Task init */
 	HAL_ADC_Start_DMA(LiPol_adc_handle, &ADC_reading, 1);
@@ -248,12 +249,15 @@ void Start_LiPol_Task(void const * argument)
 	  LiPol_voltage *= Voltage_divider_ratio;
 	  LiPol_voltage *= 100;
 
+	  LiPol_voltage_sum += LiPol_voltage;
+
+	  LiPol_voltage = LiPol_voltage_sum / Measurement_counter;
 	  LiPol_voltage_global = LiPol_voltage;
 
 	  /* Case 2: Voltage lower than 10.5 V */
 	  if( LiPol_voltage < 1050 ) {
 
-		  for(int i = 0; i < 10; i++) {
+		  for(int i = 0; i < 20; i++) {
 
 			  HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 			  osDelay(100);
@@ -265,7 +269,9 @@ void Start_LiPol_Task(void const * argument)
 		  Emergency_stop_global = 0;
 	  }
 
-	  osDelay(20000);
+	  Measurement_counter++;
+
+	  osDelay(10000);
   }
   /* USER CODE END Start_LiPol_Task */
 }
@@ -307,7 +313,7 @@ void Start_Engines_Task(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-		if (HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) == GPIO_PIN_RESET) {
+		if( HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin) == GPIO_PIN_RESET ) {
 
 			if (Emergency_stop_global == 0) {
 
@@ -335,14 +341,14 @@ void Start_Engines_Task(void const * argument)
 		}
 		else if( LeftEngineSpeed_control_global > RightEngineSpeed_control_global ) {
 
-			RightEngineSpeed_global *= 0.5;
+			RightEngineSpeed_global *= 0.1;
 
 			A4988_Set_Speed(&A4988_1, LeftEngineSpeed_global );
 		    A4988_Set_Speed(&A4988_2, -RightEngineSpeed_global );
 		}
 		else if( LeftEngineSpeed_control_global < RightEngineSpeed_control_global ) {
 
-			LeftEngineSpeed_global *= 0.5;
+			LeftEngineSpeed_global *= 0.1;
 
 			A4988_Set_Speed(&A4988_1, LeftEngineSpeed_global );
 			A4988_Set_Speed(&A4988_2, -RightEngineSpeed_global );
@@ -352,6 +358,12 @@ void Start_Engines_Task(void const * argument)
 
 		A4988_Power_off(&A4988_1);
 		A4988_Power_off(&A4988_2);
+
+		a_pid_left.integral = 0;
+		a_pid_right.integral = 0;
+
+		s_pid_left.integral = 0;
+		s_pid_right.integral = 0;
 	}
 
 	osDelay(5);
@@ -391,8 +403,10 @@ void Start_IMU_Task(void const * argument)
 		MPU9250_Calibration_Gyro(&hi2c1, &mpu1);
 		//MPU9250_Calibration_Mag(&hi2c1, &mpu1);
 
-		// set Q and R
-		//Kalman_filter_init(0, 10000);
+		MPU9250_Calculate_RPY(&hi2c1, &mpu1, dt);
+		mpu1.Gyroscope_Roll  = mpu1.Accelerometer_Roll;
+		mpu1.Gyroscope_Pitch = mpu1.Accelerometer_Pitch;
+		mpu1.Gyroscope_Yaw   = mpu1.Magnetometer_Yaw;
 
 		for (int i = 0; i < 3; ++i) {
 
@@ -426,16 +440,22 @@ void Start_IMU_Task(void const * argument)
 		  /* Case 2: RPY calculation */
 		  MPU9250_Calculate_RPY(&hi2c1, &mpu1, dt);
 
-		  a_x_g = mpu1.Accelerometer_X_g, a_y_g = mpu1.Accelerometer_Y_g, a_z_g = mpu1.Accelerometer_Z_g;
-		  g_x_dgs = mpu1.Gyroscope_X_dgs, g_y_dgs = mpu1.Gyroscope_Y_dgs, g_z_dgs = mpu1.Gyroscope_Z_dgs;
-		  m_x_uT = mpu1.Magnetometer_X_uT, m_y_uT = mpu1.Magnetometer_Y_uT, m_z_uT = mpu1.Magnetometer_Z_uT;
+		  //a_x_g = mpu1.Accelerometer_X_g, a_y_g = mpu1.Accelerometer_Y_g, a_z_g = mpu1.Accelerometer_Z_g;
+		  //g_x_dgs = mpu1.Gyroscope_X_dgs, g_y_dgs = mpu1.Gyroscope_Y_dgs, g_z_dgs = mpu1.Gyroscope_Z_dgs;
+		  //m_x_uT = mpu1.Magnetometer_X_uT, m_y_uT = mpu1.Magnetometer_Y_uT, m_z_uT = mpu1.Magnetometer_Z_uT;
 
 		  a_roll_global = mpu1.Accelerometer_Roll, a_pitch_global = mpu1.Accelerometer_Pitch;
 		  g_roll_global = mpu1.Gyroscope_Roll, g_pitch_global = mpu1.Gyroscope_Pitch, g_yaw_global = mpu1.Gyroscope_Yaw;
 		  m_yaw_global  = mpu1.Magnetometer_Yaw;
 
 		  /* Case 3: Filters using */
-		  //AlphaBeta_filter(&mpu1, 0.2, 0.05, 0, 0, 0, 0, dt);
+
+		  /* Madgwick filter */
+		  Madgwick_filter(&mpu1, Madgwick_filter_beta, dt);
+
+		  Madgwick_Roll_global  = mpu1.Madgwick_filter_Roll;
+		  Madgwick_Pitch_global = mpu1.Madgwick_filter_Pitch;
+		  Madgwick_Yaw_global   = mpu1.Madgwick_filter_Yaw;
 
 		  /* Complementary filter */
 		  Complementary_filter(&mpu1, Filter_weight_global, dt);
@@ -450,13 +470,6 @@ void Start_IMU_Task(void const * argument)
 		  Kalman_Roll_global  = mpu1.Kalman_filter_Roll;
 		  Kalman_Pitch_global = mpu1.Kalman_filter_Pitch;
 		  Kalman_Yaw_global   = mpu1.Kalman_filter_Yaw;
-
-		  /* Madgwick filter */
-		  Madgwick_filter(&mpu1, Madgwick_filter_beta, dt);
-
-		  Madgwick_Roll_global  = mpu1.Madgwick_filter_Roll;
-		  Madgwick_Pitch_global = mpu1.Madgwick_filter_Pitch;
-		  Madgwick_Yaw_global   = mpu1.Madgwick_filter_Yaw;
 	  }
 
 	  osDelay(5);
@@ -507,9 +520,6 @@ void Start_Control_Task(void const * argument)
   /* USER CODE BEGIN Start_Control_Task */
 
 	/* Control task variables */
-	struct Angle_PID a_pid_left, a_pid_right;
-	struct Speed_PID s_pid_left, s_pid_right;
-
 	uint32_t I_Time_Stop = 0;
 	uint32_t I_Time_Start = 0;
 
@@ -528,10 +538,8 @@ void Start_Control_Task(void const * argument)
 		I_Time_Start = I_Time_Stop;
 		I_Time_Stop = HAL_GetTick();
 
-		Speed_Set_point_left_global = LeftEngineSpeed_control_global;
+		Speed_Set_point_left_global  = LeftEngineSpeed_control_global;
 		Speed_Set_point_right_global = RightEngineSpeed_control_global;
-
-		Which_filter_global = 2;
 
 		switch( Which_filter_global ) {
 
@@ -551,48 +559,35 @@ void Start_Control_Task(void const * argument)
 		/* ---------------------------------> Speed PID <--------------------------------- */
 		/* 					Update PID parameters and get PID output  	 				   */
 
-		if (Speed_Set_point_left_global != LeftEngineSpeed_global
-				|| Speed_Set_point_right_global != RightEngineSpeed_global) {
+		if ( Speed_Set_point_left_global != LeftEngineSpeed_global || Speed_Set_point_right_global != RightEngineSpeed_global ) {
 
 			if (Speed_Set_point_left_global == Speed_Set_point_right_global) {
 
 				/* Left engine */
-				Speed_PID_Set_parameters(&s_pid_left,
-						Speed_Set_point_left_global, Speed_KP_global,
-						Speed_KI_global, Speed_KD_global);
-				Speed_PID_Calculate(&s_pid_left, a_pid_left.control,
-						I_Time_Start, I_Time_Stop);
+				Speed_PID_Set_parameters(&s_pid_left, Speed_Set_point_left_global, Speed_KP_global, Speed_KI_global, Speed_KD_global);
+				Speed_PID_Calculate(&s_pid_left, a_pid_left.control, I_Time_Start, I_Time_Stop);
 
 				/* Right engine */
-				Speed_PID_Set_parameters(&s_pid_right,
-						Speed_Set_point_right_global, Speed_KP_global,
-						Speed_KI_global, Speed_KD_global);
-				Speed_PID_Calculate(&s_pid_right, a_pid_right.control,
-						I_Time_Start, I_Time_Stop);
+				Speed_PID_Set_parameters(&s_pid_right, Speed_Set_point_right_global, Speed_KP_global, Speed_KI_global, Speed_KD_global);
+				Speed_PID_Calculate(&s_pid_right, a_pid_right.control, I_Time_Start, I_Time_Stop);
 
-				Angle_Set_point_left_global = -s_pid_left.control / 1000;
+				Angle_Set_point_left_global  = -s_pid_left.control  / 1000;
 				Angle_Set_point_right_global = -s_pid_right.control / 1000;
-			} else if (Speed_Set_point_left_global
-					!= Speed_Set_point_right_global) {
+			}
+			else if (Speed_Set_point_left_global != Speed_Set_point_right_global) {
 
-				Speed_Set_point_left_global = -50;
-				Speed_Set_point_right_global = -50;
+				Speed_Set_point_left_global  = -25;
+				Speed_Set_point_right_global = -25;
 
 				/* Left engine */
-				Speed_PID_Set_parameters(&s_pid_left,
-						Speed_Set_point_left_global, Speed_KP_global,
-						Speed_KI_global, Speed_KD_global);
-				Speed_PID_Calculate(&s_pid_left, a_pid_left.control,
-						I_Time_Start, I_Time_Stop);
+				Speed_PID_Set_parameters(&s_pid_left, Speed_Set_point_left_global, Speed_KP_global, Speed_KI_global, Speed_KD_global);
+				Speed_PID_Calculate(&s_pid_left, a_pid_left.control, I_Time_Start, I_Time_Stop);
 
 				/* Right engine */
-				Speed_PID_Set_parameters(&s_pid_right,
-						Speed_Set_point_right_global, Speed_KP_global,
-						Speed_KI_global, Speed_KD_global);
-				Speed_PID_Calculate(&s_pid_right, a_pid_right.control,
-						I_Time_Start, I_Time_Stop);
+				Speed_PID_Set_parameters(&s_pid_right, Speed_Set_point_right_global, Speed_KP_global, Speed_KI_global, Speed_KD_global);
+				Speed_PID_Calculate(&s_pid_right, a_pid_right.control, I_Time_Start, I_Time_Stop);
 
-				Angle_Set_point_left_global = -s_pid_left.control / 1000;
+				Angle_Set_point_left_global  = -s_pid_left.control  / 1000;
 				Angle_Set_point_right_global = -s_pid_right.control / 1000;
 			}
 		}
@@ -600,31 +595,26 @@ void Start_Control_Task(void const * argument)
 		/* ---------------------------------> Angle PID <--------------------------------- */
 		/* 					Update PID parameters and get PID output  	 				   */
 
-		if (Angle_Set_point_left_global != Actual_angle
-				|| Angle_Set_point_right_global != Complementary_Pitch_global) {
+		if( Angle_Set_point_left_global != Actual_angle || Angle_Set_point_right_global != Actual_angle ) {
 
 			/* Left engine */
-			Angle_PID_Set_parameters(&a_pid_left, Angle_Set_point_left_global,
-					Angle_KP_global, Angle_KI_global, Angle_KD_global);
-			Angle_PID_Calculate(&a_pid_left, Actual_angle,
-					I_Time_Start, I_Time_Stop);
+			Angle_PID_Set_parameters(&a_pid_left, Angle_Set_point_left_global, Angle_KP_global, Angle_KI_global, Angle_KD_global);
+			Angle_PID_Calculate(&a_pid_left, Actual_angle, I_Time_Start, I_Time_Stop);
 
 			/* Right engine */
-			Angle_PID_Set_parameters(&a_pid_right, Angle_Set_point_right_global,
-					Angle_KP_global, Angle_KI_global, Angle_KD_global);
-			Angle_PID_Calculate(&a_pid_right, Actual_angle,
-					I_Time_Start, I_Time_Stop);
+			Angle_PID_Set_parameters(&a_pid_right, Angle_Set_point_right_global, Angle_KP_global, Angle_KI_global, Angle_KD_global);
+			Angle_PID_Calculate(&a_pid_right, Actual_angle, I_Time_Start, I_Time_Stop);
 
-			if (fabs(Actual_angle) < 40 && Robot_fell_over_global != 1) {
+			if( fabs(Actual_angle) < 40 && Robot_fell_over_global != 1 ) {
 
-				LeftEngineSpeed_global = a_pid_left.control;
+				LeftEngineSpeed_global  = a_pid_left.control;
 				RightEngineSpeed_global = a_pid_right.control;
 
 			} else {
 
 				Robot_fell_over_global = 1;
 
-				LeftEngineSpeed_global = 0;
+				LeftEngineSpeed_global  = 0;
 				RightEngineSpeed_global = 0;
 
 				a_pid_left.integral = 0;
@@ -678,9 +668,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 			Speed_KD_global = (double) DF_PC.Speed_KD / 100;
 
 			/* Filters data from PC */
-			Filter_weight_global = (float) DF_PC.Complementary_filter_weight / 1000;
+			Filter_weight_global           = (float) DF_PC.Complementary_filter_weight / 1000;
 			Kalman_filter_process_variance = DF_PC.Kalman_filter_process_variance;
-			Madgwick_filter_beta = (float) DF_PC.Madgwick_filter_beta / 1000;
+			Madgwick_filter_beta           = (float) DF_PC.Madgwick_filter_beta / 1000;
 
 			/* Engines speed data from PC */
 			LeftEngineSpeed_control_global  = DF_PC.Left_engine_speed;
