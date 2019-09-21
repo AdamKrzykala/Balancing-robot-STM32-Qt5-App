@@ -108,6 +108,8 @@ void CommunicationWindow::Fill_Data_to_robot(Data_to_Robot Data)
 
 void CommunicationWindow::on_pushButton_Search_clicked()
 {
+    ui->comboBox_Devices->clear();
+
     this->CommunicationWindow_addToLogs("Szukam urządzeń...");
 
     QList<QSerialPortInfo> devices;

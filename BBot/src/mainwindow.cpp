@@ -259,9 +259,9 @@ void MainWindow::MainWindow_Display_IMU_data()
     }
 
     // OpenGL visualisation
-    ui->widget_RPY_Visualisation->setXRotation(Kalman_Filter_Pitch);
-    ui->widget_RPY_Visualisation->setYRotation(Kalman_Filter_Yaw);
-    ui->widget_RPY_Visualisation->setZRotation(Kalman_Filter_Roll);
+    ui->widget_RPY_Visualisation->setXRotation(Complementary_Filter_Pitch);
+    ui->widget_RPY_Visualisation->setYRotation(Complementary_Filter_Yaw);
+    ui->widget_RPY_Visualisation->setZRotation(Complementary_Filter_Roll);
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -309,6 +309,19 @@ void MainWindow::MainWindow_Display_Battery_data(double voltage)
     }
 
     ui->label_Voltage->setNum(voltage);
+
+    if(voltage <= 10.5) {
+
+        QMessageBox messageBox(QMessageBox::Question,
+                               tr("BBot"),
+                               tr("Nisk poziom baterii. Wyłącz robota ! \n"),
+                               QMessageBox::Ok);
+
+        if(messageBox.exec() == QMessageBox::Ok) {
+
+            exit(0);
+        }
+    }
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -361,6 +374,8 @@ void MainWindow::loadSettings()
 
     int Which_filter = settings.value("Which_filter").toInt();
 
+    int Set_speed = settings.value("Set_speed").toInt();
+
     settings.setValue("PID_Kp", PID_Kp);
     settings.setValue("PID_Ki", PID_Ki);
     settings.setValue("PID_Kd", PID_Kd);
@@ -387,6 +402,9 @@ void MainWindow::loadSettings()
     else if( Which_filter == 1 ) ui->radioButton_Kalman_filter->setChecked(true);
     else if( Which_filter == 2 ) ui->radioButton_Madgwick_filter->setChecked(true);
 
+    ui->horizontalSlider_Set_Speed->setValue(Set_speed);
+    ui->lcdNumber_Set_Speed->display(Set_speed);
+
     qDebug() << "Wczytano PID_Kp: " << PID_Kp;
     qDebug() << "Wczytano PID_Ki: " << PID_Ki;
     qDebug() << "Wczytano PID_Kd: " << PID_Kd;
@@ -399,6 +417,7 @@ void MainWindow::loadSettings()
     qDebug() << "Wczytano wariancje: "            << Variance;
     qDebug() << "Wczytano beta: "                 << Madgwick_beta;
     qDebug() << "Wczytano Which_filter: "         << Which_filter;
+    qDebug() << "Wczytano Set_Speed: "            << Set_speed;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -425,6 +444,8 @@ void MainWindow::saveSettings()
     else if(ui->radioButton_Kalman_filter->isChecked() )    Which_filter = 1;
     else if(ui->radioButton_Madgwick_filter->isChecked() )  Which_filter = 2;
 
+    int Set_speed = ui->horizontalSlider_Set_Speed->value();
+
     settings.setValue("PID_Kp", PID_Kp);
     settings.setValue("PID_Ki", PID_Ki);
     settings.setValue("PID_Kd", PID_Kd);
@@ -439,6 +460,8 @@ void MainWindow::saveSettings()
 
     settings.setValue("Which_filter", Which_filter);
 
+    settings.setValue("Set_speed", Set_speed);
+
     qDebug() << "Zapisano PID_Kp: "                 << PID_Kp;
     qDebug() << "Zapisano PID_Ki: "                 << PID_Ki;
     qDebug() << "Zapisano PID_Kd: "                 << PID_Kd;
@@ -449,6 +472,7 @@ void MainWindow::saveSettings()
     qDebug() << "Zapisano Variance: "               << Kalman_filter_process_variance;
     qDebug() << "Zapisano beta: "                   << Madgwick_beta;
     qDebug() << "Zapisano Which_filter: "           << Which_filter;
+    qDebug() << "Zapisano Set_Speed: "              << Set_speed;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -756,6 +780,8 @@ void MainWindow::on_pushButton_Send_clicked()
 
     // Filters data
     Data_to.Complementary_filter_weight = ui->doubleSpinBox_Complementary_filter_weight->value();
+    Data_to.Kalman_procces_variance = ui->doubleSpinBox_Kalman_filter_variance->value();
+    Data_to.Madgwick_filter_beta = ui->doubleSpinBox_Madgwick_beta->value();
 
     CW->Fill_Data_to_robot(Data_to);
 
@@ -795,8 +821,8 @@ void MainWindow::on_pushButton_Forward_pressed()
     ui->pushButton_Forward->setIconSize(QSize(w,h));
 
     // Send data to robot
-    Data_to.Left_engine_speed  = -50;
-    Data_to.Right_engine_speed = -50;
+    Data_to.Left_engine_speed  = -Set_Speed;
+    Data_to.Right_engine_speed = -Set_Speed;
 
     CW->Fill_Data_to_robot(Data_to);
 
@@ -841,8 +867,8 @@ void MainWindow::on_pushButton_Left_pressed()
     ui->pushButton_Left->setIconSize(QSize(w,h));
 
     // Send data to robot
-    Data_to.Left_engine_speed  = 50;
-    Data_to.Right_engine_speed = -50;
+    Data_to.Left_engine_speed  = Set_Speed;
+    Data_to.Right_engine_speed = -Set_Speed;
 
     CW->Fill_Data_to_robot(Data_to);
 
@@ -887,8 +913,8 @@ void MainWindow::on_pushButton_Right_pressed()
     ui->pushButton_Right->setIconSize(QSize(w,h));
 
     // Send data to robot
-    Data_to.Left_engine_speed  = -50;
-    Data_to.Right_engine_speed = 50;
+    Data_to.Left_engine_speed  = -Set_Speed;
+    Data_to.Right_engine_speed = Set_Speed;
 
     CW->Fill_Data_to_robot(Data_to);
 
@@ -933,8 +959,8 @@ void MainWindow::on_pushButton_Backward_pressed()
     ui->pushButton_Backward->setIconSize(QSize(w,h));
 
     // Send data to robot
-    Data_to.Left_engine_speed  = 50;
-    Data_to.Right_engine_speed = 50;
+    Data_to.Left_engine_speed  = Set_Speed;
+    Data_to.Right_engine_speed = Set_Speed;
 
     CW->Fill_Data_to_robot(Data_to);
 
@@ -1037,6 +1063,7 @@ void MainWindow::on_pushButton_Plots_Center_clicked()
 {
     ui->splitter->setSizes( Splitter_Position );
     ui->splitter->update();
+    ui->splitter->showMaximized();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1186,6 +1213,15 @@ void MainWindow::on_checkBox_Madgwick_Filter_Yaw_clicked()
 
         Show_Madgwick_Filter_Yaw = false;
     }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_horizontalSlider_Set_Speed_valueChanged(int value)
+{
+    Set_Speed = value;
+    ui->lcdNumber_Set_Speed->display(Set_Speed);
+    saveSettings();
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

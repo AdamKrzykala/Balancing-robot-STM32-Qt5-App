@@ -65,6 +65,8 @@ private:
     bool Kalman_Filter_Graph_Run;
     bool Madgwick_Filter_Graph_Run;
 
+    int Set_Speed;
+
     void loadSettings();
     void saveSettings();
 
@@ -145,10 +147,10 @@ private slots:
     void on_doubleSpinBox_Madgwick_beta_valueChanged(double arg1);
 
     void on_checkBox_Madgwick_Filter_Roll_clicked();
-
     void on_checkBox_Madgwick_Filter_Pitch_clicked();
-
     void on_checkBox_Madgwick_Filter_Yaw_clicked();
+
+    void on_horizontalSlider_Set_Speed_valueChanged(int value);
 
 signals:
 
