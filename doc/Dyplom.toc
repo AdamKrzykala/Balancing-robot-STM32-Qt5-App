@@ -1,0 +1,35 @@
+\babel@toc {polish}{}
+\contentsline {chapter}{\chapternumberline {1}Wst\IeC {\k e}p}{11}{chapter.1}% 
+\contentsline {section}{\numberline {1.1}Wprowadzenie}{11}{section.1.1}% 
+\contentsline {chapter}{\chapternumberline {2}Praca z szablonem}{13}{chapter.2}% 
+\contentsline {section}{\numberline {2.1}Organizacja szablonu}{13}{section.2.1}% 
+\contentsline {section}{\numberline {2.2}Kompilacja szablonu}{14}{section.2.2}% 
+\contentsline {chapter}{\chapternumberline {3}Zalecenia dotycz\IeC {\k a}ce formatowania}{17}{chapter.3}% 
+\contentsline {section}{\numberline {3.1}Rozmiar i uk\IeC {\l }ad tre\IeC {\'s}ci na stronach dokumentu}{17}{section.3.1}% 
+\contentsline {section}{\numberline {3.2}Strona tytu\IeC {\l }owa}{19}{section.3.2}% 
+\contentsline {section}{\numberline {3.3}Kr\IeC {\'o}j i wielko\IeC {\'s}\IeC {\'c} czcionek}{20}{section.3.3}% 
+\contentsline {section}{\numberline {3.4}Formatowanie blok\IeC {\'o}w tekstu}{21}{section.3.4}% 
+\contentsline {section}{\numberline {3.5}Opisy tabel i rysunk\IeC {\'o}w}{23}{section.3.5}% 
+\contentsline {section}{\numberline {3.6}Przypisy dolne}{24}{section.3.6}% 
+\contentsline {section}{\numberline {3.7}Formatowanie spisu tre\IeC {\'s}ci}{24}{section.3.7}% 
+\contentsline {section}{\numberline {3.8}Formatowanie list wyliczeniowych i wypunktowa\IeC {\'n}}{24}{section.3.8}% 
+\contentsline {section}{\numberline {3.9}Wzory matematyczne}{26}{section.3.9}% 
+\contentsline {chapter}{\chapternumberline {4}Redakcja pracy}{27}{chapter.4}% 
+\contentsline {section}{\numberline {4.1}Uk\IeC {\l }ad pracy}{27}{section.4.1}% 
+\contentsline {section}{\numberline {4.2}Styl}{28}{section.4.2}% 
+\contentsline {chapter}{\chapternumberline {5}Uwagi techniczne}{29}{chapter.5}% 
+\contentsline {section}{\numberline {5.1}Rysunki}{29}{section.5.1}% 
+\contentsline {section}{\numberline {5.2}Wstawianie kodu \IeC {\'z}r\IeC {\'o}d\IeC {\l }owego}{31}{section.5.2}% 
+\contentsline {section}{\numberline {5.3}Wykaz literatury oraz cytowania}{32}{section.5.3}% 
+\contentsline {section}{\numberline {5.4}Indeks rzeczowy}{33}{section.5.4}% 
+\contentsline {section}{\numberline {5.5}Inne uwagi}{34}{section.5.5}% 
+\contentsline {chapter}{\chapternumberline {6}Podsumowanie}{37}{chapter.6}% 
+\contentsline {section}{\numberline {6.1}Sekcja poziomu 1}{37}{section.6.1}% 
+\contentsline {subsection}{\numberline {6.1.1}Sekcja poziomu 2}{37}{subsection.6.1.1}% 
+\contentsline {subsubsection}{Sekcja poziomu 3}{37}{section*.2}% 
+\contentsline {paragraph}{Paragraf 4}{37}{section*.3}% 
+\contentsline {section}{\numberline {6.2}Sekcja poziomu 1}{37}{section.6.2}% 
+\contentsline {chapter}{Literatura}{39}{chapter*.4}% 
+\contentsline {appendix}{\chapternumberline {A}Tytu\IeC {\l } dodatku}{41}{appendix.A}% 
+\contentsline {appendix}{\chapternumberline {B}Opis za\IeC {\l }\IeC {\k a}czonej p\IeC {\l }yty CD/DVD}{43}{appendix.B}% 
+\contentsline {chapter}{Indeks rzeczowy}{44}{section*.5}% 
