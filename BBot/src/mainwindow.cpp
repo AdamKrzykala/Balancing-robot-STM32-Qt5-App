@@ -310,6 +310,7 @@ void MainWindow::MainWindow_Display_Battery_data(double voltage)
 
     ui->label_Voltage->setNum(voltage);
 
+    /*
     if(voltage <= 10.5) {
 
         QMessageBox messageBox(QMessageBox::Question,
@@ -319,9 +320,10 @@ void MainWindow::MainWindow_Display_Battery_data(double voltage)
 
         if(messageBox.exec() == QMessageBox::Ok) {
 
-            exit(0);
+            //exit(0);
         }
     }
+    */
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
