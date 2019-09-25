@@ -1,35 +1,64 @@
 \babel@toc {polish}{}
 \contentsline {chapter}{\chapternumberline {1}Wst\IeC {\k e}p}{11}{chapter.1}% 
-\contentsline {section}{\numberline {1.1}Wprowadzenie}{11}{section.1.1}% 
-\contentsline {chapter}{\chapternumberline {2}Praca z szablonem}{13}{chapter.2}% 
-\contentsline {section}{\numberline {2.1}Organizacja szablonu}{13}{section.2.1}% 
-\contentsline {section}{\numberline {2.2}Kompilacja szablonu}{14}{section.2.2}% 
-\contentsline {chapter}{\chapternumberline {3}Zalecenia dotycz\IeC {\k a}ce formatowania}{17}{chapter.3}% 
-\contentsline {section}{\numberline {3.1}Rozmiar i uk\IeC {\l }ad tre\IeC {\'s}ci na stronach dokumentu}{17}{section.3.1}% 
-\contentsline {section}{\numberline {3.2}Strona tytu\IeC {\l }owa}{19}{section.3.2}% 
-\contentsline {section}{\numberline {3.3}Kr\IeC {\'o}j i wielko\IeC {\'s}\IeC {\'c} czcionek}{20}{section.3.3}% 
-\contentsline {section}{\numberline {3.4}Formatowanie blok\IeC {\'o}w tekstu}{21}{section.3.4}% 
-\contentsline {section}{\numberline {3.5}Opisy tabel i rysunk\IeC {\'o}w}{23}{section.3.5}% 
-\contentsline {section}{\numberline {3.6}Przypisy dolne}{24}{section.3.6}% 
-\contentsline {section}{\numberline {3.7}Formatowanie spisu tre\IeC {\'s}ci}{24}{section.3.7}% 
-\contentsline {section}{\numberline {3.8}Formatowanie list wyliczeniowych i wypunktowa\IeC {\'n}}{24}{section.3.8}% 
-\contentsline {section}{\numberline {3.9}Wzory matematyczne}{26}{section.3.9}% 
-\contentsline {chapter}{\chapternumberline {4}Redakcja pracy}{27}{chapter.4}% 
-\contentsline {section}{\numberline {4.1}Uk\IeC {\l }ad pracy}{27}{section.4.1}% 
-\contentsline {section}{\numberline {4.2}Styl}{28}{section.4.2}% 
-\contentsline {chapter}{\chapternumberline {5}Uwagi techniczne}{29}{chapter.5}% 
-\contentsline {section}{\numberline {5.1}Rysunki}{29}{section.5.1}% 
-\contentsline {section}{\numberline {5.2}Wstawianie kodu \IeC {\'z}r\IeC {\'o}d\IeC {\l }owego}{31}{section.5.2}% 
-\contentsline {section}{\numberline {5.3}Wykaz literatury oraz cytowania}{32}{section.5.3}% 
-\contentsline {section}{\numberline {5.4}Indeks rzeczowy}{33}{section.5.4}% 
-\contentsline {section}{\numberline {5.5}Inne uwagi}{34}{section.5.5}% 
-\contentsline {chapter}{\chapternumberline {6}Podsumowanie}{37}{chapter.6}% 
-\contentsline {section}{\numberline {6.1}Sekcja poziomu 1}{37}{section.6.1}% 
-\contentsline {subsection}{\numberline {6.1.1}Sekcja poziomu 2}{37}{subsection.6.1.1}% 
-\contentsline {subsubsection}{Sekcja poziomu 3}{37}{section*.2}% 
-\contentsline {paragraph}{Paragraf 4}{37}{section*.3}% 
-\contentsline {section}{\numberline {6.2}Sekcja poziomu 1}{37}{section.6.2}% 
-\contentsline {chapter}{Literatura}{39}{chapter*.4}% 
-\contentsline {appendix}{\chapternumberline {A}Tytu\IeC {\l } dodatku}{41}{appendix.A}% 
-\contentsline {appendix}{\chapternumberline {B}Opis za\IeC {\l }\IeC {\k a}czonej p\IeC {\l }yty CD/DVD}{43}{appendix.B}% 
-\contentsline {chapter}{Indeks rzeczowy}{44}{section*.5}% 
+\contentsline {section}{\numberline {1.1}Cel i zakres pracy}{11}{section.1.1}% 
+\contentsline {section}{\numberline {1.2}Zadania do wykonania}{11}{section.1.2}% 
+\contentsline {section}{\numberline {1.3}Przebieg realizacji projektu}{11}{section.1.3}% 
+\contentsline {chapter}{\chapternumberline {2}Analiza ruchu robota}{13}{chapter.2}% 
+\contentsline {section}{\numberline {2.1}Model dynamiki robota balansuj\IeC {\k a}cego}{13}{section.2.1}% 
+\contentsline {section}{\numberline {2.2}Sterowanie}{13}{section.2.2}% 
+\contentsline {chapter}{\chapternumberline {3}Akwizycja i wykorzystanie danych z czujnik\IeC {\'o}w ruchu}{15}{chapter.3}% 
+\contentsline {section}{\numberline {3.1}\IeC {\.Z}yroskop}{15}{section.3.1}% 
+\contentsline {section}{\numberline {3.2}Przyspieszeniomierz}{15}{section.3.2}% 
+\contentsline {section}{\numberline {3.3}Magnetometr}{15}{section.3.3}% 
+\contentsline {subsection}{\numberline {3.3.1}Kompensacja efektu ,,Soft Iron" i ,,Hard Iron''}{15}{subsection.3.3.1}% 
+\contentsline {subsection}{\numberline {3.3.2}Kompensacja k\IeC {\k a}ta wychylenia magnetometru}{15}{subsection.3.3.2}% 
+\contentsline {section}{\numberline {3.4}Metody numeryczne pozwalaj\IeC {\k a}ce uzyska\IeC {\'c} orientacj\IeC {\k e} czujnika}{15}{section.3.4}% 
+\contentsline {subsection}{\numberline {3.4.1}K\IeC {\k a}ty Eulera}{15}{subsection.3.4.1}% 
+\contentsline {subsection}{\numberline {3.4.2}Proces ca\IeC {\l }kowania}{15}{subsection.3.4.2}% 
+\contentsline {subsection}{\numberline {3.4.3}Funkcje cyklometryczne}{15}{subsection.3.4.3}% 
+\contentsline {chapter}{\chapternumberline {4}Wybrane metody fuzji sygna\IeC {\l }\IeC {\'o}w}{17}{chapter.4}% 
+\contentsline {section}{\numberline {4.1}Filtr komplementarny}{17}{section.4.1}% 
+\contentsline {subsection}{\numberline {4.1.1}Filtr dolnoprzepustowy}{17}{subsection.4.1.1}% 
+\contentsline {subsection}{\numberline {4.1.2}Filtr g\IeC {\'o}rnoprzepustowy}{17}{subsection.4.1.2}% 
+\contentsline {subsection}{\numberline {4.1.3}R\IeC {\'o}wnanie filtru komplementarnego}{17}{subsection.4.1.3}% 
+\contentsline {subsection}{\numberline {4.1.4}Testy symulacyjne}{17}{subsection.4.1.4}% 
+\contentsline {section}{\numberline {4.2}Filtr Kalmana}{17}{section.4.2}% 
+\contentsline {subsection}{\numberline {4.2.1}R\IeC {\'o}wnanie stanu obiektu}{17}{subsection.4.2.1}% 
+\contentsline {subsection}{\numberline {4.2.2}R\IeC {\'o}wnanie filtru Kalmana}{17}{subsection.4.2.2}% 
+\contentsline {subsection}{\numberline {4.2.3}Testy symulacyjne}{17}{subsection.4.2.3}% 
+\contentsline {section}{\numberline {4.3}Filtr Madgwicka}{17}{section.4.3}% 
+\contentsline {subsection}{\numberline {4.3.1}Kwaterniony}{17}{subsection.4.3.1}% 
+\contentsline {subsection}{\numberline {4.3.2}Zasada dzia\IeC {\l }ania algorytmu}{18}{subsection.4.3.2}% 
+\contentsline {subsection}{\numberline {4.3.3}Testy symulacyjne}{18}{subsection.4.3.3}% 
+\contentsline {chapter}{\chapternumberline {5}Budowa dwuko\IeC {\l }owego robota balansuj\IeC {\k a}cego i implementacja algorytm\IeC {\'o}w}{19}{chapter.5}% 
+\contentsline {section}{\numberline {5.1}Konstrukcja mechaniczna}{19}{section.5.1}% 
+\contentsline {section}{\numberline {5.2}Uk\IeC {\l }ad elektroniczny}{19}{section.5.2}% 
+\contentsline {subsection}{\numberline {5.2.1}Zasilanie}{19}{subsection.5.2.1}% 
+\contentsline {subsection}{\numberline {5.2.2}Jednostka inercyjna MPU9250}{19}{subsection.5.2.2}% 
+\contentsline {subsection}{\numberline {5.2.3}Modu\IeC {\l } Bluetooth HC--05}{19}{subsection.5.2.3}% 
+\contentsline {subsection}{\numberline {5.2.4}Silniki krokowe oraz sterowniki A4988}{19}{subsection.5.2.4}% 
+\contentsline {section}{\numberline {5.3}Konfiguracja mikrokontrolera i peryferi\IeC {\'o}w}{19}{section.5.3}% 
+\contentsline {subsection}{\numberline {5.3.1}ADC}{19}{subsection.5.3.1}% 
+\contentsline {subsection}{\numberline {5.3.2}PWM}{19}{subsection.5.3.2}% 
+\contentsline {subsection}{\numberline {5.3.3}$I^{2}C$}{20}{subsection.5.3.3}% 
+\contentsline {subsection}{\numberline {5.3.4}USART}{20}{subsection.5.3.4}% 
+\contentsline {subsection}{\numberline {5.3.5}System czasu rzeczywistego FreeRTOS}{20}{subsection.5.3.5}% 
+\contentsline {section}{\numberline {5.4}Oprogramowanie}{20}{section.5.4}% 
+\contentsline {subsection}{\numberline {5.4.1}Struktura programu i algorytm sterowania}{20}{subsection.5.4.1}% 
+\contentsline {subsection}{\numberline {5.4.2}Implementacja akwizycji danych z czujnik\IeC {\'o}w ruchu}{20}{subsection.5.4.2}% 
+\contentsline {subsection}{\numberline {5.4.3}Implementacja fuzji sygna\IeC {\l }\IeC {\'o}w}{20}{subsection.5.4.3}% 
+\contentsline {subsection}{\numberline {5.4.4}Pojedynczy regulator PID}{20}{subsection.5.4.4}% 
+\contentsline {subsection}{\numberline {5.4.5}Kaskada regulator\IeC {\'o}w PID}{20}{subsection.5.4.5}% 
+\contentsline {subsection}{\numberline {5.4.6}Obs\IeC {\l }uga silnik\IeC {\'o}w krokowych}{20}{subsection.5.4.6}% 
+\contentsline {subsection}{\numberline {5.4.7}Pomiar stanu akumulatora}{20}{subsection.5.4.7}% 
+\contentsline {subsection}{\numberline {5.4.8}Komunikacja bezprzewodowa z komputerem}{20}{subsection.5.4.8}% 
+\contentsline {section}{\numberline {5.5}Testy eksperymentalne}{20}{section.5.5}% 
+\contentsline {chapter}{\chapternumberline {6}Aplikacja do wizualizacji danych sensorycznych i komunikacji z robotem}{21}{chapter.6}% 
+\contentsline {section}{\numberline {6.1}Struktura programu}{21}{section.6.1}% 
+\contentsline {section}{\numberline {6.2}Funkcjonalno\IeC {\'s}ci programu}{21}{section.6.2}% 
+\contentsline {section}{\numberline {6.3}Interfejs graficzny}{21}{section.6.3}% 
+\contentsline {chapter}{\chapternumberline {7}Testy eksperymentalne}{23}{chapter.7}% 
+\contentsline {chapter}{Literatura}{25}{chapter*.2}% 
+\contentsline {appendix}{\chapternumberline {A}Tytu\IeC {\l } dodatku}{27}{appendix.A}% 
+\contentsline {appendix}{\chapternumberline {B}Opis za\IeC {\l }\IeC {\k a}czonej p\IeC {\l }yty CD/DVD}{29}{appendix.B}% 
+\contentsline {chapter}{Indeks rzeczowy}{30}{section*.3}% 
