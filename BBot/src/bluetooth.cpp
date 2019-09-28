@@ -197,6 +197,13 @@ void Bluetooth::Parse_data_frame()
     DF_Robot.Lipol_voltage = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[0]),
                                                               static_cast<uint8_t>(Data_frame_from_robot[1])  ) ) / 100;
 
+    if( fabs(Lipol_voltage_past - DF_Robot.Lipol_voltage) > 0.5 ) {
+         Lipol_voltage_past = DF_Robot.Lipol_voltage;
+         return;
+    }
+
+    Lipol_voltage_past = DF_Robot.Lipol_voltage;
+
     DF_Robot.Complementary_roll  = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[2]),
                                                                     static_cast<uint8_t>(Data_frame_from_robot[3])  ) ) / 100;
     DF_Robot.Complementary_pitch = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[4]),
@@ -314,6 +321,7 @@ void Bluetooth::Send_frame()
     // Case 3: Send data frame
     if( Device->isWritable() ) {
 
+        /*
         qDebug() << "Wysyłam dane: ";
         qDebug() << "Kp (wychylenie): "             << Angle_Kp;
         qDebug() << "Ki (wychylenie): "             << Angle_Ki;
@@ -328,6 +336,7 @@ void Bluetooth::Send_frame()
         qDebug() << "Predkosc prawego silnika: "    << Right_engine_speed;
         qDebug() << "Przycisk awaryjny: "           << Emergency_stop;
         qDebug() << "Ktory filtr: "                 << Which_filter;
+        */
 
         Device->write( Data, DATA_FRAME_TO_ROBOT_SIZE);
         Device->waitForBytesWritten(20);

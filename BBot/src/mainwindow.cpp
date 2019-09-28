@@ -407,6 +407,7 @@ void MainWindow::loadSettings()
     ui->horizontalSlider_Set_Speed->setValue(Set_speed);
     ui->lcdNumber_Set_Speed->display(Set_speed);
 
+    /*
     qDebug() << "Wczytano PID_Kp: " << PID_Kp;
     qDebug() << "Wczytano PID_Ki: " << PID_Ki;
     qDebug() << "Wczytano PID_Kd: " << PID_Kd;
@@ -420,6 +421,7 @@ void MainWindow::loadSettings()
     qDebug() << "Wczytano beta: "                 << Madgwick_beta;
     qDebug() << "Wczytano Which_filter: "         << Which_filter;
     qDebug() << "Wczytano Set_Speed: "            << Set_speed;
+    */
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -464,6 +466,7 @@ void MainWindow::saveSettings()
 
     settings.setValue("Set_speed", Set_speed);
 
+    /*
     qDebug() << "Zapisano PID_Kp: "                 << PID_Kp;
     qDebug() << "Zapisano PID_Ki: "                 << PID_Ki;
     qDebug() << "Zapisano PID_Kd: "                 << PID_Kd;
@@ -475,6 +478,7 @@ void MainWindow::saveSettings()
     qDebug() << "Zapisano beta: "                   << Madgwick_beta;
     qDebug() << "Zapisano Which_filter: "           << Which_filter;
     qDebug() << "Zapisano Set_Speed: "              << Set_speed;
+    */
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

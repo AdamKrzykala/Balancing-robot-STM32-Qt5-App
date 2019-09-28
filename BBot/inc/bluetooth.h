@@ -88,7 +88,9 @@ private:
 
     void Parse_data_frame();
 
-    int Error_frame_counter;
+    //int Error_frame_counter;
+    double Lipol_voltage_past;
+    double Lipol_voltage_actual;
 
     QTimer *TimeoutTimer;
 public:

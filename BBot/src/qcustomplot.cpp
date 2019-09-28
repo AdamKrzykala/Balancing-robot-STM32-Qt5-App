@@ -1147,7 +1147,8 @@ void QCPLayer::drawToPaintBuffer()
       if (painter->isActive())
         draw(painter);
       else
-        qDebug() << Q_FUNC_INFO << "paint buffer returned inactive painter";
+        //qDebug() << Q_FUNC_INFO << "paint buffer returned inactive painter";
+          return;
       delete painter;
       mPaintBuffer.data()->donePainting();
     } else
