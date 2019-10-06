@@ -26,6 +26,7 @@
 
 //extern volatile float beta;				// algorithm gain
 extern volatile float q0, q1, q2, q3;	// quaternion of sensor frame relative to auxiliary frame
+extern volatile float q0_m, q1_m, q2_m, q3_m;
 
 //---------------------------------------------------------------------------------------------------
 // Function declarations
@@ -35,7 +36,11 @@ void MadgwickAHRSupdate(float beta,
 						float ax, float ay, float az,
 						float mx, float my, float mz,
 						float dt);
-void MadgwickAHRSupdateIMU(float gx, float gy, float gz, float ax, float ay, float az, float dt);
+
+void MadgwickAHRSupdateIMU(float beta,
+						   float gx, float gy, float gz,
+						   float ax, float ay, float az,
+						   float dt);
 
 //=====================================================================================================
 // End of file

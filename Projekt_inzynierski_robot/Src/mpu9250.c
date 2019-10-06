@@ -532,9 +532,9 @@ void Complementary_filter(struct MPU9250 *DataStructure,
 						  float weight,
 						  float dt) {
 
-	DataStructure->Complementary_filter_Roll   = ( (1-weight) * (DataStructure->Complementary_filter_Roll  + (DataStructure->Gyroscope_X_dgs * dt) ) + (weight * DataStructure->Accelerometer_Roll)  );
+	DataStructure->Complementary_filter_Roll   = ( (0.99) * (DataStructure->Complementary_filter_Roll  + (DataStructure->Gyroscope_X_dgs * dt) )     + (0.01   * DataStructure->Accelerometer_Roll)  );
 	DataStructure->Complementary_filter_Pitch  = ( (1-weight) * (DataStructure->Complementary_filter_Pitch - (DataStructure->Gyroscope_Y_dgs * dt) ) + (weight * DataStructure->Accelerometer_Pitch) );
-	DataStructure->Complementary_filter_Yaw    = ( (0.99)     * (DataStructure->Complementary_filter_Yaw   - (DataStructure->Gyroscope_Z_dgs * dt) ) + (0.01   * DataStructure->Magnetometer_Yaw) );
+	DataStructure->Complementary_filter_Yaw    = ( (0.9) * (DataStructure->Complementary_filter_Yaw  + (DataStructure->Gyroscope_Z_dgs * dt) )  + (0.1   * DataStructure->Magnetometer_Yaw) );
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
@@ -544,13 +544,16 @@ void Kalman_filter(struct MPU9250 *DataStructure,
 				   float dt) {
 
 	/* Case 1: Update Q and R value */
-	if( DataStructure->Kalman_R.kalman_Q != Q || DataStructure->Kalman_R.kalman_R != R ||
-	    DataStructure->Kalman_P.kalman_Q != Q || DataStructure->Kalman_P.kalman_R != R ||
-		DataStructure->Kalman_Y.kalman_Q != Q || DataStructure->Kalman_Y.kalman_R != R ) {
+	if( DataStructure->Kalman_P.kalman_Q != Q || DataStructure->Kalman_P.kalman_R != R ) {
 
-		Kalman_filter_init(&DataStructure->Kalman_R, Q, R);
 		Kalman_filter_init(&DataStructure->Kalman_P, Q, R);
+
+		Q = 0.0001; R = 10000;
 		Kalman_filter_init(&DataStructure->Kalman_Y, Q, R);
+
+		Q = 0.000001; R = 0.001;
+		Kalman_filter_init(&DataStructure->Kalman_R, Q, R);
+
 
 		return;
 	}
@@ -567,24 +570,36 @@ void Madgwick_filter(struct MPU9250 *DataStructure,
 					 float beta,
 					 float dt) {
 
-	MadgwickAHRSupdate(beta,
+	MadgwickAHRSupdateIMU(beta,
+			 	 	 	  DataStructure->Gyroscope_X_dgs * (M_PI / 180), DataStructure->Gyroscope_Y_dgs * (M_PI / 180), -DataStructure->Gyroscope_Z_dgs * (M_PI / 180),
+					      DataStructure->Accelerometer_X_g, DataStructure->Accelerometer_Y_g, DataStructure->Accelerometer_Z_g,
+						  dt);
+
+	float real_part_ag = q0;
+	float x_ag = q1;
+	float y_ag = q2;
+	float z_ag = q3;
+
+	float Roll  = atan2f( 2 * ( (real_part_ag * x_ag) + (y_ag * z_ag) ), 1 - (2 * ( (x_ag * x_ag) + (y_ag * y_ag) ) ) ) * (180 / M_PI);
+	float Pitch = -asinf( 2 * ( (real_part_ag * y_ag) - (z_ag * x_ag) ) ) * (180 / M_PI);
+
+
+	MadgwickAHRSupdate(1,
 					   DataStructure->Gyroscope_X_dgs * (M_PI / 180), DataStructure->Gyroscope_Y_dgs * (M_PI / 180), -DataStructure->Gyroscope_Z_dgs * (M_PI / 180),
 					   DataStructure->Accelerometer_X_g, DataStructure->Accelerometer_Y_g, DataStructure->Accelerometer_Z_g,
 					   DataStructure->Magnetometer_X_uT, DataStructure->Magnetometer_Y_uT, -DataStructure->Magnetometer_Z_uT,
 					   dt);
 
-	float real_part = q0;
-	float x =  q1;
-	float y =  q2;
-	float z =  q3;
+	float real_part = q0_m;
+	float x =  q1_m;
+	float y =  q2_m;
+	float z =  q3_m;
 
-	float Roll  = atan2f( 2 * ( (real_part * x) + (y * z) ), 1 - (2 * ( (x * x) + (y * y) ) ) ) * (180 / M_PI);
-	float Pitch = -asinf( 2 * ( (real_part * y) - (z * x) ) ) * (180 / M_PI);
 	float Yaw   = atan2f( 2 * ( (real_part * z) + (x * y) ), 1 - (2 * ( (y * y) + (z * z) ) ) ) * (180 / M_PI);
 
 	DataStructure->Madgwick_filter_Roll  = Roll;
 	DataStructure->Madgwick_filter_Pitch = Pitch;
-	DataStructure->Madgwick_filter_Yaw   = Yaw /*- MAGNETIC_DECLINATION*/;
+	DataStructure->Madgwick_filter_Yaw   = Yaw;
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
