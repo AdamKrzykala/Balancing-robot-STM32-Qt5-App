@@ -83,17 +83,20 @@ Bluetooth::Bluetooth()
     DT_Robot.Which_filter = 0;
 
     DF_Robot.Lipol_voltage = 0;
-    DF_Robot.Complementary_roll = 0;
-    DF_Robot.Complementary_pitch = 0;
-    DF_Robot.Complementary_yaw = 0;
-    DF_Robot.Kalman_roll = 0;
-    DF_Robot.Kalman_pitch = 0;
-    DF_Robot.Kalman_yaw = 0;
-    DF_Robot.Madgwick_roll = 0;
-    DF_Robot.Madgwick_pitch = 0;
-    DF_Robot.Madgwick_yaw = 0;
+    DF_Robot.Filter_roll = 0;
+    DF_Robot.Filter_pitch = 0;
+    DF_Robot.Filter_yaw = 0;
     DF_Robot.Left_engine_speed = 0;
     DF_Robot.Right_engine_speed = 0;
+    DF_Robot.g_x_dgs = 0;
+    DF_Robot.g_y_dgs = 0;
+    DF_Robot.g_z_dgs = 0;
+    DF_Robot.a_x_g = 0;
+    DF_Robot.a_y_g = 0;
+    DF_Robot.a_z_g = 0;
+    DF_Robot.m_x_uT = 0;
+    DF_Robot.m_y_uT = 0;
+    DF_Robot.m_z_uT = 0;
 
     TimeoutTimer = new QTimer(this);
 
@@ -204,46 +207,58 @@ void Bluetooth::Parse_data_frame()
 
     Lipol_voltage_past = DF_Robot.Lipol_voltage;
 
-    DF_Robot.Complementary_roll  = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[2]),
+    DF_Robot.Filter_roll  = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[2]),
                                                                     static_cast<uint8_t>(Data_frame_from_robot[3])  ) ) / 100;
-    DF_Robot.Complementary_pitch = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[4]),
+    DF_Robot.Filter_pitch = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[4]),
                                                                     static_cast<uint8_t>(Data_frame_from_robot[5])  ) ) / 100;
-    DF_Robot.Complementary_yaw   = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[6]),
+    DF_Robot.Filter_yaw   = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[6]),
                                                                     static_cast<uint8_t>(Data_frame_from_robot[7])  ) ) / 100;
 
-    DF_Robot.Kalman_roll  = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[8]),
-                                                             static_cast<uint8_t>(Data_frame_from_robot[9])  ) ) / 100;
-    DF_Robot.Kalman_pitch = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[10]),
-                                                             static_cast<uint8_t>(Data_frame_from_robot[11])  ) ) / 100;
-    DF_Robot.Kalman_yaw   = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[12]),
-                                                             static_cast<uint8_t>(Data_frame_from_robot[13])  ) ) / 100;
+    DF_Robot.Left_engine_speed  = static_cast<int16_t>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[8]),
+                                                                    static_cast<uint8_t>(Data_frame_from_robot[9])  ) );
+    DF_Robot.Right_engine_speed = static_cast<int16_t>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[10]),
+                                                                    static_cast<uint8_t>(Data_frame_from_robot[11]) ) );
 
-    DF_Robot.Madgwick_roll  = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[14]),
-                                                             static_cast<uint8_t>(Data_frame_from_robot[15])  ) ) / 100;
-    DF_Robot.Madgwick_pitch = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[16]),
-                                                             static_cast<uint8_t>(Data_frame_from_robot[17])  ) ) / 100;
-    DF_Robot.Madgwick_yaw   = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[18]),
-                                                             static_cast<uint8_t>(Data_frame_from_robot[19])  ) ) / 100;
+    DF_Robot.g_x_dgs = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[12]),
+                                                        static_cast<uint8_t>(Data_frame_from_robot[13])  ) ) / 100;
+    DF_Robot.g_y_dgs = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[14]),
+                                                        static_cast<uint8_t>(Data_frame_from_robot[15])  ) ) / 100;
+    DF_Robot.g_z_dgs = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[16]),
+                                                        static_cast<uint8_t>(Data_frame_from_robot[17])  ) ) / 100;
 
-    DF_Robot.Left_engine_speed  = static_cast<int16_t>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[20]),
-                                                                    static_cast<uint8_t>(Data_frame_from_robot[21])  ) );
-    DF_Robot.Right_engine_speed = static_cast<int16_t>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[22]),
-                                                                    static_cast<uint8_t>(Data_frame_from_robot[23]) ) );
+    DF_Robot.a_x_g = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[18]),
+                                                      static_cast<uint8_t>(Data_frame_from_robot[19])  ) ) / 100;
+    DF_Robot.a_y_g = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[20]),
+                                                      static_cast<uint8_t>(Data_frame_from_robot[21])  ) ) / 100;
+    DF_Robot.a_z_g = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[22]),
+                                                      static_cast<uint8_t>(Data_frame_from_robot[23])  ) ) / 100;
+
+    DF_Robot.m_x_uT = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[24]),
+                                                       static_cast<uint8_t>(Data_frame_from_robot[25])  ) ) / 100;
+    DF_Robot.m_y_uT = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[26]),
+                                                       static_cast<uint8_t>(Data_frame_from_robot[27])  ) ) / 100;
+    DF_Robot.m_z_uT = static_cast<double>( Merge_bytes(static_cast<uint8_t>(Data_frame_from_robot[28]),
+                                                       static_cast<uint8_t>(Data_frame_from_robot[29])  ) ) / 100;
 
     emit Parsed_frame_OK_Signal();
 
-    //qDebug() << "Napiecie LiPol: "             << DF_Robot.Lipol_voltage;
-    //qDebug() << "Filtr komplementarny Roll: "  << DF_Robot.Complementary_roll;
-    //qDebug() << "Filtr komplementarny Pitch: " << DF_Robot.Complementary_pitch;
-    //qDebug() << "Filtr komplementarny Yaw: "   << DF_Robot.Complementary_yaw;
-    //qDebug() << "Filtr kalmana Roll: "         << DF_Robot.Kalman_roll;
-    //qDebug() << "Filtr kalmana Pitch: "        << DF_Robot.Kalman_pitch;
-    //qDebug() << "Filtr kalmana Yaw: "          << DF_Robot.Kalman_yaw;
-    //qDebug() << "Filtr madgwicka Roll: "         << DF_Robot.Madgwick_roll;
-    //qDebug() << "Filtr madgwicka Pitch: "        << DF_Robot.Kalman_pitch;
-    //qDebug() << "Filtr madgwicka Yaw: "          << DF_Robot.Kalman_yaw;
-    //qDebug() << "Predkosc lewego silnika: "    << DF_Robot.Left_engine_speed;
-    //qDebug() << "Predskoc prawego silnika: "   << DF_Robot.Right_engine_speed;
+    /*
+    qDebug() << "Napiecie LiPol: "             << DF_Robot.Lipol_voltage;
+    qDebug() << "Filtr Roll: "  << DF_Robot.Filter_roll;
+    qDebug() << "Filtr Pitch: " << DF_Robot.Filter_pitch;
+    qDebug() << "Filtr Yaw: "   << DF_Robot.Filter_yaw;
+    qDebug() << "Predkosc lewego silnika: "    << DF_Robot.Left_engine_speed;
+    qDebug() << "Predskoc prawego silnika: "   << DF_Robot.Right_engine_speed;
+    qDebug() << "g_x_dgs: " << DF_Robot.g_x_dgs;
+    qDebug() << "g_y_dgs: " << DF_Robot.g_y_dgs;
+    qDebug() << "g_z_dgs: " << DF_Robot.g_z_dgs;
+    qDebug() << "a_x_g: " << DF_Robot.a_x_g;
+    qDebug() << "a_y_g: " << DF_Robot.a_y_g;
+    qDebug() << "a_z_g: " << DF_Robot.a_z_g;
+    qDebug() << "m_x_uT: " << DF_Robot.m_x_uT;
+    qDebug() << "m_y_uT: " << DF_Robot.m_y_uT;
+    qDebug() << "m_z_uT: " << DF_Robot.m_z_uT;
+    */
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -337,6 +352,7 @@ void Bluetooth::Send_frame()
         qDebug() << "Przycisk awaryjny: "           << Emergency_stop;
         qDebug() << "Ktory filtr: "                 << Which_filter;
         */
+
 
         Device->write( Data, DATA_FRAME_TO_ROBOT_SIZE);
         Device->waitForBytesWritten(20);

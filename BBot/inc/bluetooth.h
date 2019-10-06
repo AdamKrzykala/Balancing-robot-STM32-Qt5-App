@@ -9,7 +9,7 @@
 
 #include "math.h"
 
-#define DATA_FRAME_FROM_ROBOT_SIZE      25
+#define DATA_FRAME_FROM_ROBOT_SIZE      31
 #define DATA_FRAME_TO_ROBOT_SIZE        26
 
 #define POLYNOMIAL_9	0x31
@@ -41,11 +41,13 @@ struct Data_from_Robot
 {
     double Lipol_voltage;   // <- in volts
 
-    double Complementary_roll, Complementary_pitch, Complementary_yaw;
-    double Kalman_roll, Kalman_pitch, Kalman_yaw;
-    double Madgwick_roll, Madgwick_pitch, Madgwick_yaw;
+    double Filter_roll, Filter_pitch, Filter_yaw;
 
     int Left_engine_speed, Right_engine_speed;
+
+    double g_x_dgs, g_y_dgs, g_z_dgs;
+    double a_x_g, a_y_g, a_z_g;
+    double m_x_uT, m_y_uT, m_z_uT;
 };
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

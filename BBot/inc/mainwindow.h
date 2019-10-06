@@ -51,19 +51,19 @@ private:
     bool Show_Accelerometer_X, Show_Accelerometer_Y, Show_Accelerometer_Z;
     bool Show_Accelerometer_Roll, Show_Accelerometer_Pitch, Show_Accelerometer_Yaw;
 
-    bool Show_Gyroscope_X, Show_Gyroscope_Y, Show_Gyroscope_Z;
     bool Show_Gyroscope_Roll, Show_Gyroscope_Pitch, Show_Gyroscope_Yaw;
 
     bool Show_Magnetometer_X, Show_Magnetometer_Y, Show_Magnetometer_Z;
     bool Show_Magnetometer_Roll, Show_Magnetometer_Pitch, Show_Magnetometer_Yaw;
 
-    bool Show_Complementary_Filter_Roll, Show_Complementary_Filter_Pitch, Show_Complementary_Filter_Yaw;
-    bool Show_Kalman_Filter_Roll, Show_Kalman_Filter_Pitch, Show_Kalman_Filter_Yaw;
-    bool Show_Madgwick_Filter_Roll, Show_Madgwick_Filter_Pitch, Show_Madgwick_Filter_Yaw;
+    bool Show_Filter_Roll, Show_Filter_Pitch, Show_Filter_Yaw;
 
-    bool Complementary_Filter_Graph_Run;
-    bool Kalman_Filter_Graph_Run;
-    bool Madgwick_Filter_Graph_Run;
+    bool Show_Gyroscope_X, Show_Gyroscope_Y, Show_Gyroscope_Z;
+
+    bool Gyroscope_Graph_Run;
+    bool Accelerometer_Graph_Run;
+    bool Magnetometer_Graph_Run;
+    bool Filter_Graph_Run;
 
     int Set_Speed;
 
@@ -73,9 +73,10 @@ private:
     void MainWindow_Default_View();
     void MainWindow_Setup_Icons();
 
-    void MainWindow_Setup_Complementary_Filter_Graph();
-    void MainWindow_Setup_Kalman_Filter_Graph();
-    void MainWindow_Setup_Madgwick_Filter_Graph();
+    void MainWindow_Setup_Gyroscope_Graph();
+    void MainWindow_Setup_Accelerometer_Graph();
+    void MainWindow_Setup_Magnetometer_Graph();
+    void MainWindow_Setup_Filter_Graph();
 
     void MainWindow_Display_IMU_data();
     void MainWindow_Display_Battery_data(double voltage);
@@ -87,11 +88,9 @@ private:
 
 private slots:
 
-    void on_checkBox_Complementary_Filter_Roll_clicked();
-    void on_checkBox_Complementary_Filter_Pitch_clicked();
-    void on_checkBox_Complementary_Filter_Yaw_clicked();
-
-    //void on_pushButton_ConnectDisconnect_clicked();
+    void on_checkBox_Filter_Roll_clicked();
+    void on_checkBox_Filter_Pitch_clicked();
+    void on_checkBox_Filter_Yaw_clicked();
 
     void on_pushButton_PID_Default_clicked();
     void on_pushButton_PID_Clear_clicked();
@@ -127,10 +126,6 @@ private slots:
     void on_pushButton_Speed_PID_Default_clicked();
     void on_pushButton_Speed_PID_Clear_clicked();
 
-    void on_checkBox_Kalman_Filter_Roll_clicked();
-    void on_checkBox_Kalman_Filter_Pitch_clicked();
-    void on_checkBox_Kalman_Filter_Yaw_clicked();
-
     void on_pushButton_Plots_Center_clicked();
     void on_pushButton_Plots_Start_Stop_clicked();
 
@@ -146,11 +141,25 @@ private slots:
 
     void on_doubleSpinBox_Madgwick_beta_valueChanged(double arg1);
 
-    void on_checkBox_Madgwick_Filter_Roll_clicked();
-    void on_checkBox_Madgwick_Filter_Pitch_clicked();
-    void on_checkBox_Madgwick_Filter_Yaw_clicked();
-
     void on_horizontalSlider_Set_Speed_valueChanged(int value);
+
+    void on_checkBox_Gyroscope_X_toggled(bool checked);
+
+    void on_checkBox_Gyroscope_Y_toggled(bool checked);
+
+    void on_checkBox_Gyroscope_Z_toggled(bool checked);
+
+    void on_checkBox_Accelerometer_X_toggled(bool checked);
+
+    void on_checkBox_Accelerometer_Y_toggled(bool checked);
+
+    void on_checkBox_Accelerometer_Z_toggled(bool checked);
+
+    void on_checkBox_Magnetometer_X_toggled(bool checked);
+
+    void on_checkBox_Magnetometer_Y_toggled(bool checked);
+
+    void on_checkBox_Magnetometer_Z_toggled(bool checked);
 
 signals:
 

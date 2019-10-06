@@ -10,22 +10,16 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     // Default variables values
-    Show_Accelerometer_X = true; Show_Accelerometer_Y = true; Show_Accelerometer_Z = true;
-    Show_Accelerometer_Roll = true; Show_Accelerometer_Pitch = true; Show_Accelerometer_Yaw = true;
-
     Show_Gyroscope_X = true; Show_Gyroscope_Y = true; Show_Gyroscope_Z = true;
-    Show_Gyroscope_Roll = true; Show_Gyroscope_Pitch = true; Show_Gyroscope_Yaw = true;
-
+    Show_Accelerometer_X = true; Show_Accelerometer_Y = true; Show_Accelerometer_Z = true;
     Show_Magnetometer_X = true; Show_Magnetometer_Y = true; Show_Magnetometer_Z = true;
-    Show_Magnetometer_Roll = true; Show_Magnetometer_Pitch = true; Show_Magnetometer_Yaw = true;
 
-    Show_Complementary_Filter_Roll = true; Show_Complementary_Filter_Pitch = true; Show_Complementary_Filter_Yaw = true;
-    Show_Kalman_Filter_Roll = true; Show_Kalman_Filter_Pitch = true; Show_Kalman_Filter_Yaw = true;
-    Show_Madgwick_Filter_Roll = true; Show_Madgwick_Filter_Pitch = true; Show_Madgwick_Filter_Yaw = true;
+    Show_Filter_Roll = true; Show_Filter_Pitch = true; Show_Filter_Yaw = true;
 
-    Complementary_Filter_Graph_Run = true;
-    Kalman_Filter_Graph_Run = true;
-    Madgwick_Filter_Graph_Run = true;
+    Gyroscope_Graph_Run = true;
+    Accelerometer_Graph_Run = true;
+    Magnetometer_Graph_Run = true;
+    Filter_Graph_Run = true;
 
     Data_to.Angle_Kd = 0; Data_to.Angle_Ki = 0; Data_to.Angle_Kp = 0;
     Data_to.Speed_Kd = 0; Data_to.Speed_Ki = 0; Data_to.Speed_Kp = 0;
@@ -40,9 +34,10 @@ MainWindow::MainWindow(QWidget *parent) :
     MainWindow_Setup_Icons();
 
     // Setup real time graphs
-    MainWindow_Setup_Complementary_Filter_Graph();
-    MainWindow_Setup_Kalman_Filter_Graph();
-    MainWindow_Setup_Madgwick_Filter_Graph();
+    MainWindow_Setup_Gyroscope_Graph();
+    MainWindow_Setup_Accelerometer_Graph();
+    MainWindow_Setup_Magnetometer_Graph();
+    MainWindow_Setup_Filter_Graph();
 
     // Connection with CommunicationWindow
     connect(this, SIGNAL( Disconnect_Signal() ), CW, SLOT( Disconnect_Slot() ) );
@@ -99,71 +94,94 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void MainWindow::MainWindow_Setup_Complementary_Filter_Graph()
+void MainWindow::MainWindow_Setup_Filter_Graph()
 {
-    ui->Complementary_Filter_Graph->addGraph(); // red line
-    ui->Complementary_Filter_Graph->graph(0)->setPen(QPen(QColor(255, 0, 0)));
-    ui->Complementary_Filter_Graph->addGraph(); // green line
-    ui->Complementary_Filter_Graph->graph(1)->setPen(QPen(QColor(0, 255, 0)));
-    ui->Complementary_Filter_Graph->addGraph(); // blue line
-    ui->Complementary_Filter_Graph->graph(2)->setPen(QPen(QColor(0, 0, 255)));
+    ui->Filter_Graph->addGraph(); // red line
+    ui->Filter_Graph->graph(0)->setPen(QPen(QColor(255, 0, 0)));
+    ui->Filter_Graph->addGraph(); // green line
+    ui->Filter_Graph->graph(1)->setPen(QPen(QColor(0, 255, 0)));
+    ui->Filter_Graph->addGraph(); // blue line
+    ui->Filter_Graph->graph(2)->setPen(QPen(QColor(0, 0, 255)));
 
     QSharedPointer<QCPAxisTickerTime> timeTicker(new QCPAxisTickerTime);
     timeTicker->setTimeFormat("%h:%m:%s");
 
-    ui->Complementary_Filter_Graph->xAxis->setTicker(timeTicker);
-    ui->Complementary_Filter_Graph->axisRect()->setupFullAxesBox();
-    ui->Complementary_Filter_Graph->yAxis->setRange(-1, 1);
+    ui->Filter_Graph->xAxis->setTicker(timeTicker);
+    ui->Filter_Graph->axisRect()->setupFullAxesBox();
+    ui->Filter_Graph->yAxis->setRange(-1, 1);
 
     // make left and bottom axes transfer their ranges to right and top axes:
-    connect(ui->Complementary_Filter_Graph->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->Complementary_Filter_Graph->xAxis2, SLOT(setRange(QCPRange)));
-    connect(ui->Complementary_Filter_Graph->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->Complementary_Filter_Graph->yAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->Filter_Graph->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->Filter_Graph->xAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->Filter_Graph->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->Filter_Graph->yAxis2, SLOT(setRange(QCPRange)));
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void MainWindow::MainWindow_Setup_Kalman_Filter_Graph()
+void MainWindow::MainWindow_Setup_Gyroscope_Graph()
 {
-    ui->Kalman_Filter_Graph->addGraph(); // red line
-    ui->Kalman_Filter_Graph->graph(0)->setPen(QPen(QColor(255, 0, 0)));
-    ui->Kalman_Filter_Graph->addGraph(); // green line
-    ui->Kalman_Filter_Graph->graph(1)->setPen(QPen(QColor(0, 255, 0)));
-    ui->Kalman_Filter_Graph->addGraph(); // blue line
-    ui->Kalman_Filter_Graph->graph(2)->setPen(QPen(QColor(0, 0, 255)));
+    ui->Gyroscope_Graph->addGraph(); // red line
+    ui->Gyroscope_Graph->graph(0)->setPen(QPen(QColor(255, 0, 0)));
+    ui->Gyroscope_Graph->addGraph(); // green line
+    ui->Gyroscope_Graph->graph(1)->setPen(QPen(QColor(0, 255, 0)));
+    ui->Gyroscope_Graph->addGraph(); // blue line
+    ui->Gyroscope_Graph->graph(2)->setPen(QPen(QColor(0, 0, 255)));
 
     QSharedPointer<QCPAxisTickerTime> timeTicker(new QCPAxisTickerTime);
     timeTicker->setTimeFormat("%h:%m:%s");
 
-    ui->Kalman_Filter_Graph->xAxis->setTicker(timeTicker);
-    ui->Kalman_Filter_Graph->axisRect()->setupFullAxesBox();
-    ui->Kalman_Filter_Graph->yAxis->setRange(-1, 1);
+    ui->Gyroscope_Graph->xAxis->setTicker(timeTicker);
+    ui->Gyroscope_Graph->axisRect()->setupFullAxesBox();
+    ui->Gyroscope_Graph->yAxis->setRange(-1, 1);
 
     // make left and bottom axes transfer their ranges to right and top axes:
-    connect(ui->Kalman_Filter_Graph->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->Kalman_Filter_Graph->xAxis2, SLOT(setRange(QCPRange)));
-    connect(ui->Kalman_Filter_Graph->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->Kalman_Filter_Graph->yAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->Gyroscope_Graph->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->Gyroscope_Graph->xAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->Gyroscope_Graph->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->Gyroscope_Graph->yAxis2, SLOT(setRange(QCPRange)));
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void MainWindow::MainWindow_Setup_Madgwick_Filter_Graph()
+void MainWindow::MainWindow_Setup_Accelerometer_Graph()
 {
-    ui->Madgwick_Filter_Graph->addGraph(); // red line
-    ui->Madgwick_Filter_Graph->graph(0)->setPen(QPen(QColor(255, 0, 0)));
-    ui->Madgwick_Filter_Graph->addGraph(); // green line
-    ui->Madgwick_Filter_Graph->graph(1)->setPen(QPen(QColor(0, 255, 0)));
-    ui->Madgwick_Filter_Graph->addGraph(); // blue line
-    ui->Madgwick_Filter_Graph->graph(2)->setPen(QPen(QColor(0, 0, 255)));
+    ui->Accelerometer_Graph->addGraph(); // red line
+    ui->Accelerometer_Graph->graph(0)->setPen(QPen(QColor(255, 0, 0)));
+    ui->Accelerometer_Graph->addGraph(); // green line
+    ui->Accelerometer_Graph->graph(1)->setPen(QPen(QColor(0, 255, 0)));
+    ui->Accelerometer_Graph->addGraph(); // blue line
+    ui->Accelerometer_Graph->graph(2)->setPen(QPen(QColor(0, 0, 255)));
 
     QSharedPointer<QCPAxisTickerTime> timeTicker(new QCPAxisTickerTime);
     timeTicker->setTimeFormat("%h:%m:%s");
 
-    ui->Madgwick_Filter_Graph->xAxis->setTicker(timeTicker);
-    ui->Madgwick_Filter_Graph->axisRect()->setupFullAxesBox();
-    ui->Madgwick_Filter_Graph->yAxis->setRange(-1, 1);
+    ui->Accelerometer_Graph->xAxis->setTicker(timeTicker);
+    ui->Accelerometer_Graph->axisRect()->setupFullAxesBox();
+    ui->Accelerometer_Graph->yAxis->setRange(-1, 1);
 
     // make left and bottom axes transfer their ranges to right and top axes:
-    connect(ui->Madgwick_Filter_Graph->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->Madgwick_Filter_Graph->xAxis2, SLOT(setRange(QCPRange)));
-    connect(ui->Madgwick_Filter_Graph->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->Madgwick_Filter_Graph->yAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->Accelerometer_Graph->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->Accelerometer_Graph->xAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->Accelerometer_Graph->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->Accelerometer_Graph->yAxis2, SLOT(setRange(QCPRange)));
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::MainWindow_Setup_Magnetometer_Graph()
+{
+    ui->Magnetometer_Graph->addGraph(); // red line
+    ui->Magnetometer_Graph->graph(0)->setPen(QPen(QColor(255, 0, 0)));
+    ui->Magnetometer_Graph->addGraph(); // green line
+    ui->Magnetometer_Graph->graph(1)->setPen(QPen(QColor(0, 255, 0)));
+    ui->Magnetometer_Graph->addGraph(); // blue line
+    ui->Magnetometer_Graph->graph(2)->setPen(QPen(QColor(0, 0, 255)));
+
+    QSharedPointer<QCPAxisTickerTime> timeTicker(new QCPAxisTickerTime);
+    timeTicker->setTimeFormat("%h:%m:%s");
+
+    ui->Magnetometer_Graph->xAxis->setTicker(timeTicker);
+    ui->Magnetometer_Graph->axisRect()->setupFullAxesBox();
+    ui->Magnetometer_Graph->yAxis->setRange(-1, 1);
+
+    // make left and bottom axes transfer their ranges to right and top axes:
+    connect(ui->Magnetometer_Graph->xAxis, SIGNAL(rangeChanged(QCPRange)), ui->Magnetometer_Graph->xAxis2, SLOT(setRange(QCPRange)));
+    connect(ui->Magnetometer_Graph->yAxis, SIGNAL(rangeChanged(QCPRange)), ui->Magnetometer_Graph->yAxis2, SLOT(setRange(QCPRange)));
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -175,93 +193,112 @@ void MainWindow::MainWindow_Display_IMU_data()
     double key = time.elapsed() / 1000.0; // time elapsed since start of demo, in seconds
 
     // Fusion data
-    double Complementary_Filter_Roll  = Data_from.Complementary_roll;
-    double Complementary_Filter_Pitch = Data_from.Complementary_pitch;
-    double Complementary_Filter_Yaw   = Data_from.Complementary_yaw;
+    double Filter_Roll  = Data_from.Filter_roll;
+    double Filter_Pitch = Data_from.Filter_pitch;
+    double Filter_Yaw   = Data_from.Filter_yaw;
 
-    double Kalman_Filter_Roll  = Data_from.Kalman_roll;
-    double Kalman_Filter_Pitch = Data_from.Kalman_pitch;
-    double Kalman_Filter_Yaw   = Data_from.Kalman_yaw;
+    double Gyroscope_X = Data_from.g_x_dgs;
+    double Gyroscope_Y = Data_from.g_y_dgs;
+    double Gyroscope_Z = Data_from.g_z_dgs;
 
-    double Madgwick_Filter_Roll  = Data_from.Madgwick_roll;
-    double Madgwick_Filter_Pitch = Data_from.Madgwick_pitch;
-    double Madgwick_Filter_Yaw   = Data_from.Madgwick_yaw;
+    double Accelerometer_X = Data_from.a_x_g;
+    double Accelerometer_Y = Data_from.a_y_g;
+    double Accelerometer_Z = Data_from.a_z_g;
 
-    ui->label_Roll_View->setNum(Complementary_Filter_Roll);
-    ui->label_Pitch_View->setNum(Complementary_Filter_Pitch);
-    ui->label_Yaw_View->setNum(Complementary_Filter_Yaw);
+    double Magnetometer_X = Data_from.m_x_uT;
+    double Magnetometer_Y = Data_from.m_y_uT;
+    double Magnetometer_Z = Data_from.m_z_uT;
 
-    ui->label_Kalman_Roll_View->setNum(Kalman_Filter_Roll);
-    ui->label_Kalman_Pitch_View->setNum(Kalman_Filter_Pitch);
-    ui->label_Kalman_Yaw_View->setNum(Kalman_Filter_Yaw);
-
-    ui->label_Madgwick_Roll_View->setNum(Madgwick_Filter_Roll);
-    ui->label_Madgwick_Pitch_View->setNum(Madgwick_Filter_Pitch);
-    ui->label_Madgwick_Yaw_View->setNum(Madgwick_Filter_Yaw);
+    ui->label_Roll_View->setNum(Filter_Roll);
+    ui->label_Pitch_View->setNum(Filter_Pitch);
+    ui->label_Yaw_View->setNum(Filter_Yaw);
 
     // add data to lines:
-    if(Show_Complementary_Filter_Roll  == true) ui->Complementary_Filter_Graph->graph(0)->addData(key, Complementary_Filter_Roll);
-    if(Show_Complementary_Filter_Pitch == true) ui->Complementary_Filter_Graph->graph(1)->addData(key, Complementary_Filter_Pitch);
-    if(Show_Complementary_Filter_Yaw   == true) ui->Complementary_Filter_Graph->graph(2)->addData(key, Complementary_Filter_Yaw);
+    if(Show_Gyroscope_X == true) ui->Gyroscope_Graph->graph(0)->addData(key, Gyroscope_X);
+    if(Show_Gyroscope_Y == true) ui->Gyroscope_Graph->graph(1)->addData(key, Gyroscope_Y);
+    if(Show_Gyroscope_Z == true) ui->Gyroscope_Graph->graph(2)->addData(key, Gyroscope_Z);
 
-    if(Show_Kalman_Filter_Roll  == true) ui->Kalman_Filter_Graph->graph(0)->addData(key, Kalman_Filter_Roll);
-    if(Show_Kalman_Filter_Pitch == true) ui->Kalman_Filter_Graph->graph(1)->addData(key, Kalman_Filter_Pitch);
-    if(Show_Kalman_Filter_Yaw   == true) ui->Kalman_Filter_Graph->graph(2)->addData(key, Kalman_Filter_Yaw);
+    if(Show_Accelerometer_X == true) ui->Accelerometer_Graph->graph(0)->addData(key, Accelerometer_X);
+    if(Show_Accelerometer_Y == true) ui->Accelerometer_Graph->graph(1)->addData(key, Accelerometer_Y);
+    if(Show_Accelerometer_Z == true) ui->Accelerometer_Graph->graph(2)->addData(key, Accelerometer_Z);
 
-    if(Show_Madgwick_Filter_Roll  == true) ui->Madgwick_Filter_Graph->graph(0)->addData(key, Madgwick_Filter_Roll);
-    if(Show_Madgwick_Filter_Pitch == true) ui->Madgwick_Filter_Graph->graph(1)->addData(key, Madgwick_Filter_Pitch);
-    if(Show_Madgwick_Filter_Yaw   == true) ui->Madgwick_Filter_Graph->graph(2)->addData(key, Madgwick_Filter_Yaw);
+    if(Show_Magnetometer_X == true) ui->Magnetometer_Graph->graph(0)->addData(key, Magnetometer_X);
+    if(Show_Magnetometer_Y == true) ui->Magnetometer_Graph->graph(1)->addData(key, Magnetometer_Y);
+    if(Show_Magnetometer_Z == true) ui->Magnetometer_Graph->graph(2)->addData(key, Magnetometer_Z);
 
-    ui->Complementary_Filter_Graph->graph(0)->rescaleValueAxis(true);
-    ui->Complementary_Filter_Graph->graph(1)->rescaleValueAxis(true);
-    ui->Complementary_Filter_Graph->graph(2)->rescaleValueAxis(true);
+    if(Show_Filter_Roll  == true) ui->Filter_Graph->graph(0)->addData(key, Filter_Roll);
+    if(Show_Filter_Pitch == true) ui->Filter_Graph->graph(1)->addData(key, Filter_Pitch);
+    if(Show_Filter_Yaw   == true) ui->Filter_Graph->graph(2)->addData(key, Filter_Yaw);
 
-    ui->Kalman_Filter_Graph->graph(0)->rescaleValueAxis(true);
-    ui->Kalman_Filter_Graph->graph(1)->rescaleValueAxis(true);
-    ui->Kalman_Filter_Graph->graph(2)->rescaleValueAxis(true);
+    ui->Gyroscope_Graph->graph(0)->rescaleValueAxis(true);
+    ui->Gyroscope_Graph->graph(1)->rescaleValueAxis(true);
+    ui->Gyroscope_Graph->graph(2)->rescaleValueAxis(true);
 
-    ui->Madgwick_Filter_Graph->graph(0)->rescaleValueAxis(true);
-    ui->Madgwick_Filter_Graph->graph(1)->rescaleValueAxis(true);
-    ui->Madgwick_Filter_Graph->graph(2)->rescaleValueAxis(true);
+    ui->Accelerometer_Graph->graph(0)->rescaleValueAxis(true);
+    ui->Accelerometer_Graph->graph(1)->rescaleValueAxis(true);
+    ui->Accelerometer_Graph->graph(2)->rescaleValueAxis(true);
+
+    ui->Magnetometer_Graph->graph(0)->rescaleValueAxis(true);
+    ui->Magnetometer_Graph->graph(1)->rescaleValueAxis(true);
+    ui->Magnetometer_Graph->graph(2)->rescaleValueAxis(true);
+
+    ui->Filter_Graph->graph(0)->rescaleValueAxis(true);
+    ui->Filter_Graph->graph(1)->rescaleValueAxis(true);
+    ui->Filter_Graph->graph(2)->rescaleValueAxis(true);
 
     // make key axis range scroll with the data (at a constant range size of 8):
-    ui->Complementary_Filter_Graph->xAxis->setRange(key, 60, Qt::AlignRight);
+    ui->Gyroscope_Graph->xAxis->setRange(key, 60, Qt::AlignRight);
 
-    if( Complementary_Filter_Graph_Run == true ) {
+    if( Gyroscope_Graph_Run == true ) {
 
-        ui->Complementary_Filter_Graph->replot();
+        ui->Gyroscope_Graph->replot();
 
-        ui->lcdNumber_Complementary_Filter_Roll->display(Complementary_Filter_Roll);
-        ui->lcdNumber_Complementary_Filter_Pitch->display(Complementary_Filter_Pitch);
-        ui->lcdNumber_Complementary_Filter_Yaw->display(Complementary_Filter_Yaw);
+        ui->lcdNumber_Gyroscope_X->display(Gyroscope_X);
+        ui->lcdNumber_Gyroscope_Y->display(Gyroscope_Y);
+        ui->lcdNumber_Gyroscope_Z->display(Gyroscope_Z);
     }
 
-    ui->Kalman_Filter_Graph->xAxis->setRange(key, 60, Qt::AlignRight);
+    ui->Filter_Graph->xAxis->setRange(key, 60, Qt::AlignRight);
 
-    if( Kalman_Filter_Graph_Run == true ) {
+    ui->Accelerometer_Graph->xAxis->setRange(key, 60, Qt::AlignRight);
 
-        ui->Kalman_Filter_Graph->replot();
+    if( Accelerometer_Graph_Run == true ) {
 
-        ui->lcdNumber_Kalman_Filter_Roll->display(Kalman_Filter_Roll);
-        ui->lcdNumber_Kalman_Filter_Pitch->display(Kalman_Filter_Pitch);
-        ui->lcdNumber_Kalman_Filter_Yaw->display(Kalman_Filter_Yaw);
+        ui->Accelerometer_Graph->replot();
+
+        ui->lcdNumber_Accelerometer_X->display(Accelerometer_X);
+        ui->lcdNumber_Accelerometer_Y->display(Accelerometer_Y);
+        ui->lcdNumber_Accelerometer_Z->display(Accelerometer_Z);
     }
 
-    ui->Madgwick_Filter_Graph->xAxis->setRange(key, 60, Qt::AlignRight);
+    ui->Accelerometer_Graph->xAxis->setRange(key, 60, Qt::AlignRight);
 
-    if( Madgwick_Filter_Graph_Run == true ) {
+    ui->Magnetometer_Graph->xAxis->setRange(key, 60, Qt::AlignRight);
 
-        ui->Madgwick_Filter_Graph->replot();
+    if( Magnetometer_Graph_Run == true ) {
 
-        ui->lcdNumber_Madgwick_Filter_Roll->display(Madgwick_Filter_Roll);
-        ui->lcdNumber_Madgwick_Filter_Pitch->display(Madgwick_Filter_Pitch);
-        ui->lcdNumber_Madgwick_Filter_Yaw->display(Madgwick_Filter_Yaw);
+        ui->Magnetometer_Graph->replot();
+
+        ui->lcdNumber_Magnetometer_X->display(Magnetometer_X);
+        ui->lcdNumber_Magnetometer_Y->display(Magnetometer_Y);
+        ui->lcdNumber_Magnetometer_Z->display(Magnetometer_Z);
+    }
+
+    ui->Filter_Graph->xAxis->setRange(key, 60, Qt::AlignRight);
+
+    if( Filter_Graph_Run == true ) {
+
+        ui->Filter_Graph->replot();
+
+        ui->lcdNumber_Filter_Roll->display(Filter_Roll);
+        ui->lcdNumber_Filter_Pitch->display(Filter_Pitch);
+        ui->lcdNumber_Filter_Yaw->display(Filter_Yaw);
     }
 
     // OpenGL visualisation
-    ui->widget_RPY_Visualisation->setXRotation(Complementary_Filter_Pitch);
-    ui->widget_RPY_Visualisation->setYRotation(Complementary_Filter_Yaw);
-    ui->widget_RPY_Visualisation->setZRotation(Complementary_Filter_Roll);
+    ui->widget_RPY_Visualisation->setXRotation(Filter_Pitch);
+    ui->widget_RPY_Visualisation->setYRotation(Filter_Yaw);
+    ui->widget_RPY_Visualisation->setZRotation(Filter_Roll);
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -485,17 +522,21 @@ void MainWindow::saveSettings()
 
 void MainWindow::MainWindow_Default_View()
 {
-   if(Show_Complementary_Filter_Roll  == true) ui->checkBox_Complementary_Filter_Roll->setChecked(true);
-   if(Show_Complementary_Filter_Pitch == true) ui->checkBox_Complementary_Filter_Pitch->setChecked(true);
-   if(Show_Complementary_Filter_Yaw   == true) ui->checkBox_Complementary_Filter_Yaw->setChecked(true);
+   if(Show_Gyroscope_X == true) ui->checkBox_Gyroscope_X->setChecked(true);
+   if(Show_Gyroscope_Y == true) ui->checkBox_Gyroscope_Y->setChecked(true);
+   if(Show_Gyroscope_Z == true) ui->checkBox_Gyroscope_Z->setChecked(true);
 
-   if(Show_Kalman_Filter_Roll  == true) ui->checkBox_Kalman_Filter_Roll->setChecked(true);
-   if(Show_Kalman_Filter_Pitch == true) ui->checkBox_Kalman_Filter_Pitch->setChecked(true);
-   if(Show_Kalman_Filter_Yaw   == true) ui->checkBox_Kalman_Filter_Yaw->setChecked(true);
+   if(Show_Accelerometer_X == true) ui->checkBox_Accelerometer_X->setChecked(true);
+   if(Show_Accelerometer_Y == true) ui->checkBox_Accelerometer_Y->setChecked(true);
+   if(Show_Accelerometer_Z == true) ui->checkBox_Accelerometer_Z->setChecked(true);
 
-   if(Show_Madgwick_Filter_Roll  == true) ui->checkBox_Madgwick_Filter_Roll->setChecked(true);
-   if(Show_Madgwick_Filter_Pitch == true) ui->checkBox_Madgwick_Filter_Pitch->setChecked(true);
-   if(Show_Madgwick_Filter_Yaw   == true) ui->checkBox_Madgwick_Filter_Yaw->setChecked(true);
+   if(Show_Magnetometer_X == true) ui->checkBox_Magnetometer_X->setChecked(true);
+   if(Show_Magnetometer_Y == true) ui->checkBox_Magnetometer_Y->setChecked(true);
+   if(Show_Magnetometer_Z == true) ui->checkBox_Magnetometer_Z->setChecked(true);
+
+   if(Show_Filter_Roll  == true) ui->checkBox_Filter_Roll->setChecked(true);
+   if(Show_Filter_Pitch == true) ui->checkBox_Filter_Pitch->setChecked(true);
+   if(Show_Filter_Yaw   == true) ui->checkBox_Filter_Yaw->setChecked(true);
 
    ui->label_Voltage->setNum(0);
 
@@ -538,44 +579,57 @@ void MainWindow::MainWindow_Setup_Icons()
     h = ui->label_Battery->height();
     ui->label_Battery->setPixmap( Battery_null.scaled(w, h, Qt::KeepAspectRatio) );
 
-    // Complementary filter RGB dots
-    w = ui->label_Complementary_Filter_Roll->width();
-    h = ui->label_Complementary_Filter_Roll->height();
-    ui->label_Complementary_Filter_Roll->setPixmap( Red_dot.scaled(w, h, Qt::KeepAspectRatio) );
+    // Gyroscope RGB dots
+    w = ui->label_Gyroscope_X->width();
+    h = ui->label_Gyroscope_X->height();
+    ui->label_Gyroscope_X->setPixmap( Red_dot.scaled(w, h, Qt::KeepAspectRatio) );
 
-    w = ui->label_Complementary_Filter_Pitch->width();
-    h = ui->label_Complementary_Filter_Pitch->height();
-    ui->label_Complementary_Filter_Pitch->setPixmap( Green_dot.scaled(w, h, Qt::KeepAspectRatio) );
+    w = ui->label_Gyroscope_Y->width();
+    h = ui->label_Gyroscope_Y->height();
+    ui->label_Gyroscope_Y->setPixmap( Green_dot.scaled(w, h, Qt::KeepAspectRatio) );
 
-    w = ui->label_Complementary_Filter_Yaw->width();
-    h = ui->label_Complementary_Filter_Yaw->height();
-    ui->label_Complementary_Filter_Yaw->setPixmap( Blue_dot.scaled(w, h, Qt::KeepAspectRatio) );
+    w = ui->label_Gyroscope_Z->width();
+    h = ui->label_Gyroscope_Z->height();
+    ui->label_Gyroscope_Z->setPixmap( Blue_dot.scaled(w, h, Qt::KeepAspectRatio) );
 
-    // Kalman filter RGB dots
-    w = ui->label_Kalman_Filter_Roll->width();
-    h = ui->label_Kalman_Filter_Roll->height();
-    ui->label_Kalman_Filter_Roll->setPixmap( Red_dot.scaled(w, h, Qt::KeepAspectRatio) );
+    // Accelerometer RGB dots
+    w = ui->label_Accelerometer_X->width();
+    h = ui->label_Accelerometer_X->height();
+    ui->label_Accelerometer_X->setPixmap( Red_dot.scaled(w, h, Qt::KeepAspectRatio) );
 
-    w = ui->label_Kalman_Filter_Pitch->width();
-    h = ui->label_Kalman_Filter_Pitch->height();
-    ui->label_Kalman_Filter_Pitch->setPixmap( Green_dot.scaled(w, h, Qt::KeepAspectRatio) );
+    w = ui->label_Accelerometer_Y->width();
+    h = ui->label_Accelerometer_Y->height();
+    ui->label_Accelerometer_Y->setPixmap( Green_dot.scaled(w, h, Qt::KeepAspectRatio) );
 
-    w = ui->label_Kalman_Filter_Yaw->width();
-    h = ui->label_Kalman_Filter_Yaw->height();
-    ui->label_Kalman_Filter_Yaw->setPixmap( Blue_dot.scaled(w, h, Qt::KeepAspectRatio) );
+    w = ui->label_Accelerometer_Z->width();
+    h = ui->label_Accelerometer_Z->height();
+    ui->label_Accelerometer_Z->setPixmap( Blue_dot.scaled(w, h, Qt::KeepAspectRatio) );
 
-    // Madgwick filter RGB dots
-    w = ui->label_Madgwick_Filter_Roll->width();
-    h = ui->label_Madgwick_Filter_Roll->height();
-    ui->label_Madgwick_Filter_Roll->setPixmap( Red_dot.scaled(w, h, Qt::KeepAspectRatio) );
+    // Magnetometer RGB dots
+    w = ui->label_Magnetometer_X->width();
+    h = ui->label_Magnetometer_X->height();
+    ui->label_Magnetometer_X->setPixmap( Red_dot.scaled(w, h, Qt::KeepAspectRatio) );
 
-    w = ui->label_Madgwick_Filter_Pitch->width();
-    h = ui->label_Madgwick_Filter_Pitch->height();
-    ui->label_Madgwick_Filter_Pitch->setPixmap( Green_dot.scaled(w, h, Qt::KeepAspectRatio) );
+    w = ui->label_Magnetometer_Y->width();
+    h = ui->label_Magnetometer_Y->height();
+    ui->label_Magnetometer_Y->setPixmap( Green_dot.scaled(w, h, Qt::KeepAspectRatio) );
 
-    w = ui->label_Madgwick_Filter_Yaw->width();
-    h = ui->label_Madgwick_Filter_Yaw->height();
-    ui->label_Madgwick_Filter_Yaw->setPixmap( Blue_dot.scaled(w, h, Qt::KeepAspectRatio) );
+    w = ui->label_Magnetometer_Z->width();
+    h = ui->label_Magnetometer_Z->height();
+    ui->label_Magnetometer_Z->setPixmap( Blue_dot.scaled(w, h, Qt::KeepAspectRatio) );
+
+    // Filter RGB dots
+    w = ui->label_Filter_Roll->width();
+    h = ui->label_Filter_Roll->height();
+    ui->label_Filter_Roll->setPixmap( Red_dot.scaled(w, h, Qt::KeepAspectRatio) );
+
+    w = ui->label_Filter_Pitch->width();
+    h = ui->label_Filter_Pitch->height();
+    ui->label_Filter_Pitch->setPixmap( Green_dot.scaled(w, h, Qt::KeepAspectRatio) );
+
+    w = ui->label_Filter_Yaw->width();
+    h = ui->label_Filter_Yaw->height();
+    ui->label_Filter_Yaw->setPixmap( Blue_dot.scaled(w, h, Qt::KeepAspectRatio) );
 
     w = ui->label_Speed->width();
     h = ui->label_Speed->height();
@@ -636,43 +690,43 @@ void MainWindow::MainWindow_Setup_Icons()
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void MainWindow::on_checkBox_Complementary_Filter_Roll_clicked()
+void MainWindow::on_checkBox_Filter_Roll_clicked()
 {
-    if( ui->checkBox_Complementary_Filter_Roll->isChecked() ) {
+    if( ui->checkBox_Filter_Roll->isChecked() ) {
 
-        Show_Complementary_Filter_Roll = true;
+        Show_Filter_Roll = true;
     }
     else {
 
-        Show_Complementary_Filter_Roll = false;
+        Show_Filter_Roll = false;
     }
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void MainWindow::on_checkBox_Complementary_Filter_Pitch_clicked()
+void MainWindow::on_checkBox_Filter_Pitch_clicked()
 {
-    if( ui->checkBox_Complementary_Filter_Pitch->isChecked() ) {
+    if( ui->checkBox_Filter_Pitch->isChecked() ) {
 
-        Show_Complementary_Filter_Pitch = true;
+        Show_Filter_Pitch = true;
     }
     else {
 
-        Show_Complementary_Filter_Pitch = false;
+        Show_Filter_Pitch = false;
     }
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void MainWindow::on_checkBox_Complementary_Filter_Yaw_clicked()
+void MainWindow::on_checkBox_Filter_Yaw_clicked()
 {
-    if( ui->checkBox_Complementary_Filter_Yaw->isChecked() ) {
+    if( ui->checkBox_Filter_Yaw->isChecked() ) {
 
-        Show_Complementary_Filter_Yaw = true;
+        Show_Filter_Yaw = true;
     }
     else {
 
-        Show_Complementary_Filter_Yaw = false;
+        Show_Filter_Yaw = false;
     }
 }
 
@@ -741,9 +795,7 @@ void MainWindow::on_pushButton_EmergencyStop_clicked()
         Data_to.Emergency_stop = 1;
     }
 
-    CW->Fill_Data_to_robot(Data_to);
-
-    emit Send_data_Signal();
+    on_pushButton_Send_clicked();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1000,6 +1052,7 @@ void MainWindow::on_pushButton_Backward_released()
 
 void MainWindow::on_doubleSpinBox_Complementary_filter_weight_valueChanged(double arg1)
 {
+    arg1 = 0;
     saveSettings();
 }
 
@@ -1019,48 +1072,6 @@ void MainWindow::on_pushButton_Speed_PID_Clear_clicked()
     ui->doubleSpinBox_Speed_PID_Kp->setValue(0);
     ui->doubleSpinBox_Speed_PID_Ki->setValue(0);
     ui->doubleSpinBox_Speed_PID_Kd->setValue(0);
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-void MainWindow::on_checkBox_Kalman_Filter_Roll_clicked()
-{
-    if( ui->checkBox_Kalman_Filter_Roll->isChecked() ) {
-
-        Show_Kalman_Filter_Roll = true;
-    }
-    else {
-
-        Show_Kalman_Filter_Roll = false;
-    }
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-void MainWindow::on_checkBox_Kalman_Filter_Pitch_clicked()
-{
-    if( ui->checkBox_Kalman_Filter_Pitch->isChecked() ) {
-
-        Show_Kalman_Filter_Pitch = true;
-    }
-    else {
-
-        Show_Kalman_Filter_Pitch = false;
-    }
-}
-
-// ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-void MainWindow::on_checkBox_Kalman_Filter_Yaw_clicked()
-{
-    if( ui->checkBox_Kalman_Filter_Yaw->isChecked() ) {
-
-        Show_Kalman_Filter_Yaw = true;
-    }
-    else {
-
-        Show_Kalman_Filter_Yaw = false;
-    }
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1086,31 +1097,13 @@ void MainWindow::on_pushButton_Plots_Start_Stop_clicked()
         ui->pushButton_Plots_Start_Stop->setText("Start");
     }
 
-    if(Complementary_Filter_Graph_Run == true) {
+    if(Filter_Graph_Run == true) {
 
-        Complementary_Filter_Graph_Run = false;
+        Filter_Graph_Run = false;
     }
     else {
 
-        Complementary_Filter_Graph_Run = true;
-    }
-
-    if(Kalman_Filter_Graph_Run == true) {
-
-        Kalman_Filter_Graph_Run = false;
-    }
-    else {
-
-        Kalman_Filter_Graph_Run = true;
-    }
-
-    if(Madgwick_Filter_Graph_Run == true) {
-
-        Madgwick_Filter_Graph_Run = false;
-    }
-    else {
-
-        Madgwick_Filter_Graph_Run = true;
+        Filter_Graph_Run = true;
     }
 }
 
@@ -1118,13 +1111,9 @@ void MainWindow::on_pushButton_Plots_Start_Stop_clicked()
 
 void MainWindow::on_pushButton_Reset_Plots_Range_clicked()
 {
-    ui->Complementary_Filter_Graph->clearGraphs();
-    ui->Kalman_Filter_Graph->clearGraphs();
-    ui->Madgwick_Filter_Graph->clearGraphs();
+    ui->Filter_Graph->clearGraphs();
 
-    MainWindow_Setup_Complementary_Filter_Graph();
-    MainWindow_Setup_Kalman_Filter_Graph();
-    MainWindow_Setup_Madgwick_Filter_Graph();
+    MainWindow_Setup_Filter_Graph();
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1181,53 +1170,137 @@ void MainWindow::on_doubleSpinBox_Madgwick_beta_valueChanged(double arg1)
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-void MainWindow::on_checkBox_Madgwick_Filter_Roll_clicked()
-{
-    if( ui->checkBox_Madgwick_Filter_Roll->isChecked() ) {
-
-        Show_Madgwick_Filter_Roll = true;
-    }
-    else {
-
-        Show_Madgwick_Filter_Roll = false;
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-void MainWindow::on_checkBox_Madgwick_Filter_Pitch_clicked()
-{
-    if( ui->checkBox_Madgwick_Filter_Pitch->isChecked() ) {
-
-        Show_Madgwick_Filter_Pitch = true;
-    }
-    else {
-
-        Show_Madgwick_Filter_Pitch = false;
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-void MainWindow::on_checkBox_Madgwick_Filter_Yaw_clicked()
-{
-    if( ui->checkBox_Madgwick_Filter_Yaw->isChecked() ) {
-
-        Show_Madgwick_Filter_Yaw = true;
-    }
-    else {
-
-        Show_Madgwick_Filter_Yaw = false;
-    }
-}
-
-//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 void MainWindow::on_horizontalSlider_Set_Speed_valueChanged(int value)
 {
     Set_Speed = value;
     ui->lcdNumber_Set_Speed->display(Set_Speed);
     saveSettings();
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_checkBox_Gyroscope_X_toggled(bool checked)
+{
+    if( checked ) {
+
+        Show_Gyroscope_X = true;
+    }
+    else {
+
+        Show_Gyroscope_X = false;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_checkBox_Gyroscope_Y_toggled(bool checked)
+{
+    if( checked ) {
+
+        Show_Gyroscope_Y = true;
+    }
+    else {
+
+        Show_Gyroscope_Y = false;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_checkBox_Gyroscope_Z_toggled(bool checked)
+{
+    if( checked ) {
+
+        Show_Gyroscope_Z = true;
+    }
+    else {
+
+        Show_Gyroscope_Z = false;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_checkBox_Accelerometer_X_toggled(bool checked)
+{
+    if( checked ) {
+
+        Show_Accelerometer_X = true;
+    }
+    else {
+
+        Show_Accelerometer_X = false;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_checkBox_Accelerometer_Y_toggled(bool checked)
+{
+    if( checked ) {
+
+        Show_Accelerometer_Y = true;
+    }
+    else {
+
+        Show_Accelerometer_Y = false;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_checkBox_Accelerometer_Z_toggled(bool checked)
+{
+    if( checked ) {
+
+        Show_Accelerometer_Z = true;
+    }
+    else {
+
+        Show_Accelerometer_Z = false;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_checkBox_Magnetometer_X_toggled(bool checked)
+{
+    if( checked ) {
+
+        Show_Magnetometer_X = true;
+    }
+    else {
+
+        Show_Magnetometer_X = false;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_checkBox_Magnetometer_Y_toggled(bool checked)
+{
+    if( checked ) {
+
+        Show_Magnetometer_Y= true;
+    }
+    else {
+
+        Show_Magnetometer_Y = false;
+    }
+}
+
+//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+void MainWindow::on_checkBox_Magnetometer_Z_toggled(bool checked)
+{
+    if( checked ) {
+
+        Show_Magnetometer_Z = true;
+    }
+    else {
+
+        Show_Magnetometer_Z = false;
+    }
 }
 
 //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
