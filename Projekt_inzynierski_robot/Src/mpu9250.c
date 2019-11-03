@@ -365,11 +365,6 @@ void MPU9250_Calibration_Gyro(I2C_HandleTypeDef *I2Cx,
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
-float X_max_global = 0, Y_max_global = 0, Z_max_global = 0;
-float X_min_global = 0, Y_min_global = 0, Z_min_global = 0;
-float delta_x_global = 0, delta_y_global = 0, delta_z_global = 0;
-float delta_global = 0;
-float x_scale_global = 0, y_scale_global = 0, z_scale_global = 0;
 void MPU9250_Calibration_Mag(I2C_HandleTypeDef *I2Cx,
 	      	  	  	  	  	  	  	        struct MPU9250 *DataStructure) {
 
@@ -435,7 +430,15 @@ void MPU9250_Set_Offsets(I2C_HandleTypeDef *I2Cx,
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */
+float r11 = 0, r12 = 0, r13 = 0,
+	  r21 = 0, r22 = 0, r23 = 0,
+	  r31 = 0, r32 = 0, r33 = 0;
 
+float r11p = 1, r12p = 0, r13p = 0,
+	  r21p = 0, r22p = 1, r23p = 0,
+	  r31p = 0, r32p = 0, r33p = 1;
+
+float g_roll_test = 0, g_pitch_test = 0, g_yaw_test = 0;
 void MPU9250_Calculate_RPY(I2C_HandleTypeDef *I2Cx,
 	      	  	  	  	  	  	  		 struct MPU9250 *DataStructure,
 										 float dt) {
@@ -447,17 +450,40 @@ void MPU9250_Calculate_RPY(I2C_HandleTypeDef *I2Cx,
 
 	/* Case 2: Calculate accelerometer Roll and Pitch */
 	DataStructure->Accelerometer_Roll  = atan2f(DataStructure->Accelerometer_Y_g, DataStructure->Accelerometer_Z_g) * (180 / M_PI);
-	DataStructure->Accelerometer_Pitch = atan2f(DataStructure->Accelerometer_X_g, DataStructure->Accelerometer_Z_g) * (180 / M_PI);
+	DataStructure->Accelerometer_Pitch = -atan2f(-DataStructure->Accelerometer_X_g, sqrt(pow(DataStructure->Accelerometer_Z_g,2) + pow(DataStructure->Accelerometer_Z_g,2))) * (180 / M_PI);
 
 	/* Case 3: Calculate gyroscope Roll, Pitch and Yaw */
-	DataStructure->Gyroscope_Roll  += ( 0.5 * dt * (DataStructure->Gyroscope_X_dgs + DataStructure->Gyroscope_X_dgs_past) );
-	DataStructure->Gyroscope_Pitch -= ( 0.5 * dt * (DataStructure->Gyroscope_Y_dgs + DataStructure->Gyroscope_Y_dgs_past) );
-	DataStructure->Gyroscope_Yaw   += Z_AXIS_ORIENTATION * ( 0.5 * dt * (DataStructure->Gyroscope_Z_dgs + DataStructure->Gyroscope_Z_dgs_past) );
+	//DataStructure->Gyroscope_Roll  += ( 0.5 * dt * (DataStructure->Gyroscope_X_dgs + DataStructure->Gyroscope_X_dgs_past) );
+	//DataStructure->Gyroscope_Pitch -= ( 0.5 * dt * (DataStructure->Gyroscope_Y_dgs + DataStructure->Gyroscope_Y_dgs_past) );
+	//DataStructure->Gyroscope_Yaw   += Z_AXIS_ORIENTATION * ( 0.5 * dt * (DataStructure->Gyroscope_Z_dgs + DataStructure->Gyroscope_Z_dgs_past) );
+
+	//DataStructure->Gyroscope_Y_dgs = Z_AXIS_ORIENTATION * DataStructure->Gyroscope_Y_dgs;
+	//DataStructure->Gyroscope_Z_dgs = Z_AXIS_ORIENTATION * DataStructure->Gyroscope_Z_dgs;
+
+	r11 = r11p + (r12p * DataStructure->Gyroscope_Z_dgs * 0.01745 * dt) - (r13p * DataStructure->Gyroscope_Y_dgs * 0.01745 * dt);
+	r12 = (-r11p * DataStructure->Gyroscope_Z_dgs * 0.01745 * dt) + r12p + (r13p * DataStructure->Gyroscope_X_dgs * 0.01745 * dt);
+	r13 = (r11p * DataStructure->Gyroscope_Y_dgs * 0.01745 * dt) - (r12p * DataStructure->Gyroscope_X_dgs * 0.01745 * dt) + r13p;
+
+	r21 = r21p + (r22p * DataStructure->Gyroscope_Z_dgs * 0.01745 * dt) - (r23p * DataStructure->Gyroscope_Y_dgs * 0.01745 * dt);
+	r22 = (-r21p * DataStructure->Gyroscope_Z_dgs * 0.01745 * dt) + r22p + (r23p * DataStructure->Gyroscope_X_dgs * 0.01745 * dt);
+	r23 = (r21p * DataStructure->Gyroscope_Y_dgs * 0.01745 * dt) - (r22p * DataStructure->Gyroscope_X_dgs * 0.01745 * dt) + r23p;
+
+	r31 = r31p + (r32p * DataStructure->Gyroscope_Z_dgs * 0.01745 * dt) - (r33p * DataStructure->Gyroscope_Y_dgs * 0.01745 * dt);
+	r32 = (-r31p * DataStructure->Gyroscope_Z_dgs * 0.01745 * dt) + r32p + (r33p * DataStructure->Gyroscope_X_dgs * 0.01745 * dt);
+	r33 = (r31p * DataStructure->Gyroscope_Y_dgs * 0.01745 * dt) - (r32p * DataStructure->Gyroscope_X_dgs * 0.01745 * dt) + r33p;
+
+	DataStructure->Gyroscope_Roll = atan2f(r32, r33) * (180 / M_PI);
+	DataStructure->Gyroscope_Pitch = -asinf(-r31) * (180 / M_PI);
+	DataStructure->Gyroscope_Yaw = atan2f(r21, r11) * (180 / M_PI);
+
+	r11p = r11, r12p = r12, r13p = r13,
+	r21p = r21, r22p = r22, r23p = r23,
+	r31p = r31, r32p = r32, r33p = r33;
 
 	/* Save actual dgs/s value to data structure */
-	DataStructure->Gyroscope_X_dgs_past = DataStructure->Gyroscope_X_dgs;
-	DataStructure->Gyroscope_Y_dgs_past = DataStructure->Gyroscope_Y_dgs;
-	DataStructure->Gyroscope_Z_dgs_past = DataStructure->Gyroscope_Z_dgs;
+	//DataStructure->Gyroscope_X_dgs_past = DataStructure->Gyroscope_X_dgs;
+	//DataStructure->Gyroscope_Y_dgs_past = DataStructure->Gyroscope_Y_dgs;
+	//DataStructure->Gyroscope_Z_dgs_past = DataStructure->Gyroscope_Z_dgs;
 
 	/* Case 4: Calculate magnetometer Yaw */
 	int16_t m_y = DataStructure->Magnetometer_X;
@@ -476,13 +502,13 @@ void MPU9250_Calculate_RPY(I2C_HandleTypeDef *I2Cx,
 	DataStructure->Magnetometer_Yaw = Z_AXIS_ORIENTATION * (atan2f(X_h, Y_h) * (180 / M_PI) /*+ MAGNETIC_DECLINATION*/);
 
 	/* Case 5: Clear gyro drift */
-	if( fabs(DataStructure->Gyroscope_Roll  - DataStructure->Accelerometer_Roll)  > 10 ||
-		fabs(DataStructure->Gyroscope_Pitch - DataStructure->Accelerometer_Pitch) > 10 ||
-		fabs(DataStructure->Gyroscope_Yaw   - DataStructure->Magnetometer_Yaw)    > 10 ) {
+	if( fabs(fabs(DataStructure->Gyroscope_Roll)  - fabs(DataStructure->Accelerometer_Roll))  > 10 ||
+		fabs(fabs(DataStructure->Gyroscope_Pitch) - fabs(DataStructure->Accelerometer_Pitch)) > 10 ||
+		fabs(fabs(DataStructure->Gyroscope_Yaw)   - fabs(DataStructure->Magnetometer_Yaw))    > 10 ) {
 
-		DataStructure->Gyroscope_Roll  = DataStructure->Accelerometer_Roll;
-		DataStructure->Gyroscope_Pitch = DataStructure->Accelerometer_Pitch;
-		DataStructure->Gyroscope_Yaw   = DataStructure->Magnetometer_Yaw;
+		//DataStructure->Gyroscope_Roll  = DataStructure->Accelerometer_Roll;
+		//DataStructure->Gyroscope_Pitch = DataStructure->Accelerometer_Pitch;
+		//DataStructure->Gyroscope_Yaw   = DataStructure->Magnetometer_Yaw;
 	}
 
 	/* Case 6: Clear magnetometer high tilt */
@@ -492,6 +518,7 @@ void MPU9250_Calculate_RPY(I2C_HandleTypeDef *I2Cx,
 	}
 
 	/* Case 7: Clear accelerometer high tilt */
+	/*
 	if( fabs(DataStructure->Accelerometer_Roll) >= 80 ) {
 
 		DataStructure->Accelerometer_Pitch = DataStructure->Gyroscope_Pitch;
@@ -501,6 +528,7 @@ void MPU9250_Calculate_RPY(I2C_HandleTypeDef *I2Cx,
 
 		DataStructure->Accelerometer_Roll = DataStructure->Gyroscope_Roll;
 	}
+	*/
 }
 
 /* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ */

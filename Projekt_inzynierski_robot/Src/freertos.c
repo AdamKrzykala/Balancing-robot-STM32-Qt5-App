@@ -451,6 +451,10 @@ void Start_IMU_Task(void const * argument)
 		  g_x_dgs_global = mpu1.Gyroscope_X_dgs, g_y_dgs_global = mpu1.Gyroscope_Y_dgs, g_z_dgs_global = mpu1.Gyroscope_Z_dgs;
 		  m_x_uT_global = mpu1.Magnetometer_X_uT, m_y_uT_global = mpu1.Magnetometer_Y_uT, m_z_uT_global = mpu1.Magnetometer_Z_uT;
 
+		  a_roll_global = mpu1.Accelerometer_Roll, a_pitch_global = mpu1.Accelerometer_Pitch;
+		  g_roll_global = mpu1.Gyroscope_Roll, g_pitch_global = mpu1.Gyroscope_Pitch, g_yaw_global = mpu1.Gyroscope_Yaw;
+		  m_yaw_global = mpu1.Magnetometer_Yaw;
+
 		  /* Case 3: Filters using */
 		  Complementary_filter(&mpu1, Filter_weight_global, dt);
 		  Kalman_filter(&mpu1, 0.000001, Kalman_filter_process_variance, dt);
