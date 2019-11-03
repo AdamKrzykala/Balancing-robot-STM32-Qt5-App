@@ -171,6 +171,11 @@ MPU9250_Error_code MPU9250_Magnetometer_Configuration(I2C_HandleTypeDef *I2Cx,
 
 	HAL_Delay(100);
 
+	/* Default variables value */
+	DataStructure->Magnetometer_X_scale = 1;
+	DataStructure->Magnetometer_Y_scale = 1;
+	DataStructure->Magnetometer_Z_scale = 1;
+
 	return MPU9250_Magnetometer_Config_OK;
 }
 
@@ -299,14 +304,14 @@ MPU9250_Error_code MPU9250_Read_Magnetometer(I2C_HandleTypeDef *I2Cx,
 		return MPU9250_Read_Magnetometer_FAIL;
 	}
 
-	DataStructure->Magnetometer_X = ( Bytes_temp[2] << 8 | Bytes_temp[1] ) - DataStructure->Magnetometer_X_offset;
-	DataStructure->Magnetometer_Y = ( Bytes_temp[4] << 8 | Bytes_temp[3] ) - DataStructure->Magnetometer_Y_offset;
-	DataStructure->Magnetometer_Z = ( Bytes_temp[6] << 8 | Bytes_temp[5] ) - DataStructure->Magnetometer_Z_offset;
+	DataStructure->Magnetometer_X = ( ( Bytes_temp[2] << 8 | Bytes_temp[1] ) - DataStructure->Magnetometer_X_offset );
+	DataStructure->Magnetometer_Y = ( ( Bytes_temp[4] << 8 | Bytes_temp[3] ) - DataStructure->Magnetometer_Y_offset );
+	DataStructure->Magnetometer_Z = ( ( Bytes_temp[6] << 8 | Bytes_temp[5] ) - DataStructure->Magnetometer_Z_offset );
 
 	/* Case x: Calculate uT (micro Tesla) value for XYZ axis */
-	DataStructure->Magnetometer_X_uT = DataStructure->Magnetometer_X * DataStructure->Magnetometer_ASAX * DataStructure->Magnetometer_sesitivity_factor;
-	DataStructure->Magnetometer_Y_uT = DataStructure->Magnetometer_Y * DataStructure->Magnetometer_ASAY * DataStructure->Magnetometer_sesitivity_factor;
-	DataStructure->Magnetometer_Z_uT = DataStructure->Magnetometer_Z * DataStructure->Magnetometer_ASAZ * DataStructure->Magnetometer_sesitivity_factor;
+	DataStructure->Magnetometer_X_uT = DataStructure->Magnetometer_X * DataStructure->Magnetometer_ASAX * DataStructure->Magnetometer_sesitivity_factor * DataStructure->Magnetometer_X_scale;
+	DataStructure->Magnetometer_Y_uT = DataStructure->Magnetometer_Y * DataStructure->Magnetometer_ASAY * DataStructure->Magnetometer_sesitivity_factor * DataStructure->Magnetometer_Y_scale;
+	DataStructure->Magnetometer_Z_uT = DataStructure->Magnetometer_Z * DataStructure->Magnetometer_ASAZ * DataStructure->Magnetometer_sesitivity_factor * DataStructure->Magnetometer_Z_scale;
 
 	return MPU9250_Read_Magnetometer_OK;
 }
@@ -360,12 +365,17 @@ void MPU9250_Calibration_Gyro(I2C_HandleTypeDef *I2Cx,
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
-
+float X_max_global = 0, Y_max_global = 0, Z_max_global = 0;
+float X_min_global = 0, Y_min_global = 0, Z_min_global = 0;
+float delta_x_global = 0, delta_y_global = 0, delta_z_global = 0;
+float delta_global = 0;
+float x_scale_global = 0, y_scale_global = 0, z_scale_global = 0;
 void MPU9250_Calibration_Mag(I2C_HandleTypeDef *I2Cx,
 	      	  	  	  	  	  	  	        struct MPU9250 *DataStructure) {
 
-	float X_max = 0, X_min = 0, Y_max = 0, Y_min = 0, Z_max = 0, Z_min = 0;
+	float X_max = -99999, X_min = 99999, Y_max = -99999, Y_min = 99999, Z_max = -99999, Z_min = 99999;
 
+	/* Hard Iron effect compensation */
 	for (int i = 0; i < 1000; ++i) {
 
 		MPU9250_Read_Magnetometer(I2Cx, DataStructure);
@@ -390,6 +400,17 @@ void MPU9250_Calibration_Mag(I2C_HandleTypeDef *I2Cx,
 	DataStructure->Magnetometer_X_offset = (X_max + X_min) / 2;
 	DataStructure->Magnetometer_Y_offset = (Y_max + Y_min) / 2;
 	DataStructure->Magnetometer_Z_offset = (Z_max + Z_min) / 2;
+
+	/* Soft Iron effect compensation */
+	float delta_x = (X_max - X_min) / 2;
+	float delta_y = (Y_max - Y_min) / 2;
+	float delta_z = (Z_max - Z_min) / 2;
+
+	float delta = (delta_x + delta_y + delta_z) / 3;
+
+	DataStructure->Magnetometer_X_scale = delta / delta_x;
+	DataStructure->Magnetometer_Y_scale = delta / delta_y;
+	DataStructure->Magnetometer_Z_scale = delta / delta_z;
 }
 
 /* ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */

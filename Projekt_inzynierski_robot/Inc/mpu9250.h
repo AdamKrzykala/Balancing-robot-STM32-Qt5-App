@@ -237,6 +237,7 @@ struct MPU9250 {
 	float Accelerometer_X_offset, Accelerometer_Y_offset, Accelerometer_Z_offset;
 	float Gyroscope_X_offset, Gyroscope_Y_offset, Gyroscope_Z_offset;
 	float Magnetometer_X_offset, Magnetometer_Y_offset, Magnetometer_Z_offset;
+	float Magnetometer_X_scale, Magnetometer_Y_scale, Magnetometer_Z_scale;
 
 	float Accelerometer_X_g, Accelerometer_Y_g, Accelerometer_Z_g;
 	float Gyroscope_X_dgs, Gyroscope_Y_dgs, Gyroscope_Z_dgs;
