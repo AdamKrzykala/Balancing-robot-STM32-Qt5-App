@@ -1,0 +1,24 @@
+\babel@toc {polish}{}
+\addvspace {10pt}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Modele odwr\IeC {\'o}conego wahad\IeC {\l }a}}{11}{figure.2.1}% 
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Schemat modelu}}{12}{figure.2.2}% 
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Schemat sterowania z wykorzystaniem jednego regulatora PID}}{17}{figure.2.3}% 
+\contentsline {figure}{\numberline {2.4}{\ignorespaces Pozycja wahad\IeC {\l }a po 2 sekundach symulacji w p\IeC {\l }aszczy\IeC {\'z}nie XY}}{18}{figure.2.4}% 
+\contentsline {figure}{\numberline {2.5}{\ignorespaces Wykres dla uk\IeC {\l }adu z jednym regulatorem: nr.1 -- wychylenie wahad\IeC {\l }a, nr.2 -- pr\IeC {\k e}dko\IeC {\'s}\IeC {\'c} obrotu k\IeC {\'o}\IeC {\l }, nr.3 -- pozycja k\IeC {\'o}\IeC {\l }}}{18}{figure.2.5}% 
+\contentsline {figure}{\numberline {2.6}{\ignorespaces Schemat sterowania z wykorzystaniem dw\IeC {\'o}ch regulator\IeC {\'o}w PID po\IeC {\l }\IeC {\k a}czonych kaskadowo}}{19}{figure.2.6}% 
+\contentsline {figure}{\numberline {2.7}{\ignorespaces Pozycja wahad\IeC {\l }a po 5 sekundach symulacji w p\IeC {\l }aszczy\IeC {\'z}nie XY}}{20}{figure.2.7}% 
+\contentsline {figure}{\numberline {2.8}{\ignorespaces Wykres dla uk\IeC {\l }adu z dwoma regulatorami: nr.1 -- wychylenie wahad\IeC {\l }a, nr.2 -- pr\IeC {\k e}dko\IeC {\'s}\IeC {\'c} obrotu k\IeC {\'o}\IeC {\l }, nr.3 -- pozycja k\IeC {\'o}\IeC {\l }}}{20}{figure.2.8}% 
+\addvspace {10pt}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Wizualizacja odczyt\IeC {\'o}w \IeC {\.z}yroskopu}}{21}{figure.3.1}% 
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Wizualizacja odczyt\IeC {\'o}w akcelerometru}}{23}{figure.3.2}% 
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Wizualizacja odczyt\IeC {\'o}w magnetometru}}{24}{figure.3.3}% 
+\contentsline {figure}{\numberline {3.4}{\ignorespaces Odchylenie magnetometru od wektora p\IeC {\'o}\IeC {\l }nocy magnetycznej}}{24}{figure.3.4}% 
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Odczyty dla nieskalibrowanego magnetometru}}{27}{figure.3.5}% 
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Odczyty dla skalibrowanego magnetometru}}{28}{figure.3.6}% 
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}

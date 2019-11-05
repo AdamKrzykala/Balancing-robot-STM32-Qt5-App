@@ -1,0 +1,67 @@
+\babel@toc {polish}{}
+\contentsline {chapter}{\chapternumberline {1}Wst\IeC {\k e}p}{9}{chapter.1}% 
+\contentsline {section}{\numberline {1.1}Cel i zakres pracy}{9}{section.1.1}% 
+\contentsline {section}{\numberline {1.2}Zadania do wykonania}{9}{section.1.2}% 
+\contentsline {section}{\numberline {1.3}Przebieg realizacji projektu}{9}{section.1.3}% 
+\contentsline {chapter}{\chapternumberline {2}Analiza ruchu robota}{11}{chapter.2}% 
+\contentsline {section}{\numberline {2.1}Model dynamiki robota balansuj\IeC {\k a}cego}{11}{section.2.1}% 
+\contentsline {subsection}{\numberline {2.1.1}Energia kinetyczna}{13}{subsection.2.1.1}% 
+\contentsline {subsection}{\numberline {2.1.2}Energia potencjalna}{14}{subsection.2.1.2}% 
+\contentsline {subsection}{\numberline {2.1.3}R\IeC {\'o}wnania Eulera--Lagrange'a}{14}{subsection.2.1.3}% 
+\contentsline {subsection}{\numberline {2.1.4}R\IeC {\'o}wnania stanu}{16}{subsection.2.1.4}% 
+\contentsline {section}{\numberline {2.2}Sterowanie}{17}{section.2.2}% 
+\contentsline {subsection}{\numberline {2.2.1}Pojedynczy regulator PID}{17}{subsection.2.2.1}% 
+\contentsline {subsection}{\numberline {2.2.2}Podw\IeC {\'o}jny regulator PID}{19}{subsection.2.2.2}% 
+\contentsline {chapter}{\chapternumberline {3}Akwizycja i wykorzystanie danych z czujnik\IeC {\'o}w ruchu}{21}{chapter.3}% 
+\contentsline {section}{\numberline {3.1}\IeC {\.Z}yroskop}{21}{section.3.1}% 
+\contentsline {section}{\numberline {3.2}Akcelerometr}{23}{section.3.2}% 
+\contentsline {section}{\numberline {3.3}Magnetometr}{24}{section.3.3}% 
+\contentsline {subsection}{\numberline {3.3.1}Kompensacja k\IeC {\k a}ta wychylenia}{25}{subsection.3.3.1}% 
+\contentsline {subsection}{\numberline {3.3.2}Deklinacja magnetyczna}{25}{subsection.3.3.2}% 
+\contentsline {subsection}{\numberline {3.3.3}Kompensacja efektu ,,Hard Iron'' oraz ,,Soft Iron''}{25}{subsection.3.3.3}% 
+\contentsline {chapter}{\chapternumberline {4}Wybrane metody fuzji sygna\IeC {\l }\IeC {\'o}w}{29}{chapter.4}% 
+\contentsline {section}{\numberline {4.1}Filtr komplementarny}{29}{section.4.1}% 
+\contentsline {subsection}{\numberline {4.1.1}Filtr dolnoprzepustowy}{29}{subsection.4.1.1}% 
+\contentsline {subsection}{\numberline {4.1.2}Filtr g\IeC {\'o}rnoprzepustowy}{29}{subsection.4.1.2}% 
+\contentsline {subsection}{\numberline {4.1.3}R\IeC {\'o}wnanie filtru komplementarnego}{29}{subsection.4.1.3}% 
+\contentsline {subsection}{\numberline {4.1.4}Testy symulacyjne}{29}{subsection.4.1.4}% 
+\contentsline {section}{\numberline {4.2}Filtr Kalmana}{29}{section.4.2}% 
+\contentsline {subsection}{\numberline {4.2.1}R\IeC {\'o}wnanie stanu obiektu}{29}{subsection.4.2.1}% 
+\contentsline {subsection}{\numberline {4.2.2}R\IeC {\'o}wnanie filtru Kalmana}{29}{subsection.4.2.2}% 
+\contentsline {subsection}{\numberline {4.2.3}Testy symulacyjne}{29}{subsection.4.2.3}% 
+\contentsline {section}{\numberline {4.3}Filtr Madgwicka}{30}{section.4.3}% 
+\contentsline {subsection}{\numberline {4.3.1}Kwaterniony}{30}{subsection.4.3.1}% 
+\contentsline {subsection}{\numberline {4.3.2}Zasada dzia\IeC {\l }ania algorytmu}{30}{subsection.4.3.2}% 
+\contentsline {subsection}{\numberline {4.3.3}Testy symulacyjne}{30}{subsection.4.3.3}% 
+\contentsline {chapter}{\chapternumberline {5}Budowa dwuko\IeC {\l }owego robota balansuj\IeC {\k a}cego i implementacja algorytm\IeC {\'o}w}{31}{chapter.5}% 
+\contentsline {section}{\numberline {5.1}Konstrukcja mechaniczna}{31}{section.5.1}% 
+\contentsline {section}{\numberline {5.2}Uk\IeC {\l }ad elektroniczny}{31}{section.5.2}% 
+\contentsline {subsection}{\numberline {5.2.1}Zasilanie}{31}{subsection.5.2.1}% 
+\contentsline {subsection}{\numberline {5.2.2}Jednostka inercyjna MPU9250}{31}{subsection.5.2.2}% 
+\contentsline {subsection}{\numberline {5.2.3}Modu\IeC {\l } Bluetooth HC--05}{31}{subsection.5.2.3}% 
+\contentsline {subsection}{\numberline {5.2.4}Silniki krokowe oraz sterowniki A4988}{31}{subsection.5.2.4}% 
+\contentsline {section}{\numberline {5.3}Konfiguracja mikrokontrolera i peryferi\IeC {\'o}w}{31}{section.5.3}% 
+\contentsline {subsection}{\numberline {5.3.1}ADC}{31}{subsection.5.3.1}% 
+\contentsline {subsection}{\numberline {5.3.2}PWM}{31}{subsection.5.3.2}% 
+\contentsline {subsection}{\numberline {5.3.3}$I^{2}C$}{32}{subsection.5.3.3}% 
+\contentsline {subsection}{\numberline {5.3.4}USART}{32}{subsection.5.3.4}% 
+\contentsline {subsection}{\numberline {5.3.5}System czasu rzeczywistego FreeRTOS}{32}{subsection.5.3.5}% 
+\contentsline {section}{\numberline {5.4}Oprogramowanie}{32}{section.5.4}% 
+\contentsline {subsection}{\numberline {5.4.1}Struktura programu i algorytm sterowania}{32}{subsection.5.4.1}% 
+\contentsline {subsection}{\numberline {5.4.2}Implementacja akwizycji danych z czujnik\IeC {\'o}w ruchu}{32}{subsection.5.4.2}% 
+\contentsline {subsection}{\numberline {5.4.3}Implementacja fuzji sygna\IeC {\l }\IeC {\'o}w}{32}{subsection.5.4.3}% 
+\contentsline {subsection}{\numberline {5.4.4}Pojedynczy regulator PID}{32}{subsection.5.4.4}% 
+\contentsline {subsection}{\numberline {5.4.5}Kaskada regulator\IeC {\'o}w PID}{32}{subsection.5.4.5}% 
+\contentsline {subsection}{\numberline {5.4.6}Obs\IeC {\l }uga silnik\IeC {\'o}w krokowych}{32}{subsection.5.4.6}% 
+\contentsline {subsection}{\numberline {5.4.7}Pomiar stanu akumulatora}{32}{subsection.5.4.7}% 
+\contentsline {subsection}{\numberline {5.4.8}Komunikacja bezprzewodowa z komputerem}{32}{subsection.5.4.8}% 
+\contentsline {section}{\numberline {5.5}Testy eksperymentalne}{32}{section.5.5}% 
+\contentsline {chapter}{\chapternumberline {6}Aplikacja do wizualizacji danych sensorycznych i komunikacji z robotem}{33}{chapter.6}% 
+\contentsline {section}{\numberline {6.1}Struktura programu}{33}{section.6.1}% 
+\contentsline {section}{\numberline {6.2}Funkcjonalno\IeC {\'s}ci programu}{33}{section.6.2}% 
+\contentsline {section}{\numberline {6.3}Interfejs graficzny}{33}{section.6.3}% 
+\contentsline {chapter}{\chapternumberline {7}Testy eksperymentalne}{35}{chapter.7}% 
+\contentsline {chapter}{Literatura}{37}{chapter*.1}% 
+\contentsline {appendix}{\chapternumberline {A}Tytu\IeC {\l } dodatku}{39}{appendix.A}% 
+\contentsline {appendix}{\chapternumberline {B}Opis za\IeC {\l }\IeC {\k a}czonej p\IeC {\l }yty CD/DVD}{41}{appendix.B}% 
+\contentsline {chapter}{Indeks rzeczowy}{42}{section*.2}% 

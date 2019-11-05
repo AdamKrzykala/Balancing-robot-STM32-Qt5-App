@@ -1,0 +1,61 @@
+This is BibTeX, Version 0.99d (TeX Live 2019)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: main.aux
+A level-1 auxiliary file: skroty.aux
+A level-1 auxiliary file: rozdzial01.aux
+A level-1 auxiliary file: rozdzial02.aux
+A level-1 auxiliary file: rozdzial03.aux
+A level-1 auxiliary file: rozdzial04.aux
+A level-1 auxiliary file: rozdzial05.aux
+A level-1 auxiliary file: rozdzial06.aux
+A level-1 auxiliary file: rozdzial07.aux
+The style file: plabbrv.bst
+A level-1 auxiliary file: dodatekA.aux
+A level-1 auxiliary file: dodatekB.aux
+Database file #1: dokumentacja.bib
+Warning--empty journal in Akwizycja
+Warning--empty journal in Kalman
+Warning--empty journal in Madgwick2010AnEO
+Warning--empty publisher in ManipulatoryiRoboty
+You've used 5 entries,
+            2129 wiz_defined-function locations,
+            547 strings with 4707 characters,
+and the built_in function-call counts, 1436 in all, are:
+= -- 134
+> -- 68
+< -- 0
++ -- 29
+- -- 22
+* -- 99
+:= -- 253
+add.period$ -- 15
+call.type$ -- 5
+change.case$ -- 25
+chr.to.int$ -- 0
+cite$ -- 9
+duplicate$ -- 54
+empty$ -- 109
+format.name$ -- 22
+if$ -- 287
+int.to.chr$ -- 0
+int.to.str$ -- 5
+missing$ -- 6
+newline$ -- 28
+num.names$ -- 10
+pop$ -- 33
+preamble$ -- 1
+purify$ -- 21
+quote$ -- 0
+skip$ -- 40
+stack$ -- 0
+substring$ -- 69
+swap$ -- 2
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 18
+warning$ -- 4
+while$ -- 12
+width$ -- 6
+write$ -- 50
+(There were 4 warnings)
