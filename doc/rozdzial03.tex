@@ -75,7 +75,7 @@ $$
     \alpha_t = \int_{0}^{t} \omega \Delta t = \alpha_{t-1} + \omega_t \Delta t
 $$
 
-Problem pojawia się w momencie, w którym chcemy znać orientację czujnika w przestrzeni trójwymiarowej. Żyroskop mierzy prędkości kątowe w osiach swojego lokalnego układu współrzędnych i jeśli dokona się zmiany orientacji czujnika względem układu, w którym wyznaczamy orientację, to wyniki będą niepoprawne. W takim przypadku, należy skorzystać ze wzoru na prędkość kątową w przestrzeni, korzystając z własności $R^T=R^{-1}$, która wynika z tego, że macierz R jest ortogonalna.
+Problem pojawia się w momencie, w którym chcemy znać orientację czujnika w przestrzeni trójwymiarowej. Żyroskop mierzy prędkości kątowe w osiach swojego lokalnego układu współrzędnych. W momencie zmiany orientacji czujnika względem układu odniesienia, to wyniki będą niepoprawne. W takim przypadku, należy zastosować wzór na prędkość kątową w przestrzeni, korzystając z własności $R^T=R^{-1}$, wynikającej z ortogonalności macierzy \textbf{R} 
 \begin{equation}
     \left[\omega\right] = \dot{R}R^T \Rightarrow \dot{R} = R \left[\omega\right]
     \label{Predkosc obrotowa}
@@ -396,9 +396,17 @@ $$
 Efekt ,,Soft Iron'' (wpływ ferromagnetyków miękkich), który objawia się zniekształceniem odczytów, które powinny tworzyć idealny okrąg na płaszczyźnie, należy skompensować przeskalowując odczyty o wartości wyliczane według następujących wzorów
 $$
     \begin{array}{c}
-        a(m_x) = \frac{max(m_x) - min(m_x)}{2}, a(m_y) = \frac{max(m_y) - min(m_y)}{2}, a(m_z) = \frac{max(m_z) - min(m_z)}{2} \\ \\
+        a(m_x) = \frac{max(m_x) - min(m_x)}{2}
+        \quad
+        a(m_y) = \frac{max(m_y) - min(m_y)}{2}
+        \quad
+        a(m_z) = \frac{max(m_z) - min(m_z)}{2} \\ \\
         b = \frac{a(m_x) + a(m_y) + a(m_z)}{3} \\ \\
-        scale(m_x) = \frac{b}{a(m_x)}, scale(m_y) = \frac{b}{a(m_y)}, scale(m_z) = \frac{b}{a(m_z)} 
+        scale(m_x) = \frac{b}{a(m_x)}
+        \quad
+        scale(m_y) = \frac{b}{a(m_y)}
+        \quad
+        scale(m_z) = \frac{b}{a(m_z)} 
     \end{array}
 $$
 
