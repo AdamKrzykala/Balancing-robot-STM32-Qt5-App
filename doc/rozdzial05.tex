@@ -1,6 +1,13 @@
 \chapter{Budowa dwukołowego robota balansującego i implementacja algorytmów}
 \label{chap:budowa}
 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=1\textwidth]{Rysunki/Rozdzial05/Platforma_sprzetowa.png}
+    \caption{Wykorzystane w budowie moduły}
+    \label{Moduly}
+\end{figure}
+
 %----------------------------------------------------------------------------------------------------------------
 \section{Konstrukcja mechaniczna}
 
@@ -22,13 +29,20 @@
 %----------------------------------------------------------------------------------------------------------------
 \section{Konfiguracja mikrokontrolera i peryferiów}
 
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\textwidth]{Rysunki/Rozdzial05/Pinout.png}
+    \caption{Konfiguracja pinów mikrokontrolera}
+    \label{Piny}
+\end{figure}
+
 \subsection{ADC}
 ...
 
 \subsection{PWM}
 ...
 
-\subsection{$I^{2}C$}
+\subsection{$\mathbf{I^{2}C}$}
 ...
 
 \subsection{USART}
@@ -41,7 +55,13 @@
 \section{Oprogramowanie}
 
 \subsection{Struktura programu i algorytm sterowania}
-...
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.5\textwidth]{Rysunki/Rozdzial05/Software.png}
+    \caption{Struktura podziału programu na wątki}
+    \label{Watki}
+\end{figure}
 
 \subsection{Implementacja akwizycji danych z czujników ruchu}
 ...

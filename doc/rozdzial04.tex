@@ -1,10 +1,17 @@
 \chapter{Wybrane metody fuzji sygnałów}
 \label{chap:wybrane}
 
+Z racji tego, że każdy z omówionych czujników ruchu posiada swoje niedoskonałości, takie jak dryf kątów obrotu obliczonych na podstawie odczytów z żyroskopu, brak odporności na szybkozmienne zakłócenia akcelerometru oraz wpływ ferromagnetyków na odczyty magnetometru, konieczna jest fuzja pochodzących z czujników sygnałów, za pomocą dostępnych algorytmów, w celu osiągnięcia zadowalającego rezultatu obliczonych rotacji wokół osi. Za zadowalający rezultat, uznaje się brak dryfu, brak zakłóceń szybkozmiennych oraz skompensowane stałe zakłócenia pochodzące z ferromagnetyków w pobliżu czujnika. W tym celu zaimplementowano i przetestowano trzy znane algorytmy wykorzystywane w zakresie fuzji sygnałów:
+\begin{itemize}
+    \item Filtr komplementarny
+    \item Filtr Kalmana
+    \item Filtr Madgwicka
+\end{itemize}
+
 %----------------------------------------------------------------------------------------------------------------
 \section{Filtr komplementarny}
 
-Jednym z łatwiejszych w implementacji filtrów używanych do fuzji dwóch lub większej ilości sygnałów, jest filtr komplementarny. Zasada działania tego filtra opiera się o filtr dolno i górno przepustowy, za pomocą których eliminujemy zakłócenia wolno i szybko zmienne. Przedstawiony poniżej algorytm filtra komplementarnego opracowano w oparciu o artykuł \cite{Komplementarny2}.
+Jednym z łatwiejszych w implementacji filtrów używanych do fuzji dwóch lub większej ilości sygnałów, jest filtr komplementarny. Zasada działania tego filtra opiera się o filtr dolno i górno przepustowy, za pomocą których eliminujemy zakłócenia wolno i szybko zmienne. Przedstawiony poniżej algorytm filtra komplementarnego opracowano w oparciu o artykuł \cite{Komplementarny2}. Schemat filtra znajduje się na rysunku \ref{filtr komplementarny}
 
 \begin{figure}[h!]
     \centering
@@ -12,20 +19,23 @@ Jednym z łatwiejszych w implementacji filtrów używanych do fuzji dwóch lub w
     \caption{Schemat blokowy filtra komplementarnego}
     \label{filtr komplementarny}
 \end{figure}
-%
-gdzie
-\begin{itemize}
-    \item $\alpha_s$ -- pomiar kąta obarczony szybko-zmiennymi zakłóceniami
-    \item $\alpha_{sf}$ -- pomiar kąta pozbawiony szybko-zmiennych zakłóceń
-    \item $\alpha_w$ -- pomiar kąta obarczony wolno-zmiennymi zakłóceniami
-    \item $\alpha_{wf}$ -- pomiar kąta pozbawiony wolno-zmiennych zakłóceń
-    \item $\alpha_f$ -- kąt po odfiltrowaniu zakłóceń
-\end{itemize}
+
+dla którego
+
+$\alpha_s$ -- pomiar kąta obarczony szybko-zmiennymi zakłóceniami
+
+$\alpha_{sf}$ -- pomiar kąta pozbawiony szybko-zmiennych zakłóceń
+
+$\alpha_w$ -- pomiar kąta obarczony wolno-zmiennymi zakłóceniami
+
+$\alpha_{wf}$ -- pomiar kąta pozbawiony wolno-zmiennych zakłóceń
+
+$\alpha_f$ -- kąt po odfiltrowaniu zakłóceń
 
 %----------------------------------------------------------------------------------------------------------------
 \subsection{Filtr dolnoprzepustowy}
 
-Za pomocą filtra dolnoprzepustowego eliminujemy zakłócenia szybkozmienne o wysokiej częstotliwości (charakterystyczne, np. dla akcelerometru lub magnetometru) powyżej częstotliwości granicznej, która powiązana jest ze stałą czasową w następujący sposób
+Za pomocą filtra dolnoprzepustowego eliminujemy zakłócenia szybko zmienne (charakterystyczne, np. dla akcelerometru lub magnetometru) powyżej częstotliwości granicznej, która powiązana jest ze stałą czasową w następujący sposób
 $$
     f_{gr} = \frac{1}{2\pi RC} = \frac{1}{2\pi\tau}
 $$
@@ -41,9 +51,9 @@ Dyskretny wzór na sygnał wyjściowy z filtra dolnoprzepustowego, można wyprow
 
 Transmitancja filtra dolnoprzepustowego
 $$
-    \frac{U_{wej}}{U_{wyj}} = \frac{1}{RCs + 1} = \frac{1}{\tau s + 1}
+    \frac{U_{wyj}}{U_{wej}} = \frac{1}{RCs + 1} = \frac{1}{\tau s + 1}
 $$
-Korzystając z prawa Kirchoffa i tego, że prąd jest pochodną po czasie z napięcia otrzymujemy wzór na wartość napięcia wejściowego filtra
+Na podstawie transmitancji otrzymujemy wzór na wartość napięcia wejściowego filtra
 $$
      U_{wej} = RC\Dot{U}_{wyj} + U_{wyj} = \tau \Dot{U}_{wyj} + U_{wyj}
 $$
@@ -62,7 +72,7 @@ $$
 %----------------------------------------------------------------------------------------------------------------
 \subsection{Filtr górnoprzepustowy}
 
-Jeśli mamy do czynienia z zakłóceniami wolno-zmiennymi (np. w przypadku żyroskopu) korzysta się z filtra górnoprzepustowego, odcinającego zakłócenia o niskiej częstotliwości poniżej częstotliwości granicznej, która związana jest ze stałą czasową w taki sam sposób, jak w przypadku filtra dolnoprzepustowego.
+Jeśli mamy do czynienia z zakłóceniami wolno zmiennymi (np. w przypadku żyroskopu) korzysta się z filtra górnoprzepustowego, odcinającego zakłócenia poniżej częstotliwości granicznej, która związana jest ze stałą czasową w taki sam sposób, jak w przypadku filtra dolnoprzepustowego.
 $$
 $$
 
@@ -133,6 +143,12 @@ Celem przedstawionej tutaj implementacji filtra Kalmana, jest uzyskanie odchylen
     \label{Kalman idea}
 \end{figure}
 
+Dane wejściowe podawane są w następujących jednostkach
+\begin{itemize}
+    \item $\alpha (^o)$
+    \item $\omega (^0/s)$
+\end{itemize}
+
 Do działania filtru konieczne jest zamodelowanie obiektu w postaci równań stanu. W tym celu zaproponowano równanie opisujące system
 $$
     \theta_x(t) = \theta_x(t-1) + (\omega_x(t-1) - \zeta_x)\Delta t
@@ -150,7 +166,7 @@ gdzie wartości na wyjściu systemu to odpowiednio
 \begin{itemize}
     \item $\theta_x$ -- wartość odchylenia kątowego 
     \item $\omega_x$ -- wartość prędkości kątowej 
-    \item $\zeta_x$ -- wartość błędu żyroskopu (dryft)
+    \item $\zeta_x$ -- wartość błędu żyroskopu (dryf)
 \end{itemize}
 
 Mając równania systemu w takiej postaci, możemy zapisać je w postaci macierzowej, czyli sformułować równania stanu obiektu.
@@ -200,7 +216,7 @@ $$
 %
 Z racji tego, że na wyjściu systemu istotne dla nas jest aktualne odfiltrowane odchylenie kątowe $\theta_x$ przechowywane w wektorze stanu po aktualizacji, macierz wyjścia przyjmuje postać
 $$
-    \mathbf{H} = 
+    \mathbf{C} = 
     \left[
     \begin{array}{ccc}
         1 & 0 & 0
@@ -258,7 +274,7 @@ W każdej iteracji działania algorytmu, aktualny kąt wychylenia $\theta_x$ zna
 %----------------------------------------------------------------------------------------------------------------
 \section{Filtr Madgwicka}
 
-W 2010 roku S.O Madgwick opublikował raport \cite{Madgwick2010AnEO} dotyczący opracowanego przez siebie algorytmu do uzyskiwania orientacji w przestrzeni czujników MARG. Przewagą jaką ma owy filtr nad innymi znanymi filtrami jest to, że nie wymaga on kalibracji magnetometru. Algorytm samodzielnie radzi sobie z odkształceniami ,,hard iron'' oraz ,,soft iron''. Drugą dużą zaletą jest odporność na tzw. efekt ,,gimbal lock'', który jest poważną wadą przy opisie orientacji za pomocą kątów Eulera. Objawia się on maksymalnym zakresem dla kąta Pitch wynoszącym $<-90^o, 90^o>$, co wynika z maksymalnej oraz minimalnej wartości jaką przyjmuje funkcja arcus sinus.
+W 2010 roku S.O Madgwick opublikował raport \cite{Madgwick2010AnEO} dotyczący opracowanego przez siebie algorytmu do uzyskiwania orientacji w przestrzeni czujników MARG. Przewagą jaką ma owy filtr nad innymi znanymi filtrami jest to, że nie wymaga on kalibracji magnetometru. Algorytm samodzielnie radzi sobie z odkształceniami ,,hard iron'' oraz ,,soft iron''. Drugą dużą zaletą jest odporność na tzw. efekt ,,gimbal lock'', który jest poważną wadą przy opisie orientacji za pomocą kątów RPY oraz Eulera. Objawia się on maksymalnym zakresem dla kąta Pitch wynoszącym $<-90^o, 90^o>$, co wynika z maksymalnej oraz minimalnej wartości jaką przyjmuje funkcja arcus sinus.
 
 Inne zalety jakie w swoim raporcie wymienia autor to m.in niski koszt obliczeniowy, dzięki czemu algorytm z powodzeniem można implementować na słabszych mikroprocesorach oraz wysoka skuteczność przy niskich częstotliwościach próbkowania czujników, np. 10Hz.
 
@@ -276,7 +292,7 @@ Dane wejściowe podawane są w następujących jednostkach
     \item $m_x, m_y, m_z (\mu T)$
 \end{itemize}
 
-Do matematycznego opisu orientacji w przestrzeni algorytm wykorzystuje kwaterniony, które z powodzeniem można przeliczyć na kąty Eulera
+Do matematycznego opisu orientacji w przestrzeni algorytm wykorzystuje kwaterniony, które z powodzeniem można przeliczyć na kąty RPY
 $$
     \begin{array}{l}
         Roll = arctan\left(\frac{2(ab + cd)}{1 - 2(b^2 + c^2)}\right) \\ \\
@@ -286,7 +302,7 @@ $$
 $$
 
 %----------------------------------------------------------------------------------------------------------------
-\subsection{Zasada działania algorytmu}
+\subsection{Poszczególne etapy działania algorytmu}
 
 \begin{enumerate}
     \item Wyznaczenie szybkości zmiany orientacji kwaternionu na podstawie wektora prędkości kątowych
@@ -323,6 +339,7 @@ $$
     $$
         _E^S q_{est,t} = _E^S q_{est,t-1} + _E^S \Dot{q}_{est,t} \Delta t
     $$
+    którą możemy wykorzystać do obliczenia kątów RPY, lub pozostawić w postaci kwaternionu jeśli bazujemy na takiej metodzie określania orientacji w przestrzeni, jednak jest ona dosyć nieintuicyjna i mało czytelna na pierwszy rzut oka. 
     
 \end{enumerate}
 
@@ -336,7 +353,7 @@ Testy opisanych wcześniej trzech algorytmów przeprowadzone zostały w środowi
     \item Magnetometr -- indukcja pola magnetycznego ($\mu T$) 
 \end{itemize}
 
-Przed zapisaniem danych czujnik został skalibrowany. Wczytane dane zaprezentowane zostały na rysunku \ref{MARG sygnaly}
+Przed zapisaniem danych czujnik został skalibrowany, o czym więcej w kolejnym rozdziale \ref{chap:budowa} dotyczącym budowy robota balansującego. Wczytane dane zaprezentowane zostały na rysunku \ref{MARG sygnaly}
 \begin{figure}[h!]
     \centering
     \includegraphics[width=1\textwidth]{Rysunki/Rozdzial04/MARG_sygnaly.png}
@@ -344,10 +361,11 @@ Przed zapisaniem danych czujnik został skalibrowany. Wczytane dane zaprezentowa
     \label{MARG sygnaly}
 \end{figure}
 
+\newpage
 %----------------------------------------------------------------------------------------------------------------
 \subsection{Filtr komplementarny}
 
-Do implementacji filtra komplementarnego, wykorzystano bloczki \texttt{Transfer Fcn}, do których zostały wprowadzone odpowiednie transmitancje, oraz stała czasowa wczytywana ze skryptu
+Do implementacji filtra komplementarnego, wykorzystano bloczki \texttt{Transfer Fcn}, do których zostały wprowadzone odpowiednie transmitancje, oraz stała czasowa wczytywana ze skryptu.
 \begin{figure}[h!]
     \centering
     \includegraphics[width=0.75\textwidth]{Rysunki/Rozdzial04/Filtr_komplementarny_implementacja.png}
@@ -355,7 +373,9 @@ Do implementacji filtra komplementarnego, wykorzystano bloczki \texttt{Transfer 
     \label{Komplementarny implementacja}
 \end{figure}
 
-Filtr komplementarny wykorzystano do uzyskania rotacji w trzech osiach. Rotację w osiach x i y uzyskano na podstawie pomiarów z akcelerometru i żyroskopu, a rotację w okół osi z na podstawie pomiarów z magnetometru i żyroskopu.
+Filtr komplementarny wykorzystano do uzyskania rotacji w trzech osiach. Rotację w osiach X i Y uzyskano na podstawie pomiarów z akcelerometru i żyroskopu, a rotację w okół osi Z na podstawie pomiarów z magnetometru i żyroskopu
+
+\newpage
 \begin{figure}[h!]
     \centering
     \includegraphics[width=1\textwidth]{Rysunki/Rozdzial04/Filtr_komplementarny_struktura_png.png}
@@ -363,7 +383,7 @@ Filtr komplementarny wykorzystano do uzyskania rotacji w trzech osiach. Rotację
     \label{Komplementarny struktura}
 \end{figure}
 
-Sygnały wejściowe dla filtra komplementarnego, odpowiednio dla osi x,y oraz z. Na rysunku \ref{Komplementarny przed} widać, że akcelerometr i magnetometr obarczony jest szybkozmiennymi zakłóceniami, a żyroskop wolnozmiennymi.
+ Na rysunku \ref{Komplementarny przed} widać, że akcelerometr i magnetometr obarczony jest szybkozmiennymi zakłóceniami, a żyroskop wolnozmiennymi.
 \begin{figure}[h!]
     \centering
     \includegraphics[width=1\textwidth]{Rysunki/Rozdzial04/Filtr_komplementarny_przed.png}
@@ -377,18 +397,26 @@ $$
         \tau_1 = 1 & \tau_2 = 0.01 & \tau_3 = 0.0001
     \end{array}
 $$
+które odpowiadają odpowiednio parametrowi filtra przy czasie próbkowania $\Delta t = 0.01s$
+$$
+    \begin{array}{ccc}
+        \beta_1 \approx 0.99 & \beta_2 = 0.5 & \beta_3 \approx 0.009
+    \end{array}
+$$
+
 \begin{figure}[h!]
     \centering
     \includegraphics[width=1\textwidth]{Rysunki/Rozdzial04/Filtr_komplementarny_po.png}
     \caption{Sygnały wyjściowe dla filtra komplementarnego}
-    \label{Komplementarny przed}
+    \label{Komplementarny po}
 \end{figure}
 
 Stała czasowa decyduje o tym, jaką część z ostatecznej wartości na wyjściu filtra stanowi pomiar z akcelerometru lub magnetometru, a jaką pomiar z żyroskopu. Stąd wywnioskowano, że im większa stała czasowa tym większy udział w ostatecznym wyniku ma pomiar z żyroskopu (mniej widocznych zakłóceń szybkozmiennych).
 %----------------------------------------------------------------------------------------------------------------
 \subsection{Filtr Kalmana}
 
-Sygnałami wejściowymi dla filtra Kalmana są obarczone zakłóceniami szybkozmiennymi kąty obliczone na podstawie odczytów z akcelerometru oraz prędkości kątowe odczytane za pomocą żyroskopu.
+Sygnałami wejściowymi dla filtra Kalmana są obarczone zakłóceniami szybkozmiennymi kąty obliczone na podstawie odczytów z akcelerometru oraz prędkości kątowe odczytane za pomocą żyroskopu, rysunek \ref{Kalman przed}
+
 \begin{figure}[h!]
     \centering
     \includegraphics[width=1\textwidth]{Rysunki/Rozdzial04/Filtr_Kalmana_przed.png}
@@ -396,7 +424,7 @@ Sygnałami wejściowymi dla filtra Kalmana są obarczone zakłóceniami szybkozm
     \label{Kalman przed}
 \end{figure}
 
-W celach eksperymentalnych spróbowano zastosować kąty obliczone na podstawie odczytów z magnetometru zamiast akcelerometru do wyznaczenia obrotu wokół osi z. Z powodzeniem uzyskano wyniki zbliżone do filtra komplementarnego. Dodatkowo przetestowano algorytm dla trzech par parametrów
+W celach eksperymentalnych spróbowano zastosować kąty obliczone na podstawie odczytów z magnetometru zamiast akcelerometru do wyznaczenia obrotu wokół osi Z. Z powodzeniem uzyskano wyniki zbliżone do filtra komplementarnego. Dodatkowo przetestowano algorytm dla trzech par parametrów
 $$
     \begin{array}{ll}
         r_1 = 1000 & q_1 = 10000 \\
@@ -447,4 +475,4 @@ Dla kątów Roll oraz Pitch algorytmy działają podobnie, jednak dla kąta Yaw 
     \label{Porownanie}
 \end{figure}
 
-Warto też dodać, że wartość początkowa kąta obliczanego na podstawie odczytów z żyroskopu wynosi 0. Tak aby porównanie działania filtrów było miarodajne, należy przesunąć kąt obliczany na podstawie odczytów z żyroskopu o pewną wartość względem pomiarów obliczanych na podstawie odczytów z magnetometru.
+Warto też dodać, że wartość początkowa kąta obliczanego na podstawie odczytów z żyroskopu wynosi 0. Tak aby porównanie działania filtrów było miarodajne, należy przesunąć kąt obliczany na podstawie odczytów z żyroskopu o pewną wartość względem pomiarów obliczanych na podstawie odczytów z magnetometru, tak aby w chwili $t = 0$ oba wykresy miały tą samą wartość.
