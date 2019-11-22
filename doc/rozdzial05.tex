@@ -1,15 +1,15 @@
 \chapter{Budowa dwukołowego robota balansującego}
 \label{chap:budowa}
 
-W celu przetestowania zaimplementowanych metod fuzji sygnałów pochodzących z czujnika ruchu, oraz algorytmu sterowania opartego na dwóch regulatorach PID połączonych kaskadowo, powstał rzeczywisty model robota balansującego. Jednym z założeń realizacji projektu było wykorzystanie gotowych modułów elektronicznych, tak aby zaoszczędzić czas podczas wykonywania konstrukcji oraz umożliwić łatwą ich ewentualną wymianę, w celu naprawy lub wykorzystania w innych projektach. Do wykonania konstrukcji użyto:
+W celu przetestowania zaimplementowanych metod fuzji sygnałów pochodzących z czujnika ruchu, oraz algorytmu sterowania opartego na dwóch regulatorach PID połączonych kaskadowo, powstał rzeczywisty model robota balansującego. Jednym z założeń realizacji projektu było wykorzystanie gotowych modułów elektronicznych, tak aby zaoszczędzić czas podczas wykonywania konstrukcji oraz umożliwić ich łatwą ewentualną wymianę w celu naprawy, lub wykorzystania w innych projektach. Do wykonania konstrukcji użyto:
 \begin{itemize}
-    \item zaprojektowany w SolidWorksi korpus wycinany laserowo z płyty pleksi
-    \item dwustronna płytka PCB wykonana domową metodą termotransferu
+    \item zaprojektowany w SolidWorksie korpus wycinany laserowo z płyty pleksi
+    \item dwustronną płytkę PCB wykonana domową metodą termotransferu
     \item dwa koła o średnicy ok. 8 cm z mocowaniami wykonanymi własnoręcznie ze stalowych pięciokątnych słupków dystansowych
     \item dwa sterowniki Pololu A4988 RepRap 35V/2A
-    \item bateria LiPo 11.1V / 1300mAh
+    \item baterię LiPo 11.1V / 1300mAh
     \item dwa silniki krokowe JK42HS48-1684 200 kroków/obr 2.8V / 1.68A / 0.43Nm
-    \item płytka z mikrokontrolerem Nucleo F103RB
+    \item płytkę z mikrokontrolerem Nucleo F103RB
     \item moduł bluetooth HC-05
     \item dwie regulowane przetwornice impulsowe step-down LM2596 3.2V-35V / 3A
 \end{itemize}
@@ -166,7 +166,7 @@ Najważniejsze parametry ustawione dla przetwornika ADC, to pomiar na kanale 15 
 %----------------------------------------------------------------------------------------------------------------
 \subsection{PWM}
 
-Jeśli chodzi o generator sygnałów PWM, to są nim dwa osobne timery. Pierwszy z nich z wyjściem na pinie PA6, a drugi z wyjściem na pinie PA15. Preskaler został domyślnie ustawiony na 0, ponieważ i tak jest modyfikowany w trakcie działania programu w celu zmiany częstotliwości generowanego sygnału. Wartość ARR - 1 (Counter Period), mówi o ilości dostępnych poziomów wypełnienia sygnału. W tym przypadku dostępne jest 1000 poziomów wypełnienia, czyli 0.1\%, 0.2\%, ... , 100\%. 
+Generator sygnałów PWM są dwa osobne timery. Pierwszy z nich z wyjściem na pinie PA6, a drugi z wyjściem na pinie PA15. Preskaler został domyślnie ustawiony na 0, ponieważ i tak jest modyfikowany w trakcie działania programu w celu zmiany częstotliwości generowanego sygnału. Wartość ARR - 1 (Counter Period), mówi o ilości dostępnych poziomów wypełnienia sygnału. W tym przypadku dostępne jest 1000 poziomów wypełnienia, czyli 0.1\%, 0.2\%, ... , 100\%. 
 
 \begin{table}[h!]
     \centering
@@ -285,7 +285,7 @@ Jako pomiar uznaje się średnią ze 100 pomiarów, w celu uniknięcia odchyłek
 %----------------------------------------------------------------------------------------------------------------
 \subsection{Algorytm sterowania}
 
-Obsługa algorytmu sterowania odbywa się w wątku \texttt{Control\_Task}, wewnątrz którego zaimplementowana została kaskada dwóch regulatorów PID, którą zaprezentowano w rozdziale \ref{chap:analizaruchurobota}, w części dotyczącej sterowania. Różnica pomiędzy symulacją, a implementacją algorytmu sterowania na mikrokontrolerze polega na wprowadzeniu możliwości skręcania prawo--lewo, a nie jazdy tylko przód--tył. Dlatego każde koło posiada swoją niezależnie działającą kaskadę regulatorów PID, tak aby możliwe było zadawanie różnych prędkości dla dwóch kół, co zostało przedstawione na schemacie \ref{Algorytm}.
+Obsługa algorytmu sterowania odbywa się w wątku \texttt{Control\_Task}, wewnątrz którego zaimplementowana została kaskada dwóch regulatorów PID, którą zaprezentowano w podrozdziale \ref{Sterowanie podrozdzial}, dotyczącym sterowania. Różnica pomiędzy symulacją, a implementacją algorytmu sterowania na mikrokontrolerze polega na wprowadzeniu możliwości skręcania prawo--lewo, a nie jazdy tylko przód--tył. Dlatego każde koło posiada swoją niezależnie działającą kaskadę regulatorów PID, tak aby możliwe było zadawanie różnych prędkości dla dwóch kół, co zostało przedstawione na schemacie \ref{Algorytm}.
 
 \begin{figure}[h!]
     \centering
@@ -340,7 +340,7 @@ gdzie \\
 LSB -- pomiar dla danej osi \\
 ASA -- współczynnik czułości dla danej osi
 
-Podczas implementacji obsługi czujnika bardzo ważną rzeczą i należy uwzględnić to w obliczeniach jest inna orientacja osi akcelerometru i żyroskopu względem osi magnetometru, co przedstawione zostało na rysunku \ref{Orientacja}
+Podczas implementacji obsługi czujnika bardzo ważną rzeczą, którą należy uwzględnić w obliczeniach, jest inna orientacja osi akcelerometru i żyroskopu względem osi magnetometru, co przedstawione zostało na rysunku \ref{Orientacja}
 
 \begin{figure}[h!]
     \centering
@@ -362,7 +362,7 @@ Za pomocą sterownika i jego pinów MS1,MS2,MS3 ustawiamy rozdzielczość silnik
 
 Sygnał PWM generowany jest przez timer, dlatego zmieniając wartość preskalera możemy decydować o częstotliwości zmiany stanu generowanego sygnału, a co za tym idzie ilością generowanych kroków w danym okresie czasu, z którego możemy obliczyć prędkość silnika wyrażoną w obrotach na minutę (RPM). Wartość wypełnienia sygnału jest stała i wynosi 50\%. 
 
-Chcąc wyznaczyć wartość preskalera, w celu zadawania prędkości obrotowej silnika, musimy znać wartość odstępów między poszczególnymi krokami. Wyznacza się go korzystając z wartości kąta jaki zakreśla wał silnika podczas wykonywania kroku (w silnikach zastosowanych w projekcie jest to $1.8^o$ dla pełnego kroku).
+Aby wyznaczyć wartość preskalera, w celu zadawania prędkości obrotowej silnika, musimy znać wartość odstępów między poszczególnymi krokami. Wyznacza się go korzystając z wartości kąta jaki zakreśla wał silnika podczas wykonywania kroku (w silnikach zastosowanych w projekcie jest to $1.8^o$ dla pełnego kroku).
 
 Po kolei obliczamy wartość kąta na krok dla ustawionej rozdzielczości kroku
 $$
@@ -384,7 +384,7 @@ Wartość preskalera dla zadanej prędkości obrotowej 100RPM, częstotliwości 
 $$
     PSC = \frac{32MHz * 375ms}{ARR + 1} - 1 = 23
 $$
-Wartość preskalera obliczamy analogicznie do innych wartości zadanej prędkości obrotwej.
+Wartość preskalera obliczamy analogicznie dla innych wartości zadanej prędkości obrotwej.
 
 %----------------------------------------------------------------------------------------------------------------
 \subsection{Komunikacja bezprzewodowa z komputerem}
@@ -396,7 +396,7 @@ Do bezprzewodowej komunikacji robota z komputerem wykorzystano gotowy moduł blu
     \item parametrów transmisji -- AT+UART = "115200,1,0" (baud 115200, 1 bit stopu, brak kontroli parzystości)
 \end{itemize}
 
-Za komunikację z komputerem odpowiedzialny jest wątek o nazwie \texttt{USART\_Task}, którego głównym zadaniem jest cykliczne parsowanie i wysyłanie informacji do komputera co 10ms. Wysyłane dane parsowane są do ramki w postaci
+Za komunikację z komputerem odpowiedzialny jest wątek o nazwie \texttt{USART\_Task}, którego głównym zadaniem jest cykliczne parsowanie i wysyłanie informacji do komputera co 10ms. Wysyłane dane parsowane są do ramki, której budowa przedstawiona została w postaci tabeli \ref{Ramka wysylana}.
 
 \begin{table}[h!]
     \centering
@@ -422,7 +422,7 @@ Za komunikację z komputerem odpowiedzialny jest wątek o nazwie \texttt{USART\_
 \end{table}
 gdzie CRC jest cyklicznym kodem nadmiarowym służącym do kontroli poprawności odebranej ramki po stronie komputera.
 
-Parsowanie danych z komputera odbywa się w obsłudze przerwania, wywoływanego przez interfejs UART w momencie odebrania danych. Odebrane dane są ramką w postaci
+Parsowanie danych z komputera odbywa się w obsłudze przerwania, wywoływanego przez interfejs UART w momencie odebrania danych. Odebrane dane są do ramką, której budowa przedstawiona została w postaci tabeli \ref{Ramka odebrana}f.
 
 \begin{table}[h!]
     \centering
@@ -444,7 +444,7 @@ Parsowanie danych z komputera odbywa się w obsłudze przerwania, wywoływanego 
         int8\_t & CRC \\
         \hline
     \end{tabular}
-    \label{Ramka wysylana}
+    \label{Ramka odebrana}
 \end{table}
 
 %----------------------------------------------------------------------------------------------------------------
