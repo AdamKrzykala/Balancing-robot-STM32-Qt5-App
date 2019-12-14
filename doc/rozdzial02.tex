@@ -119,7 +119,7 @@ $$
     \right.
 $$
 
-Korzystając z twierdzenia odwrotnego do twierdznia Pitagorasa, oraz rachunku różniczkowego (prędkość jako pochodna po czasie z przebytej drogi) można wyznaczyć prędkość środka masy wahadła na podstawie jej składowych w osi x oraz y. Składowe prędkości jako pochodne z przemieszczenia w osi x oraz y
+Korzystając z twierdzenia odwrotnego do twierdzenia Pitagorasa, oraz rachunku różniczkowego (prędkość jako pochodna po czasie z przebytej drogi) można wyznaczyć prędkość środka masy wahadła na podstawie jej składowych w osi x oraz y. Składowe prędkości jako pochodne z przemieszczenia w osi x oraz y
 $$
     \left\{
     \begin{array}{c}
@@ -195,7 +195,7 @@ Znając energię kinetyczną oraz potencjalną układu przystąpić można do ob
     \label{Lagranżjan}
     \end{array}
 \end{equation}
-gdzie droga przebyta przez toczące się koło oraz prędkość ruchu postępowego wynosi $x_1 = R\theta$, a co za tym idzie prędkość koła w osi x to $\dot{x}_1 = R\dot{\theta}$, co po wstawieniu do wzoru (\ref{Lagranżjan}) daje ostateczną postać Lagrangianu:
+gdzie droga przebyta przez toczące się koło oraz prędkość ruchu postępowego wynosi $x_1 = R\theta$, a co za tym idzie prędkość koła w osi x to $\dot{x}_1 = R\dot{\theta}$, co po wstawieniu do wzoru (\ref{Lagranżjan}) daje ostateczną postać Lagranżjanu:
 \begin{equation}
     \begin{array}{ll}
     \mathcal{L} = \frac{1}{2}m_2(R^2\dot{\theta}^2 + 2R\dot{\theta}Lcos\varphi\dot{\varphi} + L^2\dot{\varphi}^2) + m_1R^2\dot{\theta}^2 + \\ \\
@@ -237,7 +237,7 @@ $$
     \right.
 $$
 
-Mając wszystkie składowe oblicza się jeszcze pochodne po czasie składowych sił uogólnionych i otrzymujemy ostatecznie równania Eulera-Lagrange'a:
+Mając wszystkie składowe oblicza się pochodne po czasie składowych sił uogólnionych i otrzymujemy ostatecznie równania Eulera-Lagrange'a:
 \begin{equation}
     \begin{array}{ll}
     \frac{d}{dt}\frac{\delta\mathcal{L}}{\delta\dot{\varphi}} - \frac{\delta\mathcal{L}}{\delta\varphi} = m_2R\Ddot{\theta}Lcos\varphi - m_2R\dot{\theta}sin\varphi\dot{\varphi} + m_2L^2\Ddot{\varphi} + J_2\Ddot{\varphi} + m_2R\dot{\theta}Lsin\varphi\dot{\varphi} + \\ \\
@@ -249,7 +249,7 @@ Mając wszystkie składowe oblicza się jeszcze pochodne po czasie składowych s
 %
 gdzie $M$ to moment siły generowany przez napęd. Dla zmiennej $\theta$ ze znakiem dodatnim, ponieważ kierunek obrotu kół jest zgodny z kierunkiem generowanego momentu. Dla zmiennej $\varphi$ z ujemnym znakiem, ponieważ kierunek obrotu wahadła jest przeciwny do działającego momentu siły. 
 
-Równania dynamiki można przedstawić w postaci macierzowej, która jest bardziej czytelna
+Równania dynamiki można przedstawić w postaci macierzowej
 $$
     \begin{array}{cc}
         \left[ \begin{array}{cc}
@@ -282,7 +282,7 @@ $$
     \end{array}
 $$
 
-Taki model jest jednak nieliniowy i liniowy algorytm sterowania nie zadziałałby dla niego poprawnie, dlatego dokonuje się częściowej linearyzacji modelu w okolicach punktu równowagi, w przypadku w którym chcemy wykorzystać liniowy sterownik. Jednym z punktów równowagi odwróconego wahadła jest jego pionowa pozycja, punkt niestabilny. Drugi punkt równowagi to swobodne zwisanie wahadła, który jest stabilnym punktem równowagi, jednak zostaje on pominięty ze względu na jego brak w rozważanym modelu. Dla punktu równowagi $\varphi \approx 0$ możemy dokonać częściowej linearyzacji modelu, dla którego
+Taki model jest nieliniowy i nie można zastosować dla niego liniowego algorytmu sterowania opisanego w dalszej części rozdziału. Dlatego dokonuje się częściowej linearyzacji modelu w okolicach punktu równowagi. Jednym z punktów równowagi odwróconego wahadła jest jego górna pozycja (punkt niestabilny). Drugi punkt równowagi to dolna pozycja, czyli swobodne zwisanie wahadła (stabilny punkt równowagi), jednak zostaje on pominięty ze względu na jego brak w rozważanym modelu. Dla punktu równowagi $\varphi \approx 0$ możemy dokonać częściowej linearyzacji modelu, dla którego
 $$
     \left\{
     \begin{array}{c}
@@ -303,43 +303,44 @@ gdzie:
     \item $q$ -- wektor uogólnionych współrzędnych,
     \item $\dot{q}$ -- wektor uogólnionych prędkości,
     \item $M(q)$ -- symetryczna, dodatnio określona macierz inercji,
-    \item $C(q,\dot{q})$ -- macierz sił Coriolisa i sił dośrodkowych,
+    \item $C(q,\dot{q})$ -- macierz sił Coriolissa i sił dośrodkowych,
     \item $D(q)$ -- wektor oddziaływań potencjalnych,
     \item $u$ -- wektor sterowań.
 \end{itemize}
 
 $$
-\mathbf{M(q)} =
-\left[ \begin{array}{cc}
-m_2L^2 + J_2 & m_2RL \\
-m_2RL & m_2R^2 + 2m_1R^2 + J_1
-\end{array} \right]
-$$
-\\
-$$
-\mathbf{C(q,\dot{q})} = \emptyset
-$$
-\\
-$$
-\mathbf{D(q)} =
-\left[ \begin{array}{c}
--m_2gL \\
-0
-\end{array} \right]
-$$
-\\
-$$
-\mathbf{q} =
-\left[ \begin{array}{c}
-\varphi \\
-\theta \\
-\end{array} \right]
-,
-\mathbf{u} =
-\left[ \begin{array}{c}
--M \\
-M \\
-\end{array} \right]
+\begin{array}{cc}
+    \mathbf{M(q)} =
+        \left[ \begin{array}{cc}
+            m_2L^2 + J_2 & m_2RL \\
+            m_2RL & m_2R^2 + 2m_1R^2 + J_1
+        \end{array} \right], \\ \\
+    \newline
+    \begin{array}{cc}
+        \mathbf{C(q,\dot{q})} = \emptyset,
+        &
+        \mathbf{D(q)} =
+        \left[ \begin{array}{c}
+        -m_2gL \\
+        0
+        \end{array} \right],
+    \end{array} \\ \\
+    \newline
+    \begin{array}{cc}
+        \mathbf{q} =
+        \left[ \begin{array}{c}
+        \varphi \\
+        \theta \\
+        \end{array} \right],
+        &
+        \mathbf{u} =
+        \left[ \begin{array}{c}
+        -M \\
+        M \\
+        \end{array} \right]
+    \end{array} \\ \\
+    \newline
+\end{array}
 $$
 
 %---------------------------------------------------------------------------------------------
@@ -466,7 +467,7 @@ Zadaniem algorytmu jest utrzymanie wychylenia wahadła w okolicy punktu równowa
 	\caption{Schemat sterowania z wykorzystaniem jednego regulatora PID}
 \end{figure}
 
-W symulacji bloczki \texttt{gain} służą do przeliczenia radianów na stopnie oraz radiany na sekundę na liczbę obrotów na minutę. Są to jednostki bardziej przystępne i łatwiej sobie wyobrazić z jaką wartością mamy do czynienia.
+W symulacji bloczki \texttt{gain} służą do przeliczenia radianów na stopnie oraz radiany na sekundę na liczbę obrotów na minutę.
 
 Parametry regulatora wyznaczone zostały eksperymentalnie i prezentują się następująco
 \begin{table}[h!]
@@ -490,7 +491,7 @@ Parametry regulatora wyznaczone zostały eksperymentalnie i prezentują się nas
 \end{table}
 
 \begin{figure}
-    Wizualizację tego jak zachowuje się wahadło podczas implementacji algorytmu i strojenia regulatora, daje prosta animacja pozycji kół oraz wychylenia wahadła. Na obrazku widzimy, że pomimo utrzymanego wychylenia wahadła w zadanej pozycji, położenie obiektu dryfuje w nieskończoność przy nieskończonym czasie symulacji.
+    Wizualizację tego jak zachowuje się wahadło podczas implementacji algorytmu i strojenia regulatora, daje prosta animacja pozycji kół oraz wychylenia wahadła. Na obrazku widzimy, że pomimo utrzymanego wychylenia wahadła w zadanej pozycji, położenie zmienia się w czasie.
     \\ 
     \begin{center}
         \includegraphics[width=0.9\textwidth]{Rysunki/Rozdzial02/Pojedynczy_PID_animacja.png}
@@ -571,7 +572,7 @@ Dla kaskadowego połączenia regulatorów, nastawy również zostały dobrane ek
 \end{figure}
 
 \begin{figure}[h!]
-    Jednym z efektów ubocznych zastosowania bardziej skomplikowanego układu regulacji jest wydłużenie samego czasu stabilizacji kąta wychylenia wahadła, co jest widoczne na wykresie.
+    Jednym z efektów ubocznych zastosowania bardziej skomplikowanego układu regulacji jest wydłużenie samego czasu stabilizacji kąta wychylenia wahadła, co jest widoczne na wykresie \ref{Wykresy PID2}
     \\ \\ 
     \begin{center}
         \includegraphics[width=0.9\textwidth]{Rysunki/Rozdzial02/Podwojny_PID_wykresy.png}

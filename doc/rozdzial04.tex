@@ -11,7 +11,7 @@ Z racji tego, że każdy z omówionych czujników ruchu posiada swoje niedoskona
 %----------------------------------------------------------------------------------------------------------------
 \section{Filtr komplementarny}
 
-Jednym z łatwiejszych w implementacji filtrów używanych do fuzji dwóch lub większej ilości sygnałów, jest filtr komplementarny. Zasada działania tego filtra opiera się o filtr dolno i górno przepustowy, za pomocą których eliminujemy zakłócenia wolno i szybko zmienne. Przedstawiony poniżej algorytm filtra komplementarnego opracowano w oparciu o artykuł \cite{Komplementarny2}. Schemat filtra znajduje się na rysunku \ref{filtr komplementarny}
+Jednym z łatwiejszych w implementacji filtrów używanych do fuzji dwóch lub większej ilości sygnałów, jest filtr komplementarny. Zasada działania tego filtra opiera się o filtr dolno i górno przepustowy, za pomocą których eliminujemy zakłócenia wolno i szybko zmienne. Przedstawiony poniżej algorytm filtra komplementarnego opracowano w oparciu o artykuł \cite{Komplementarny2}. Schemat filtra znajduje się na rysunku \ref{filtr komplementarny}.
 
 \begin{figure}[h!]
     \centering
@@ -20,7 +20,7 @@ Jednym z łatwiejszych w implementacji filtrów używanych do fuzji dwóch lub w
     \label{filtr komplementarny}
 \end{figure}
 
-dla którego
+Przyjęto oznaczenia:
 
 $\alpha_s$ -- pomiar kąta obarczony szybko-zmiennymi zakłóceniami
 
@@ -134,7 +134,7 @@ $\beta$ -- parametr dostrajający filtr wyznaczany eksperymentalnie
 %----------------------------------------------------------------------------------------------------------------
 \section{Filtr Kalmana}
 
-Celem przedstawionej tutaj implementacji filtra Kalmana, jest uzyskanie odchylenia kątowego, w oparciu o wartości odchylenia kątowego obliczonego na podstawie pomiarów pochodzących z akcelerometru, oraz prędkości kątowej zmierzonej przez żyroskop. Wartość na wyjściu filtra powinna być pozbawiona zakłóceń szybko oraz wolno zmiennych, które wynikają z zasady działania oraz sposobu obliczeń dla akcelerometru i żyroskopu. Zmienne wejściowe oraz wyjściowe dla filtra Kalmana przedstawiono na rysunku \ref{Kalman idea}. Parametrami, które decydują o charakterystyce sygnału wyjściowego są: $q$ -- wariancja procesu, oraz $r$ -- wariancja pomiaru. Są to parametry wyznaczane eksperymentalnie. Dokładniejszy opis i zasadę działania algorytmu, można znaleźć w pracy \cite{Kalman} poświęconej w pełni filtrowi Kalmana, na podstawie, której powstał poniższy opis algorytmu.
+Celem przedstawionej tutaj implementacji filtra Kalmana, jest uzyskanie odchylenia kątowego, w oparciu o wartości odchylenia kątowego obliczonego na podstawie pomiarów pochodzących z akcelerometru, oraz prędkości kątowej zmierzonej przez żyroskop. Wartość na wyjściu filtra powinna być pozbawiona zakłóceń szybko oraz wolno zmiennych, które wynikają z zasady działania oraz sposobu obliczeń dla akcelerometru i żyroskopu. Zmienne wejściowe oraz wyjściowe dla filtra Kalmana przedstawiono na rysunku \ref{Kalman idea}. Parametrami, które decydują o charakterystyce sygnału wyjściowego są: $q$ -- wariancja procesu, oraz $r$ -- wariancja pomiaru. Są to parametry wyznaczane eksperymentalnie. Dokładniejszy opis i zasadę działania algorytmu, można znaleźć w pracy \cite{Kalman} poświęconej w pełni filtrowi Kalmana, na podstawie której powstał poniższy opis algorytmu.
 
 \begin{figure}[h!]
     \centering

@@ -2,7 +2,7 @@
 
 Celem tego rozdziału jest ukazanie, w jaki sposób zastosować odczyty prędkości kątowych, wartości przyspieszenia ziemskiego oraz natężenia ziemskiego pola magnetycznego, w poszczególnych osiach, tak aby uzyskać wartości kątów RPY, które wykorzystuje się do opisu rotacji względem układu XYZ. 
 
-Przy niektórych obliczeniach, konieczne będzie dokonanie dodatkowych rotacji układu bazowego lub wektora względem, którego mierzymy rotację. W tym celu zastosowano macierze obrotów, których zapis dodatkowo uproszczono wprowadzając następujące oznaczenia
+Przy niektórych obliczeniach konieczne będzie dokonanie dodatkowych rotacji układu bazowego lub wektora, względem którego mierzymy rotację. W tym celu zastosowano macierze obrotów, których zapis dodatkowo uproszczono wprowadzając następujące oznaczenia
 $$
     \begin{array}{ccc}
         s_{\varphi} = sin\varphi, & s_{\theta} = sin\theta, & s_{\psi} = sin\psi \\
@@ -155,7 +155,7 @@ Mając przybliżone rozwiązanie równania różniczkowego, możemy obliczyć el
     \end{array}
 \end{equation}
 
-Z racji, tego że korzystamy z przybliżonego rozwiązania równania różniczkowego, wyznaczanego w sposób iteracyjny występuje problem normalizacji macierzy \textbf{R}. Problem ten został jednak pominięty ze względu na osiągnięta zadowalająca dokładność wyznaczanej rotacji na podstawie takiej, która nie zawsze jest znormalizowana.
+Z racji, tego że korzystamy z przybliżonego rozwiązania równania różniczkowego, wyznaczanego w sposób iteracyjny występuje problem normalizacji macierzy \textbf{R}. Problem ten został jednak pominięty ze względu na osiągniętą zadowalającą dokładność wyznaczanych kątów RPY, na podstawie nieznormalizowanej macierzy rotacji.
 
 %----------------------------------------------------------------------------------------------------------------
 \section{Akcelerometr}

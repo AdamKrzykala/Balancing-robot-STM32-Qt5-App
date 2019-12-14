@@ -1,0 +1,6 @@
+(sym_lib_table
+  (lib (name esp8266-01)(type Legacy)(uri ${KIPRJMOD}/biblioteki/esp8266-01.lib)(options "")(descr ""))
+  (lib (name hc-05)(type Legacy)(uri ${KIPRJMOD}/biblioteki/hc-05.lib)(options "")(descr ""))
+  (lib (name lm2596)(type Legacy)(uri ${KIPRJMOD}/biblioteki/lm2596.lib)(options "")(descr ""))
+  (lib (name mpu-6050)(type Legacy)(uri ${KIPRJMOD}/biblioteki/mpu-6050.lib)(options "")(descr ""))
+)

@@ -1,6 +1,7 @@
 \chapter{Aplikacja do wizualizacji danych sensorycznych i komunikacji z robotem}
+\label{chap:aplikacja}
 
-Tak, aby ułatwić proces strojenia filtrów oraz regulatorów PID stworzono aplikację, którą wyposażono dodatkowo w graficzną reprezentację danych pochodzących z robota w postaci wykresów i wizualizacji 3D. Pozwoliło to, wyeliminować problem, polegający na konieczności wgrywania za każdym razem nowego programu do mikrokontrolera sterującego robotem, w celu zmiany któregokolwiek z parametrów oraz pozwoliło wykryć błędy na etapie implementacji fuzji sygnałów.
+W celu ułatwienia procesu strojenia filtrów oraz regulatorów PID stworzono aplikację, którą wyposażono dodatkowo w graficzną reprezentację danych pochodzących z robota w postaci wykresów i wizualizacji 3D. Pozwoliło to wyeliminować problem polegający na konieczności wgrywania za każdym razem nowego programu do mikrokontrolera sterującego robotem w celu zmiany któregokolwiek z parametrów oraz pozwoliło wykryć błędy na etapie implementacji fuzji sygnałów.
 
 %----------------------------------------------------------------------------------------------------------------
 \section{Struktura programu}
@@ -35,7 +36,7 @@ służących do ustawiania parametrów transmisji, oraz
 \end{itemize}
 za pomocą, których zaimplementowano transmisję dwukierunkową z robotem.
 
-Odbieranie i przetwarzanie danych odbywa się na zasadzie przerwania, którego obsługa wykonywana jest po wykryciu sygnału \texttt{readyRead()} generowanego przez obiekt klasy \texttt{QSerialPort} po odebraniu całej ramki danych. Odebrane dane są odpowiednio parsowane, i wyświetlane w odpowiednich miejscach.
+Odbieranie i przetwarzanie danych odbywa się na zasadzie przerwania, którego obsługa wykonywana jest po wykryciu sygnału \texttt{readyRead()} generowanego przez obiekt klasy \texttt{QSerialPort} po odebraniu całej ramki danych. Odebrane dane są odpowiednio parsowane i wyświetlane w odpowiednich miejscach.
 
 %----------------------------------------------------------------------------------------------------------------
 \subsection{Wyświetlanie danych dotyczących czujnika ruchu i fuzji sygnałów}
@@ -61,7 +62,7 @@ Cały interfejs graficzny został podzielony na dwa główne okna. Pierwsze z ni
 %----------------------------------------------------------------------------------------------------------------
 \subsection{Okno łączenia}
 
-Okno podzielone jest na 3 główne obszary, których rozmieszczenie zaprezentowano na rysunku \ref{Okno laczenie koncepcja}.
+Okno podzielone jest na trzy główne obszary, których rozmieszczenie zaprezentowano na rysunku \ref{Okno laczenie koncepcja}.
 W pierwszym obszarze okna oznaczonym numerem 1 na rysunku \ref{Okno laczenie koncepcja}, znajdują się rozwijane opcje dotyczące portu szeregowego, z którego odczytywane są dane pochodzące z robota w postaci bitowej ramki danych. Do stworzenia rozwijanych list wykorzystano klasę \texttt{QComboBox}.
 
 W obszarze drugim użytkownik aplikacji ma do dyspozycji trzy przyciski:
@@ -71,7 +72,7 @@ W obszarze drugim użytkownik aplikacji ma do dyspozycji trzy przyciski:
     \item Rozłącz -- rozłącza się z aktualnie połączonym portem
 \end{itemize}
 
-Obszar trzeci jest konsolą służącą do wyświetlania komunikatów dla użytkownika. Jest to obiekt stworzony za pomocą klasy \texttt{QTextBrowser}. Ponadto w oknie dostępne są dwa przyciski: "Anuluj" oraz "Dalej". Pierwszy z nich kończy działanie aplikacji, natomiast drugi, po poprawnym nawiązaniu połączenia otwiera główne okno aplikacji.
+Obszar trzeci jest konsolą służącą do wyświetlania komunikatów dla użytkownika. Jest to obiekt stworzony za pomocą klasy \texttt{QTextBrowser}. Ponadto w oknie dostępne są dwa przyciski: ,,Anuluj'' oraz ,,Dalej''. Pierwszy z nich kończy działanie aplikacji, natomiast drugi, po poprawnym nawiązaniu połączenia otwiera główne okno aplikacji. Rzeczywisty wygląd okna łączenia z robotem, widoczny jest na zrzucie ekranu \ref{Okno laczenie}.
 
 \begin{figure}[h!]
     \centering
@@ -79,8 +80,6 @@ Obszar trzeci jest konsolą służącą do wyświetlania komunikatów dla użytk
     \caption{Rozmieszczenie elementów w oknie do łączenia z robotem}
     \label{Okno laczenie koncepcja}
 \end{figure}
-
-Rzeczywisty wygląd okna łączenia z robotem, widoczny jest na zrzucie ekranu \ref{Okno laczenie}.
 
 %----------------------------------------------------------------------------------------------------------------
 \subsection{Główne okno}
@@ -96,7 +95,7 @@ W trzecim obszarze znajduje się obiekt graficzny stworzony z wykorzystaniem kla
     \item Panel sterowania -- aktualne nastawy regulatorów PID oraz możliwość ich edycji, podgląd zmiennych odbieranych z robota, możliwość zmiany parametrów związanych z algorytmami fuzji sygnałów, wybranie filtru aktualnie biorącego udział w algorytmie sterowania
 \end{itemize}
 
-W obszarze numer cztery, użytkownik ma podgląd na aktualną orientację robota wyświetlaną w środowisku \texttt{OpenGL}, na podstawie odebranych kątów RPY obliczonych przez mikrokontroler robota. Zaraz poniżej w obszarze numer pięć użytkownik ma dostęp do panelu sterowania za pomocą, którego możliwe jest wymuszenie poruszania się robota w przód-tył oraz prawo-lewo, za pomocą czterech strzałek. Dodatkowo stworzono przycisk awaryjny, który po naciśnięciu przesyła do robota informację o tym, aby wyłączył napęd. Tak, aby możliwe było zmienianie aktualnej prędkości zadanej robota, wykorzystano do tego suwak stworzony za pomocą klasy \texttt{QSlider}, oraz podgląd za pomocą klasy \texttt{QLCDNumber}.
+W obszarze numer cztery, użytkownik ma podgląd na aktualną orientację robota wyświetlaną w środowisku \texttt{OpenGL}, na podstawie odebranych kątów RPY obliczonych przez mikrokontroler robota. Zaraz poniżej w obszarze numer pięć użytkownik ma dostęp do panelu sterowania za pomocą, którego możliwe jest wymuszenie poruszania się robota w przód-tył oraz prawo-lewo, za pomocą czterech strzałek. Dodatkowo stworzono przycisk awaryjny, który po naciśnięciu przesyła do robota informację o tym, aby wyłączył napęd. Tak, aby możliwe było zmienianie aktualnej prędkości zadanej robota, wykorzystano do tego suwak stworzony za pomocą klasy \texttt{QSlider}, oraz podgląd za pomocą klasy \texttt{QLCDNumber}. Rzeczywisty wygląd okna zobaczyć, można na zrzutach ekranu, \ref{Okno panel}, \ref{Okno fuzja}, \ref{Okno zyro}.
 
 Na samym dole okna zdefiniowano przyciski z następującymi funkcjami:
 \begin{itemize}
@@ -115,14 +114,13 @@ Na samym dole okna zdefiniowano przyciski z następującymi funkcjami:
     \label{Okno glowne}
 \end{figure}
 
-Rzeczywisty wygląd okna zobaczyć, można na zrzutach ekranu, \ref{Okno panel}, \ref{Okno fuzja}, \ref{Okno zyro}.
-
+\newpage
 %----------------------------------------------------------------------------------------------------------------
 \section{Zrzuty ekranu}
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.75\textwidth]{Rysunki/Rozdzial06/Okno_laczenia.png}
+    \includegraphics[width=1\textwidth]{Rysunki/Rozdzial06/Okno_laczenia.png}
     \caption{Okno do łączenia się z robotem}
     \label{Okno laczenie}
 \end{figure}

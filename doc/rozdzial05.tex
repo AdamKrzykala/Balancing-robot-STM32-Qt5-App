@@ -39,15 +39,15 @@ Kolejnym etapem, było zaprojektowanie korpusu, który zdecydowano się wykonać
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.5\textwidth]{Rysunki/Rozdzial05/rama.png}
+    \includegraphics[width=0.55\textwidth]{Rysunki/Rozdzial05/rama.png}
     \caption{Wyrenderowany wygląd zaprojektowanego korpusu}
     \label{render}
 \end{figure}
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.5\textwidth]{Rysunki/Rozdzial05/smallWall.png}
-    \includegraphics[width=0.5\textwidth]{Rysunki/Rozdzial05/bigWall.png}
+    \includegraphics[width=0.55\textwidth]{Rysunki/Rozdzial05/smallWall.png}
+    \includegraphics[width=0.55\textwidth]{Rysunki/Rozdzial05/bigWall.png}
     \caption{Rysunki wykonawcze elementów korpusu}
     \label{rysunki wykonawcze}
 \end{figure}
@@ -260,7 +260,7 @@ Oprogramowanie na mikrokontroler napisane zostało w oparciu o darmową dystrybu
 
 \begin{figure}[h!]
     \centering
-    \includegraphics[width=0.75\textwidth]{Rysunki/Rozdzial05/Software.png}
+    \includegraphics[width=0.6\textwidth]{Rysunki/Rozdzial05/Software.png}
     \caption{Struktura podziału programu na wątki}
     \label{Watki}
 \end{figure}
@@ -384,7 +384,7 @@ Wartość preskalera dla zadanej prędkości obrotowej 100RPM, częstotliwości 
 $$
     PSC = \frac{32MHz * 375ms}{ARR + 1} - 1 = 23
 $$
-Wartość preskalera obliczamy analogicznie dla innych wartości zadanej prędkości obrotwej.
+Wartość preskalera obliczamy analogicznie dla innych wartości zadanej prędkości obrotowej.
 
 %----------------------------------------------------------------------------------------------------------------
 \subsection{Komunikacja bezprzewodowa z komputerem}
@@ -422,7 +422,7 @@ Za komunikację z komputerem odpowiedzialny jest wątek o nazwie \texttt{USART\_
 \end{table}
 gdzie CRC jest cyklicznym kodem nadmiarowym służącym do kontroli poprawności odebranej ramki po stronie komputera.
 
-Parsowanie danych z komputera odbywa się w obsłudze przerwania, wywoływanego przez interfejs UART w momencie odebrania danych. Odebrane dane są do ramką, której budowa przedstawiona została w postaci tabeli \ref{Ramka odebrana}f.
+Parsowanie danych z komputera odbywa się w obsłudze przerwania, wywoływanego przez interfejs UART w momencie odebrania danych. Odebrane dane są do ramką, której budowa przedstawiona została w postaci tabeli \ref{Ramka odebrana}.
 
 \begin{table}[h!]
     \centering
@@ -447,8 +447,14 @@ Parsowanie danych z komputera odbywa się w obsłudze przerwania, wywoływanego 
     \label{Ramka odebrana}
 \end{table}
 
+\newpage
 %----------------------------------------------------------------------------------------------------------------
 \subsection{Fotografie}
 
-\textcolor{red}{DOŁĄCZYĆ FOTOGRAFIE ROBOTA}
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Rysunki/Rozdzial05/Robot_przod.JPG}
+    \includegraphics[width=0.9\textwidth]{Rysunki/Rozdzial05/Robot_tyl.JPG}
+    \caption{Fotografie robota w trakcie balansowania}
+\end{figure}
 %----------------------------------------------------------------------------------------------------------------
